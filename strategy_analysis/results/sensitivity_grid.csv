@@ -1,0 +1,37 @@
+levels,min_leg_atr,fresh_level,require_bos,generated,recall,precision,f1,bt_avg_R
+both,2.0,True,False,447,0.568,0.318,0.407,0.085
+both,1.5,True,True,392,0.52,0.332,0.405,0.138
+both,2.0,True,True,350,0.476,0.34,0.397,0.091
+both,2.5,True,False,347,0.472,0.34,0.395,0.084
+fvg choice,2.0,True,False,405,0.508,0.314,0.388,0.072
+both,2.5,True,True,281,0.408,0.363,0.384,0.11
+both,1.5,True,False,545,0.608,0.279,0.382,0.031
+both,2.0,False,True,433,0.52,0.3,0.381,0.009
+both,2.5,False,False,448,0.528,0.295,0.378,-0.007
+both,2.5,False,True,373,0.468,0.314,0.376,0.024
+both,1.5,False,True,464,0.536,0.289,0.375,0.058
+both,2.0,False,False,526,0.58,0.276,0.374,0.032
+fvg choice,2.5,True,False,299,0.404,0.338,0.368,0.09
+fvg choice,1.5,True,True,349,0.436,0.312,0.364,0.112
+fvg choice,2.0,True,True,308,0.4,0.325,0.358,0.091
+0.79 only,2.0,True,False,406,0.468,0.288,0.357,0.015
+fvg choice,2.5,True,True,240,0.348,0.362,0.355,0.075
+fvg choice,2.5,False,False,416,0.472,0.284,0.354,0.019
+fvg choice,1.5,True,False,518,0.54,0.261,0.352,-0.006
+fvg choice,2.0,False,True,400,0.456,0.285,0.351,0.01
+fvg choice,2.0,False,False,505,0.528,0.261,0.35,0.002
+fvg choice,2.5,False,True,339,0.412,0.304,0.35,0.012
+fvg choice,1.5,False,True,430,0.472,0.274,0.347,0.028
+0.79 only,1.5,True,True,350,0.416,0.297,0.347,0.103
+0.79 only,2.5,True,False,304,0.384,0.316,0.347,0.082
+0.79 only,1.5,False,True,427,0.456,0.267,0.337,0.028
+0.79 only,2.0,True,True,310,0.376,0.303,0.336,0.068
+0.79 only,1.5,True,False,520,0.516,0.248,0.335,-0.025
+both,1.5,False,False,587,0.56,0.239,0.335,0.043
+0.79 only,2.0,False,True,397,0.432,0.272,0.334,0.013
+0.79 only,2.5,True,True,244,0.328,0.336,0.332,0.057
+0.79 only,2.5,False,False,412,0.44,0.267,0.332,0.012
+0.79 only,2.0,False,False,495,0.492,0.248,0.33,0.018
+0.79 only,2.5,False,True,337,0.388,0.288,0.33,0.003
+fvg choice,1.5,False,False,583,0.524,0.225,0.315,0.003
+0.79 only,1.5,False,False,581,0.504,0.217,0.303,0.028

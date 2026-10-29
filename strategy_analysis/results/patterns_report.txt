@@ -1,0 +1,113 @@
+Trades with inferred direction: 213 of 250
+             n  loss_rate  avg_rr  fib_0705
+direction                                  
+long       108      0.120   2.734     0.389
+short      105      0.124   2.724     0.410
+
+== Condition prevalence (share of trades where it holds) ==
+                                                          condition   n  all longs shorts non-losers losers loss rate if true loss rate if false
+                                               entry 02:00-09:30 ET 213 100%  100%   100%       100%   100%               12%                n/a
+                               journal: OB or FVG confluence logged 213  95%   95%    94%        95%    92%               12%                18%
+                                      journal: OB confluence logged 213  86%   89%    83%        86%    88%               13%                10%
+                                    journal: aligned with trend = Y 213  82%   84%    79%        82%    77%               11%                15%
+                    entry 15m candle closes back in trade direction 213  80%   84%    75%        85%    42%                6%                35%
+                     leg broke prior 15M swing (BOS) before retrace 211  79%   81%    77%        78%    88%               14%                 7%
+entry at logged fib of most recent unbroken 15M swing leg (+/-0.05) 212  77%   75%    79%        74%    96%               15%                 2%
+                                any FVG or OB (15m/30m/1h) at entry 213  74%   80%    68%        73%    81%               13%                 9%
+                15m RSI on pullback side of 50 (long<50 / short>50) 213  62%   62%    63%        63%    62%               12%                12%
+                  15m BB %b on pullback side (long<0.5 / short>0.5) 213  60%   61%    59%        61%    50%               10%                15%
+                       entry on premium/discount side of 00:00 open 213  59%   57%    61%        59%    58%               12%                13%
+                entry 15m candle has rejection wick >= 30% of range 213  58%   68%    48%        60%    38%                8%                18%
+                                       15m EMA50 sloping with trade 213  57%   66%    49%        56%    65%               14%                10%
+                             15m MACD hist against trade (pullback) 213  56%   62%    50%        58%    46%               10%                15%
+                       entry on premium/discount side of 18:00 open 213  54%   45%    62%        53%    54%               12%                12%
+                                        1h EMA50 sloping with trade 213  54%   63%    44%        54%    50%               11%                13%
+                                   entry on trade side of 1h EMA200 213  53%   68%    38%        52%    58%               13%                11%
+                                                4h trend with trade 213  51%   64%    38%        50%    58%               14%                11%
+                                                1h trend with trade 213  51%   59%    42%        51%    50%               12%                12%
+                                             daily trend with trade 213  50%   72%    27%        50%    46%               11%                13%
+                                  entry on trade side of 15m EMA200 213  46%   55%    37%        46%    46%               12%                12%
+                                    entry on trade side of 1h EMA50 213  46%   56%    35%        47%    42%               11%                13%
+                      15m trend with trade (close vs EMA50 + slope) 213  46%   51%    40%        44%    54%               14%                10%
+                                     15m order block at entry price 212  35%   40%    31%        35%    38%               13%                12%
+                                    leg anchor swept Asian high/low 212  35%   34%    37%        35%    35%               12%                12%
+                                     30m order block at entry price 212  33%   41%    26%        32%    42%               15%                11%
+                                     journal: FVG confluence logged 213  32%   31%    33%        32%    35%               13%                12%
+                 15m stoch in pullback extreme (long<30 / short>70) 213  26%   23%    30%        27%    19%                9%                13%
+                        15m FVG (in trade direction) at entry price 212  24%   23%    25%        24%    23%               12%                12%
+                                journal: key open confluence logged 213  24%   22%    26%        23%    31%               16%                11%
+                             leg anchor swept previous-day high/low 212  22%   18%    26%        21%    27%               15%                11%
+                                      1h order block at entry price 212  18%   25%    11%        18%    19%               13%                12%
+                                             30m FVG at entry price 212  11%   10%    12%        12%     4%                4%                13%
+                                              1h FVG at entry price 212   8%    6%    11%         8%    12%               17%                12%
+
+== Fib leg geometry ==
+       leg_size_pts  leg_minutes  mins_since_extreme  fib_ratio_at_entry
+count        163.00       163.00              163.00              163.00
+mean         142.66       130.11              103.08                0.75
+std           99.25       124.20              116.03                0.04
+min           36.30         2.00                2.00                0.66
+25%           81.50        58.50               34.50                0.70
+50%          118.60        82.00               63.00                0.79
+75%          175.95       153.50              126.00                0.79
+max          979.60       769.00              825.00                0.83
+leg size in 15m ATRs: count    163.00 | mean       3.82 | std        2.12 | min        1.67 | 25%        2.52 | 50%        3.36 | 75%        4.48 | max       18.84
+
+== Stop placement ==
+Loss  n= 26  stop pts median 19.7  stop/leg 0.152 (IQR 0.132-0.163)  stop/ATR15 0.54 (IQR 0.40-0.61)  stop fib coord 0.909
+Win   n=154  stop pts median 17.6  stop/leg 0.141 (IQR 0.121-0.163)  stop/ATR15 0.48 (IQR 0.34-0.63)  stop fib coord 0.903
+BE    n= 33  stop pts median 20.4  stop/leg 0.141 (IQR 0.133-0.162)  stop/ATR15 0.60 (IQR 0.38-0.77)  stop fib coord 0.923
+fib 0.705: stop fib coord median 0.840 (IQR 0.826-0.859), stop/leg 0.136, stop beyond anchor pts -17.5
+fib 0.79: stop fib coord median 0.936 (IQR 0.919-0.952), stop/leg 0.145, stop beyond anchor pts -8.0
+Coefficient of variation (lower = more rule-like): stop pts 0.51, stop/leg 0.23, stop/ATR15 0.43
+
+== Exit logic ==
+RR achieved (wins): count    154.00 | mean       3.45 | std        1.40 | min        2.00 | 25%        2.36 | 50%        3.09 | 75%        4.20 | max        8.26
+MFE of BE trades: count    33.00 | mean      2.35 | std       0.32 | min       1.69 | 25%       2.09 | 50%       2.27 | 75%       2.58 | max       2.93
+MFE of losing trades: count    26.00 | mean      0.86 | std       0.58 | min       0.00 | 25%       0.39 | 50%       0.88 | 75%       1.40 | max       1.77
+Win exit fib coordinate (0 = leg extreme, <0 extension): count    154.00 | mean       0.26 | std        0.26 | min       -1.18 | 25%        0.15 | 50%        0.34 | 75%        0.44 | max        0.74
+Nearest liquidity level to the winning exit:
+target_nearest_level
+fib0_extreme    50
+open_0000       20
+asia_high       19
+open_1800       14
+asia_low        14
+pdh             11
+london_low       7
+london_high      7
+fib_-0.27        6
+fib_-0.5         3
+pdl              3
+distance of exit to that level (R): count    154.00 | mean       1.13 | std        1.12 | min        0.00 | 25%        0.34 | 50%        0.77 | 75%        1.60 | max        7.16
+Holding minutes by result: result | BE      17.0 | Loss    18.0 | Win     25.0
+
+== Time ==
+entries by hour: entry_et | 2    32 | 3    32 | 4    30 | 5    26 | 6    23 | 7    30 | 8    33 | 9     7
+loss rate by hour: h | 2    0.09 | 3    0.19 | 4    0.07 | 5    0.08 | 6    0.17 | 7    0.17 | 8    0.12 | 9    0.00
+loss rate by weekday: dow | Fri    0.08 | Mon    0.09 | Thu    0.17 | Tue    0.19 | Wed    0.06
+loss rate news day vs not: news_day | False    0.14 | True     0.10
+
+== Winners vs losers: numeric medians ==
+outcome                           loss  non-loss
+fib_ratio_at_entry                0.77      0.79
+leg_size_pts                    130.20    129.40
+leg_minutes                      92.50     95.00
+mins_since_extreme               70.50     63.00
+stop_pts_est                     19.73     17.79
+stop_atr15                        0.54      0.51
+15m_rsi14                        49.10     50.40
+15m_stoch_k                      49.90     50.60
+15m_bb_pctb                       0.58      0.49
+1h_rsi14                         48.10     52.80
+15m_atr14                        35.80     36.10
+pos_in_overnight_range            0.42      0.57
+rating                            7.00      7.00
+15m_rsi14_dirnorm                48.70     47.20
+15m_stoch_k_dirnorm              54.95     47.90
+15m_bb_pctb_dirnorm               0.48      0.40
+pos_in_overnight_range_dirnorm    0.40      0.33
+
+== Candle patterns ==
+entry 15m bar: entrybar15_pattern | bull_candle          74 | bear_candle          67 | bullish_pin          23 | bearish_pin          17 | bullish_engulfing    13 | bearish_engulfing    12 | doji                  7
+prev 15m bar: prev15_pattern | bull_candle          67 | bear_candle          58 | inside_bar           22 | bullish_pin          16 | bullish_engulfing    16 | bearish_engulfing    13 | bearish_pin          12 | doji                  9

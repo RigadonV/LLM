@@ -1,0 +1,8 @@
+group,variant,journal_trades,generated,matched,recall,precision,missed,extra,extra_on_unlogged_days,loss_vs_nonloss_agreement,bt_win_rate,bt_loss_rate,bt_avg_R,median_abs_dt_min,bt_avg_R_on_matched,journal_avg_R_on_matched
+entry rules (refinement rounds),baseline,250,581,126,0.504,0.217,124,455,125,0.73,0.231,0.664,0.028,0.0,0.786,2.135
+entry rules (refinement rounds),refine1_fresh_level_bigger_legs,250,406,117,0.468,0.288,133,289,76,0.752,0.227,0.665,0.015,0.0,0.692,2.014
+entry rules (refinement rounds),refine2_both_levels,250,447,142,0.568,0.318,108,305,87,0.69,0.251,0.667,0.085,0.0,0.669,2.404
+exit alternatives on the final entry rules,exit_2R_noBE,250,460,147,0.588,0.32,103,313,91,0.701,0.324,0.676,-0.028,0.0,0.449,2.354
+exit alternatives on the final entry rules,exit_3R_BE_at_2R,250,447,142,0.568,0.318,108,305,87,0.69,0.251,0.667,0.085,0.0,0.669,2.404
+exit alternatives on the final entry rules,exit_3R_noBE,250,445,142,0.568,0.319,108,303,87,0.62,0.263,0.737,0.052,0.0,0.662,2.404
+exit alternatives on the final entry rules,exit_fib0_min2R,250,400,133,0.532,0.333,117,267,84,0.496,0.182,0.815,0.116,0.0,0.789,2.319
