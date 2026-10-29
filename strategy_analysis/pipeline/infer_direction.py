@@ -7,8 +7,8 @@ For a candidate direction the entry price is pinned down by the trade window:
 That implied price must sit inside the candles at the logged entry minute, and the rest of the
 journal row must then be consistent with the path price took:
     Loss : stop distance (1R) ~= MAE, favourable move before the stop ~= MFE x MAE
-    Win/BE: favourable move by the exit = RR x R with R > MAE (the stop was never hit). The journal's
-            "BE" is a stats-sheet class (closed at 1.7-2.9R, never reached 2.98R), not a scratch trade.
+    Win/BE: favourable move by the logged time = RR x R with R > MAE (the stop was never hit). For "BE"
+            trades RR is the peak (~2R, below 2.98R) before the stop, moved to entry at 2R, was hit later.
 Only the true direction (and the true timezone) passes these tests consistently.
 """
 import argparse
@@ -65,8 +65,8 @@ def direction_error(m1, tr, t0, d):
             fav_before = max(0.0, s * ((core[fav_col].max() if d == "long" else core[fav_col].min()) - e))
             err = abs(fav_before - tr.mfe_r * r) - 0.25 * r
         else:
-            # Win and "BE" alike: the trade was closed at RR x R when the logged time ran out. The journal's
-            # "BE" label is a stats-sheet class (closed in profit but never reached 2.98R), not a scratch.
+            # Win and "BE" alike: price stood at RR x R at the logged time. For "BE" that is the peak
+            # (logged RR ~= MFE); the break-even exit at the entry price came afterwards.
             r = max(fav_run.max(), 0) / max(tr.rr, 0.1)
             err = max(0.0, tr.mae_pts + 0.5 - r) + max(0.0, MIN_R - r) + max(0.0, r - MAX_R)
         err = max(err, 0.0)

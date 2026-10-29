@@ -106,11 +106,22 @@ def build(journal, inf, m1, h1):
         if tr.result == "Loss":
             r_pts = tr.mae_pts
         else:
-            # Win and "BE" were both closed at RR x R at the logged exit time; "BE" is the journal's label for
-            # a profitable trade that never reached 2.98R (see infer_direction.py)
+            # Win and "BE" both stood at RR x R at the logged time (see infer_direction.py)
             r_pts = fav / tr.rr if tr.rr > 0 else np.nan
         stop = e - s * r_pts
-        exit_px = stop if tr.result == "Loss" else e + s * tr.rr * r_pts
+        exit_t = tr.exit_et
+        if tr.result == "Loss":
+            exit_px = stop
+        elif tr.result == "Win":
+            exit_px = e + s * tr.rr * r_pts
+        else:
+            # "BE": the stop was moved to entry at +2R (trader's checklist) and then hit. The logged time is
+            # when the trade peaked, so the exit is the first return to the entry after it (before 12:00).
+            exit_px = e
+            after = m1.loc[tr.exit_et: t0.normalize() + pd.Timedelta(hours=12)]
+            back = after.index[(after["low"] <= e) if s == 1 else (after["high"] >= e)]
+            exit_t = back[0] if len(back) else pd.NaT
+        row["exit_time_est"] = exit_t
         row.update({"stop_pts_est": round(r_pts, 2), "stop_price_est": round(stop, 2), "exit_price_est": round(exit_px, 2)})
         a15 = last_closed(frames["15m"], t0, "15m")
         row["stop_atr15"] = round(r_pts / a15["atr14"], 2)
@@ -167,7 +178,7 @@ def build(journal, inf, m1, h1):
                 row[f"fvg_{tf}_at_entry"] = zone_hit(fvgs(bars, d, z_start, z_end), e, tol=2.0)
                 row[f"ob_{tf}_at_entry"] = zone_hit(order_blocks(bars, d, z_start, z_end), e, tol=2.0)
             # target vs liquidity levels on the opposite side
-            if tr.result != "Loss" and r_pts > 0:
+            if tr.result == "Win" and r_pts > 0:
                 levels = {"fib0_extreme": leg["ext"], "asia_high": lv["asia_high"], "asia_low": lv["asia_low"],
                           "london_high": lv["london_high_so_far"], "london_low": lv["london_low_so_far"],
                           "pdh": lv["pdh"], "pdl": lv["pdl"], "open_0000": lv["open_0000"], "open_1800": lv["open_1800"],
@@ -197,11 +208,11 @@ def build(journal, inf, m1, h1):
             row["entrybar5_pattern"] = candle_pattern(m5.iloc[i5 - 1], m5.iloc[i5])
 
         # ---- exit context
-        bx = last_closed(frames["15m"], tr.exit_et + pd.Timedelta(minutes=15), "15m")
+        bx = last_closed(frames["15m"], (exit_t if pd.notna(exit_t) else tr.exit_et) + pd.Timedelta(minutes=15), "15m")
         if bx is not None:
             row["exit_15m_rsi14"] = round(bx["rsi14"], 1)
             row["exit_15m_px_vs_ema20"] = round((exit_px - bx["ema20"]) / bx["atr14"], 2)
-            row["exit_session"] = session_of(tr.exit_et)
+            row["exit_session"] = session_of(exit_t if pd.notna(exit_t) else tr.exit_et)
         rows.append(row)
     return pd.DataFrame(rows)
 
@@ -216,7 +227,7 @@ def main():
     m1 = load_prices("m1")
     h1 = load_h1_extended(m1)
     ctx = build(journal, inf, m1, h1)
-    for c in ("entry_et", "exit_et", "fib_anchor_time", "fib_extreme_time"):
+    for c in ("entry_et", "exit_et", "exit_time_est", "fib_anchor_time", "fib_extreme_time"):
         if c in ctx:
             ctx[c] = pd.to_datetime(ctx[c]).dt.strftime("%Y-%m-%d %H:%M")
     ctx.to_csv(args.out, index=False)

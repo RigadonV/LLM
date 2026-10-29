@@ -47,7 +47,7 @@ def naive(ts):
 
 def chart_trade(tr, m1, path, title_prefix=""):
     entry_t = pd.Timestamp(tr.entry_et).tz_localize(ET)
-    exit_t = pd.Timestamp(tr.exit_et).tz_localize(ET)
+    exit_t = pd.Timestamp(tr.exit_time_est if pd.notna(tr.exit_time_est) else tr.exit_et).tz_localize(ET)
     anchor_t = pd.Timestamp(tr.fib_anchor_time).tz_localize(ET) if pd.notna(tr.fib_anchor_time) else entry_t - pd.Timedelta(hours=3)
     start = max(anchor_t - pd.Timedelta(minutes=45), entry_t - pd.Timedelta(hours=10))
     end = exit_t + pd.Timedelta(minutes=max(60, 0.4 * tr.minutes))
@@ -85,7 +85,7 @@ def chart_trade(tr, m1, path, title_prefix=""):
     xe0, xe1 = naive(entry_t), naive(exit_t)
     ax.hlines(tr.stop_price_est, xe0, xe1, colors=CRITICAL, linewidth=1.6, zorder=6)
     ax.text(xe0, tr.stop_price_est, "Stop ", va="center", ha="right", fontsize=8, color=INK2)
-    if tr.result != "Loss":
+    if tr.result == "Win":
         ax.hlines(tr.exit_price_est, xe0, xe1, colors=GOOD, linewidth=1.6, zorder=6)
         ax.text(xe0, tr.exit_price_est, "Exit ", va="center", ha="right", fontsize=8, color=INK2)
     ax.scatter([xe0], [tr.entry_price_est], marker="^" if s == 1 else "v", s=110, color=INK, edgecolor=SURFACE,
@@ -113,11 +113,11 @@ def chart_trade(tr, m1, path, title_prefix=""):
     ax.set_xlim(naive(start), naive(end) + pd.Timedelta(minutes=20 if span_h <= 7 else 50))
 
     res = {"Win": f"Win +{tr.rr:.2f}R", "Loss": "Loss -1R",
-           "BE": f"closed +{tr.rr:.2f}R (journal 'BE': peak {tr.mfe_r:.2f}R < 3R)"}[tr.result]
+           "BE": f"BE (peaked +{tr.mfe_r:.2f}R, stopped at entry)"}[tr.result]
     fig.suptitle(f"{title_prefix}Trade #{tr.trade_id} - {tr.date} {tr.entry_et[-5:]} ET - {tr.direction} at {tr.fib_level:g} - {res}",
                  x=0.07, ha="left", fontsize=11.5, color=INK, fontweight="bold", y=0.985)
     sub = (f"Leg {tr.fib_anchor_time[-5:]} -> {tr.fib_extreme_time[-5:]} ({tr.leg_size_pts:.0f} pts), entry ratio {tr.fib_ratio_at_entry:.3f}; "
-           f"stop {tr.stop_pts_est:.1f} pts ({tr.stop_leg_frac:.2f} of leg); held {tr.minutes:.0f} min. "
+           f"stop {tr.stop_pts_est:.1f} pts ({tr.stop_leg_frac:.2f} of leg); held {(exit_t - entry_t).total_seconds() / 60:.0f} min. "
            f"Journal: OB {tag(tr.ob_tf)}, FVG {tag(tr.fvg_tf)}, trend aligned {tr.trend_aligned}") if pd.notna(tr.fib_anchor_price) else ""
     fig.text(0.07, 0.945, sub, ha="left", fontsize=8.5, color=INK2)
     def ema_label(n):
@@ -133,7 +133,7 @@ def chart_trade(tr, m1, path, title_prefix=""):
                 Line2D([], [], marker="^", color=INK, linestyle="", label="entry"),
                 Line2D([], [], marker="X", color=INK, linestyle="", label="exit"),
                 plt.Rectangle((0, 0), 1, 1, color=LONDON_BAND, label="02:00-05:00 ET")]
-    if tr.result != "Loss":
+    if tr.result == "Win":
         handles.insert(5, Line2D([], [], color=GOOD, linewidth=1.6, label="exit level (RR achieved)"))
     fig.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.065, 0.925), fontsize=7.5, frameon=False,
                ncol=len(handles), labelcolor=INK2, handlelength=1.6, columnspacing=1.2)

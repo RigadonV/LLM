@@ -12,6 +12,8 @@ Rules (all times New York):
   6. Exit: take profit at a fixed R multiple (or the leg extreme), stop moved to break-even once
      price reaches +BE_AT R; flat by EXIT_BY.
   7. One position at a time, each leg traded once, max trades per day.
+  Optional, from the trader's own checklist: 2 losses = done for the day, SL < 50 pts, trend filter
+  (15M or 1H EMA50 trend), and a 15M/30M/1H OB or FVG required at the entry.
 
 Data: Dukascopy USATECHIDXUSD (Nasdaq-100 CFD) 1-minute bid candles as a proxy for NQ futures.
 Run `python pipeline/fetch_data.py` first if data/ is empty.
@@ -29,7 +31,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "pipeline"))
-from common import RESULTS_DIR, atr, load_journal, load_prices, pivots, resample  # noqa: E402
+from common import RESULTS_DIR, atr, ema, load_journal, load_prices, pivots, resample  # noqa: E402
 
 
 @dataclass(frozen=True)
@@ -50,6 +52,11 @@ class Rules:
     min_target_r: float = 2.0
     max_trades_day: int = 5
     exit_by: float = 12.0          # flat by this hour if neither stop nor target is hit
+    # options mirroring the trader's own Model 2 checklist (0 / "none" / False = off)
+    max_losses_day: int = 0        # "2 losses = done for the day"
+    max_stop_pts: float = 0.0      # "SL < 50pts": skip legs whose stop would be wider
+    trend_filter: str = "none"     # "15m" / "1h": EMA50 trend of the last closed bar must agree
+    require_zone: bool = False     # "Either a HTF OB/FVG": a 15m/30m/1h OB or FVG formed in the leg covers the entry
 
 
 BASE = Rules()
@@ -65,6 +72,15 @@ EXIT_VARIANTS = {r.name: r for r in (
     Rules(**{**FINAL.__dict__, "name": "exit_3R_BE_at_2R"}),
     Rules(**{**FINAL.__dict__, "name": "exit_3R_noBE", "be_at_r": None}),
     Rules(**{**FINAL.__dict__, "name": "exit_fib0_min2R", "target_mode": "fib0", "be_at_r": None}),
+)}
+# the trader's stated checklist (TP 3R and BE at 2R are already the final rules' exits)
+CHECKLIST_RISK = Rules(**{**FINAL.__dict__, "name": "checklist_risk", "max_losses_day": 2, "max_stop_pts": 50.0})
+CHECKLIST_VARIANTS = {r.name: r for r in (
+    CHECKLIST_RISK,
+    Rules(**{**CHECKLIST_RISK.__dict__, "name": "checklist_risk_trend15m", "trend_filter": "15m"}),
+    Rules(**{**CHECKLIST_RISK.__dict__, "name": "checklist_risk_trend1h", "trend_filter": "1h"}),
+    Rules(**{**CHECKLIST_RISK.__dict__, "name": "checklist_risk_zone", "require_zone": True}),
+    Rules(**{**CHECKLIST_RISK.__dict__, "name": "checklist_risk_trend15m_zone", "trend_filter": "15m", "require_zone": True}),
 )}
 
 
@@ -103,6 +119,36 @@ class Market:
             if hi15[b] < lo15[b - 2]:
                 self.fvg["short"].append((formed, hi15[b], lo15[b - 2]))
         self.fvg = {d: np.array(v) for d, v in self.fvg.items()}
+        # EMA50 trend of the last closed 15M / 1H bar, per minute: +1 up, -1 down, 0 mixed
+        self.trend = {}
+        for tf, bars in (("15m", m15), ("1h", resample(m1, "1h"))):
+            e = ema(bars["close"], 50)
+            slope = e - e.shift(4)
+            tr = np.where((bars["close"] > e) & (slope > 0), 1, np.where((bars["close"] < e) & (slope < 0), -1, 0))
+            self.trend[tf] = pd.Series(tr, index=bars.index).shift(1).reindex(m1.index, method="ffill").fillna(0).values
+        # 15m/30m/1h FVGs and order blocks: (1m index when known, zone low, zone high)
+        zones = {"long": [], "short": []}
+        for rule in ("15min", "30min", "1h"):
+            bars = m15 if rule == "15min" else resample(m1, rule)
+            o_, h_, l_, c_ = (bars[k].values for k in ("open", "high", "low", "close"))
+            step = pd.Timedelta(rule)
+            for b in range(1, len(bars)):
+                known = pos(bars.index[b] + step)
+                if b >= 2 and l_[b] > h_[b - 2]:
+                    zones["long"].append((known, h_[b - 2], l_[b]))
+                if b >= 2 and h_[b] < l_[b - 2]:
+                    zones["short"].append((known, h_[b], l_[b - 2]))
+                if c_[b - 1] < o_[b - 1] and c_[b] > h_[b - 1]:
+                    zones["long"].append((known, l_[b - 1], h_[b - 1]))
+                if c_[b - 1] > o_[b - 1] and c_[b] < l_[b - 1]:
+                    zones["short"].append((known, l_[b - 1], h_[b - 1]))
+        self.zones = {d: np.array(v) for d, v in zones.items()}
+
+    def zone_covers(self, d, start_i, i, price, tol=2.0):
+        """Is there a 15m/30m/1h OB or FVG in direction d, known by i and formed since start_i, containing price?"""
+        z = self.zones[d]
+        m = (z[:, 0] >= start_i) & (z[:, 0] <= i) & (z[:, 1] - tol <= price) & (z[:, 2] + tol >= price)
+        return bool(m.any())
 
     def fvg_covers(self, d, start_i, i, price, tol=2.0):
         """Is there a 15M FVG in direction d, formed inside [start_i, i), whose zone contains price?"""
@@ -180,8 +226,8 @@ def backtest(mk, rules, start, end):
         iend = mk.t.searchsorted(day + pd.Timedelta(hours=rules.exit_by))
         if i1 - i0 < 60:
             continue
-        used_legs, n_day, i = set(), 0, i0
-        while i < i1 and n_day < rules.max_trades_day:
+        used_legs, n_day, losses, i = set(), 0, 0, i0
+        while i < i1 and n_day < rules.max_trades_day and not (rules.max_losses_day and losses >= rules.max_losses_day):
             fill = None
             for d in ("long", "short"):
                 lg = mk.leg(i, d, lookback_bars)
@@ -197,6 +243,10 @@ def backtest(mk, rules, start, end):
                     continue
                 if rules.require_bos and not mk.broke_structure(d, k, ext):
                     continue
+                if rules.max_stop_pts and rules.stop_leg_frac * size > rules.max_stop_pts:
+                    continue
+                if rules.trend_filter != "none" and mk.trend[rules.trend_filter][i] != (1 if d == "long" else -1):
+                    continue
                 levels = sorted(rules.fib_levels)
                 if rules.level_choice == "fvg":
                     p705 = ext - 0.705 * (ext - a)
@@ -208,6 +258,8 @@ def backtest(mk, rules, start, end):
                         seg = slice(j_ext + 1, i)
                         if (mk.l[seg] <= px).any() if d == "long" else (mk.h[seg] >= px).any():
                             continue
+                    if rules.require_zone and not mk.zone_covers(d, mk.piv[d]["start"][k], i, px):
+                        continue
                     if d == "long" and prev_close > px and mk.l[i] <= px:
                         fill = (d, f, px, k, a, ext, size, j_ext)
                     elif d == "short" and prev_close < px and mk.h[i] >= px:
@@ -238,6 +290,7 @@ def backtest(mk, rules, start, end):
             })
             used_legs.add((d, k))
             n_day += 1
+            losses += outcome == "Loss"
             i = xi + 1  # one position at a time
     return pd.DataFrame(trades)
 
@@ -302,9 +355,10 @@ def main():
     m1 = load_prices("m1")
     start, end = journal.date.min(), journal.date.max()
     covered = journal.entry_et.between(m1.index.min() + pd.Timedelta(days=2), m1.index.max())
-    all_variants = {**VARIANTS, **EXIT_VARIANTS}
+    all_variants = {**VARIANTS, **EXIT_VARIANTS, **CHECKLIST_VARIANTS}
     groups = {"single": {args.variant: all_variants[args.variant]}} if args.variant else \
-        {"entry rules (refinement rounds)": VARIANTS, "exit alternatives on the final entry rules": EXIT_VARIANTS}
+        {"entry rules (refinement rounds)": VARIANTS, "exit alternatives on the final entry rules": EXIT_VARIANTS,
+         "the trader's own checklist added to the final rules": CHECKLIST_VARIANTS}
 
     cache, table = {}, []
     for title, variants in groups.items():
@@ -315,9 +369,10 @@ def main():
             bt = backtest(cache[rules.pivot_n], rules, start, end)
             jt, bt = match(journal, bt, inferred, args.tol)
             row = report(name, jt, bt, covered)
-            m = bt[bt.matched_trade_id.notna()].merge(journal[["trade_id", "rr"]], left_on="matched_trade_id", right_on="trade_id")
+            m = bt[bt.matched_trade_id.notna()].merge(journal[["trade_id", "rr", "result"]], left_on="matched_trade_id", right_on="trade_id")
             row["bt_avg_R_on_matched"] = round(m.r.mean(), 3) if len(m) else np.nan
-            row["journal_avg_R_on_matched"] = round(m.rr.mean(), 3) if len(m) else np.nan
+            # journal outcome scored with its own TP 3R / BE / -1R classes (the logged "RR Achieved" overstates BE trades)
+            row["journal_avg_R_on_matched"] = round(m.result.map({"Win": 3.0, "BE": 0.0, "Loss": -1.0}).mean(), 3) if len(m) else np.nan
             rows.append(row)
             if name == FINAL.name or args.variant:
                 bt.to_csv(os.path.join(args.outdir, f"bt_trades_{name}.csv"), index=False)

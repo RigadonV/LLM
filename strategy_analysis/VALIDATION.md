@@ -6,11 +6,13 @@ the same day, in the same direction (where the direction is known), and enters w
 Precision is measured on the 131 days the trader actually logged trades; trades generated on the 28
 weekdays with no journal entries (holidays and a late-August gap) are reported separately.
 
+All variants exit the way the trader's checklist says: **stop to break-even at +2R, take profit at 3R**.
+
 ## Result
 
 | Round | Rules | Generated | Matched (recall) | Precision | Extra trades |
 |---|---|---|---|---|---|
-| Baseline | 0.79 limit on the most recent 15M leg ≥1.5 ATR; stop 0.14 × leg; 3R target, break-even at 2R | 581 | 126 (50%) | 22% | 455 (+125 on unlogged days) |
+| Baseline | 0.79 limit on the most recent 15M leg ≥1.5 ATR; stop 0.14 × leg | 581 | 126 (50%) | 22% | 455 (+125 on unlogged days) |
 | Refine 1 | + level must be untouched since the extreme; leg ≥2 ATR | 406 | 117 (47%) | 29% | 289 (+76) |
 | **Refine 2 (final)** | + orders at both 0.705 and 0.79, first untouched level fills | **447** | **142 (57%)** | **32%** | **305 (+87)** |
 
@@ -28,14 +30,37 @@ weekdays with no journal entries (holidays and a late-August gap) are reported s
   A 36-combination sensitivity grid (`results/sensitivity_grid.csv`) is fairly flat (F1 0.30–0.41),
   so the final rules are not a lucky corner of the parameter space.
 
+## The trader's own checklist, coded
+
+Each checklist item added on top of the final rules:
+
+| Variant | Generated | Matched (recall) | Precision | Mechanical R / trade |
+|---|---|---|---|---|
+| Final rules | 447 | 142 (57%) | 32% | +0.09 |
+| + 2 losses = done for the day, SL < 50 pts | 331 | 117 (47%) | 35% | +0.08 |
+| + trend aligned (15M EMA50 trend) | 229 | 79 (32%) | 35% | +0.17 |
+| + trend aligned (1H EMA50 trend) | 232 | 80 (32%) | 35% | +0.13 |
+| + HTF OB/FVG at the entry (15M/30M/1H) | 299 | 107 (43%) | 36% | +0.10 |
+| + 15M trend and OB/FVG | 198 | 70 (28%) | 35% | +0.11 |
+
+The checklist items make the rules slightly more selective and slightly better, but they cut the
+number of journal trades reproduced and leave the mechanical loss rate at ~67%. The 2-loss daily
+stop costs recall because the mechanical rules lose earlier in the day than the trader did, so they
+stop before reaching the trader's later trades. "Key open level" was not coded: the trader logged
+it on only 24% of trades.
+
 ## Outcomes do not reproduce
+
+The journal is scored the way the checklist implies: Win = +3R, BE = 0R, Loss = −1R. The
+"RR Achieved" column adds up to more (+2.54R per trade) because it logs "BE" trades at the R they
+reached (1.7–2.9R) rather than 0R, and wins at values other than 3R.
 
 | | Journal | Mechanical rules |
 |---|---|---|
 | Loss rate, all trades | 16% | 67% |
 | Loss rate, the 142 matched trades | 20% | 51% |
-| Average R, the 142 matched trades | +2.40R | +0.67R |
-| Average R per trade, all trades | +2.54R | +0.09R |
+| Average R, the 142 matched trades | +1.85R | +0.67R |
+| Average R per trade, all trades | +1.94R | +0.09R |
 
 All 29 journal losses among the matched trades are also losses in the backtest. But 35 of the 97
 matched journal winners are stopped out mechanically. No exit variant closes the gap: a 2R target,
@@ -43,12 +68,13 @@ matched journal winners are stopped out mechanically. No exit variant closes the
 (`results/validation_variants.csv`).
 
 **What this means:**
-- The *entry mechanics* — session window, 15M leg, 0.705/0.79 limit, stop at ~0.14 of the leg — are
-  recoverable and explain over half of the trades.
-- The trader's *selection* of which setups to take, and the journal's very high win rate, are not.
-  Either the edge lives in discretion that price-derived features do not capture (reading OB/FVG
-  quality, context, momentum on lower timeframes), or the journal reflects hindsight. For example,
-  manual backtesting on bar replay makes it easy to skip or mis-log setups that would have failed.
+- The *entry mechanics* — session window, 15M leg, 0.705/0.79 limit, stop at ~0.14 of the leg,
+  BE at 2R, TP at 3R — are recoverable and explain over half of the trades.
+- The trader's *selection* of which setups to take, and the journal's very high win rate, are not —
+  not even with the trader's own checklist coded in. Either the edge lives in discretion that
+  price-derived features do not capture (reading OB/FVG quality, context, momentum on lower
+  timeframes), or the journal reflects hindsight. For example, manual backtesting on bar replay
+  makes it easy to skip or mis-log setups that would have failed.
 - Forward-test with live or replay trades logged *before* the outcome is known, before risking money.
 
 ## Limitations
@@ -56,16 +82,15 @@ matched journal winners are stopped out mechanically. No exit variant closes the
 - **Reconstructed inputs:** the journal has no direction, prices, stops or size. Direction and entry
   price were inferred from the entry minute, duration, MAE and MFE. Direction is identified for 213 of
   250 trades: 160 from the price path alone, 53 with the fib as a tie-breaker. The stop is inferred
-  from MAE (losers) or the favourable move ÷ RR (non-losers).
+  from MAE (losers) or the favourable move at the logged time ÷ RR (wins and "BE").
 - **Proxy data:** Dukascopy's Nasdaq-100 CFD, not NQ futures. Against NQ=F 5-minute bars
   (Aug 20 – Oct 16) the 5-minute return correlation is 0.9965 and bar ranges agree within ~2%; the
   price level differs by ~177 pts, drifting ~6.5 pts per session.
 - **1-minute resolution:** stops of 12–25 pts are close to the size of a 1-minute NQ candle, so the
   order of high and low within the entry bar is unknown. The backtest only counts a stop on the fill
   bar if that bar closes beyond it, and assumes the stop is hit first when stop and target share a bar.
-- **"BE" interpretation:** "BE" trades are treated as closed in profit at their logged RR (they never
-  reached 2.98R). This fits the Stats sheet definition and the price path better than a break-even
-  scratch, but it is an interpretation.
-- **Exits** are modelled as a fixed R target; the trader's real exits are discretionary.
+- **Journal fields:** for "BE" trades, the logged time is when the trade peaked, not when it was
+  stopped at the entry. For wins, "RR Achieved" does not match the stated 3–4R target on half the
+  trades, so it is unclear what that column measures.
 - **Sample:** one instrument, seven months, during a strong Nasdaq uptrend (~24,900 in March to
   ~30,000 by June). Results may not generalise.

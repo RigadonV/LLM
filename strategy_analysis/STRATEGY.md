@@ -8,12 +8,35 @@ the trades and what they cannot explain.
 
 **In one sentence:** during the London session and the NY pre-open, wait for a 15-minute swing leg
 to retrace into the 0.705–0.79 zone of its fib, enter there with a limit order, put the stop about
-a seventh of the leg beyond the entry (still inside the swing point), and take profit at roughly
-2–4R, usually before the leg's extreme.
+a seventh of the leg beyond the entry (still inside the swing point), move it to break-even at +2R
+and take profit at 3R.
 
 Confidence levels: **High** = holds for (nearly) every trade and is clearly not chance.
 **Medium** = holds for most trades or is strongly supported but not exact.
 **Low** = a tendency only; the trader is likely using judgement that the data cannot see.
+
+## The trader's stated checklist vs this reconstruction
+
+The trader's own "Model 2" checklist was shared after the first version of this analysis. Each item
+was checked against the journal and the price data.
+
+| Checklist item | What the data shows | Verdict |
+|---|---|---|
+| 1% risk per trade | Every full loss is logged as exactly −1R | Consistent (the % itself cannot be seen) |
+| 2 losses = done for the day | 4 days had 2 losses; on one (29 Sep) two more trades were taken afterwards | Followed on 3 of 4 days |
+| BE at 2RR | 31 of 33 "BE" trades reached 2R, then came back to the entry before 3R; every loser but one peaked below 1.8R | Confirmed — and it corrects this analysis: "BE" trades are 0R scratches, not profits |
+| TP at 3RR–4RR | Every "Win" reached ≥2.98R (the Stats sheet's own definition). But the "RR Achieved" column logs 51% of wins below 3R | TP 3R matches the Win/BE/Loss classes; "RR Achieved" does not record a 3–4R exit |
+| SL < 50pts | Largest losing stop 47.5 pts; 6 of 213 inferred stops exceed 50 (likely inference error) | Consistent |
+| 15M fib from swing point to swing point | Confirmed; this analysis adds *which* swing: the most recent unbroken 2-bar fractal, leg ≥1.5–2 ATR (section 3) | Confirmed, made specific |
+| Either a HTF OB/FVG | Logged on 95% of trades; detected at the entry on 74%; loss rate no lower when present | Present, but not what separates winners |
+| Key open level | Logged on only 24% of trades (accurately — 86% of those entries are within 1R of the 00:00/18:00 open) | Optional in practice; no better results when present |
+| Trade aligned with the overall trend | Logged Y on 83%. "Y" trades agree with the 15M EMA50 trend 62% of the time, "N" trades only 10% | Partly reproducible as a short-term (15M/1H) trend read |
+
+Scored the way the checklist implies (Win = +3R, BE = 0R, Loss = −1R), the journal averages
+**+1.94R per trade**, not the +2.54R that the "RR Achieved" column adds up to.
+
+Not on the checklist but found in the trades: the 02:00–09:30 ET window, the exact swing definition,
+entries only at an untouched 0.705/0.79 level, and a stop of ~14% of the leg (well inside the 50-pt cap).
 
 ---
 
@@ -56,9 +79,11 @@ larger size filters all fit worse (`results/leg_definition_test.csv`).
 
 10. Trade **with the leg**: buy retracements of up-legs, sell retracements of down-legs.
     The sample is evenly split: 108 longs, 105 shorts, with near-identical loss rates (12.0% vs 12.4%).
-11. **No moving-average trend filter.** Price vs EMA 20/50/200 on 15M, 1H, 4H or daily, and the
-    EMA slopes, agree with the trade direction only 46–57% of the time. The journal's "Aligned w/ Trend = Y" (82% of trades)
-    is a discretionary read that could not be reproduced from price data.
+11. **Trend is a short-term, discretionary read — not a moving-average rule.** Across all trades,
+    price vs EMA 20/50/200 on 15M, 1H, 4H or daily agrees with the trade direction only 46–57% of
+    the time. The trader's own "aligned with trend" tag (83% Y) lines up best with the 15M EMA50
+    trend: 62% of "Y" trades vs 10% of "N" trades. As a mechanical filter it halves the number of
+    trades and only nudges expectancy (see `VALIDATION.md`). *Low–Medium.*
 
 ## 5. Setup filters
 
@@ -68,7 +93,8 @@ larger size filters all fit worse (`results/leg_definition_test.csv`).
 13. **Order block / FVG confluence at the entry level.** *Medium (present, but not selective).*
     The journal logs an OB or FVG on 95% of trades; independent detection finds a 15M/30M/1H OB or FVG
     covering the entry price on 74% — but losers have one just as often as winners, so it does not
-    separate good from bad trades.
+    separate good from bad trades. A **key open** (00:00 / 18:00) near the entry is logged on only
+    24% of trades, with no better results, so it is optional confluence.
 14. Not part of the rules (each holds for roughly 35–62% of trades and does not separate winners
     from losers): RSI, MACD, Stochastic and Bollinger Band position; premium/discount versus the
     00:00 or 18:00 open; sweeps of the Asian or previous-day high/low.
@@ -90,31 +116,33 @@ larger size filters all fit worse (`results/leg_definition_test.csv`).
 19. Place the stop **about 14% of the leg beyond the entry** — i.e. at roughly fib **0.84 for a 0.705
     entry** and **0.93 for a 0.79 entry**. The stop always stays inside the swing point (1.0).
 20. In points this is a median 18.6 pts (IQR 12–25); it is *not* a fixed point stop or an ATR stop.
+    The trader's cap of **SL < 50 pts** holds: the widest losing stop was 47.5 pts.
 
 *Evidence:* the stop implied for losers (stop = MAE), winners and the "BE" class independently
 comes out at 0.152, 0.141 and 0.141 of the leg. As a fraction of the leg the stop varies far less
 (coefficient of variation 0.23) than in points (0.51) or ATR multiples (0.43).
 
-## 8. Take profit and trade management — *Medium (that profit is taken from ~2R) / Low (exact target)*
+## 8. Take profit and trade management — *High (BE at 2R) / Medium (TP 3R)*
 
-21. Take profit at **roughly 2–4R**: winners closed at a median **3.1R** (IQR 2.4–4.2R, min 2.0R).
-    On the fib this is usually around the 0.2–0.45 retracement, **before** the leg's extreme.
-22. **No trade that reached 2R was allowed to lose.** Every loser but one peaked below 1.8R
-    (trade 71, which ran +9.8R first, is the exception); every non-losing trade was closed at ≥1.7R. Practically: from about +2R, either take the profit or
-    move the stop to break-even.
-23. The journal's **"BE"** label is not a scratch trade. It is the Stats sheet's class for a trade
-    that was **closed in profit (1.7–2.9R) but never reached 2.98R**. The price path confirms these
-    were closed near their logged RR, not at the entry price.
-24. The exact target is discretionary. The nearest obvious level to the exit was the leg's extreme in
-    32% of winners, otherwise a session level (00:00/18:00 open, Asian high/low, previous day
-    high/low), but typically 0.8R away from it — no single level explains the exits.
-25. Trades are short: median 23 min for winners, 15 min for losers; all but one were closed by
+21. **Move the stop to break-even at +2R.** Every loser but one peaked below 1.8R (trade 71, which
+    ran +9.8R first, is the exception), and 31 of the 33 "BE" trades reached 2R and then came back
+    to the entry before 3R. The journal's "BE" trades are therefore **0R scratches**; their
+    "RR Achieved" (1.7–2.9) is how far they ran, not what was banked.
+22. **Take profit at 3R** (the checklist says 3–4R). Every "Win" reached at least 2.98R, which is the
+    Stats sheet's definition of a win. On the fib, 3R from a 0.705/0.79 entry with a 0.14-leg stop lands
+    around the 0.3–0.4 retracement, **before** the leg's extreme.
+23. The "RR Achieved" column does not record a 3–4R exit: it logs 51% of wins between 2.0R and 3R
+    and 24% above 4R (median 3.1R). Read it as the R at the logged time, not as the exit rule.
+    Scored as TP 3R / BE 0R / SL −1R, the journal averages +1.94R per trade.
+24. Trades are short: median 23 min for winners, 15 min for losers; all but one were closed by
     10:00 ET (latest exit 10:14).
 
-## 9. Position sizing — *Medium (inferred)*
+## 9. Position sizing and daily risk — *High (stated by the trader, consistent with the journal)*
 
-26. **Fixed risk per trade (1R)**: every full loss is recorded as exactly −1R. Size = account risk ÷
-    (stop in points × $20 per point for NQ, or $2 for MNQ). There is no lot data in the journal.
+25. **Risk 1% of the account per trade**: every full loss is recorded as exactly −1R.
+    Contracts = (1% of account) ÷ (stop in points × $20 per point for NQ, or $2 for MNQ).
+26. **Stop for the day after 2 losses.** Followed on 3 of the 4 days that had two losses
+    (on 29 Sep two more trades followed).
 
 ## 10. When not to trade — *High for the window, Low for anything else*
 
@@ -133,12 +161,12 @@ comes out at 0.152, 0.141 and 0.141 of the leg. As a fraction of the leg the sto
 
 Trade #196 (4 Aug 2026). The 15M swing low at 01:00 (1.0) and the high at 04:21 (0.0) define a
 153-point leg (3.5 × ATR). Price retraces through 0.705 and fills the long at the untouched 0.79
-level at 05:17; the stop sits 22.5 pts below (0.15 of the leg, fib ≈ 0.94); the trade is closed
-20 minutes later at +2.1R, around the 0.5 retracement.
+level at 05:17; the stop sits 22.5 pts below (0.15 of the leg, fib ≈ 0.94). The journal logs
++2.1R twenty minutes later, around the 0.5 retracement; the trade went on to reach 3R (a "Win").
 
 More charts (one win each way, a loss, a "BE", and a trade the rules do **not** explain):
 `charts/trade_246_short_win.png`, `charts/trade_167_loss.png`,
-`charts/trade_061_closed_at_2R_be.png`, `charts/trade_010_does_not_fit.png`.
+`charts/trade_061_be_at_2R.png`, `charts/trade_010_does_not_fit.png`.
 
 ## Trades that do not fit
 
@@ -157,11 +185,11 @@ More charts (one win each way, a loss, a "BE", and a trade the rules do **not** 
 | 1 | NQ, 15M structure | High | 250/250 trades; journal checklist |
 | 2 | Entries 02:00–09:30 ET | High | 250/250; ET fits 93.6% vs ≤64% |
 | 3 | Leg = most recent unbroken 15M fractal → extreme, ≥1.5–2 ATR | Medium–High | 77% match vs 11% chance |
-| 4 | Trade with the leg, no EMA trend filter | High / Low for trader's trend read | 108 L / 105 S; EMA agreement 46–57% |
-| 5 | Fresh (untouched) level | Medium | 2× higher take-rate in backtest |
+| 4 | Trade with the leg; trend is a short-term discretionary read | High (no bias) / Low–Medium (trend) | 108 L / 105 S; 15M EMA50 agrees with 62% of "Y" vs 10% of "N" trades |
+| 5 | Fresh (untouched) level; OB/FVG present, key open optional | Medium | 2× higher take-rate in backtest; OB/FVG 95% logged, key open 24% |
 | 6 | Limit at 0.79 or 0.705 | Medium (level) / Low (which one) | 61% / 39%; FVG vs OB tendency |
-| 7 | Stop ≈ 0.14 × leg beyond entry | Medium–High | 0.141–0.152 in all three outcome groups |
-| 8 | Profit from ~2R, median 3.1R; never let 2R become a loss | Medium | loser MFE ≤1.77R (one exception); exits ≥1.69R |
-| 8b | Exact target | Low | no single level explains exits |
-| 9 | Fixed 1R risk | Medium | all full losses = −1R |
+| 7 | Stop ≈ 0.14 × leg beyond entry, < 50 pts | Medium–High | 0.141–0.152 in all three outcome groups; max loss stop 47.5 pts |
+| 8 | Break-even at +2R | High | 31/33 "BE" trades hit 2R then entry; loser MFE ≤1.77R (one exception) |
+| 8b | Take profit at 3R | Medium | every Win reached ≥2.98R; "RR Achieved" disagrees for half the wins |
+| 9 | 1% risk per trade, done after 2 losses | High | all full losses = −1R; 3 of 4 two-loss days stopped |
 | 10 | No news avoidance | High | 40% of trades on news days |
