@@ -1,0 +1,16 @@
+additions,exit,trades,trades_per_month,win_rate,breakeven_win_rate,be_rate,loss_rate,net_R_per_trade,profit_factor,total_return_pct,per_month_pct,max_drawdown_pct,longest_losing_streak,losing_months,unseen_17-29_Oct_trades,unseen_17-29_Oct_return_pct
+1. London 07:00-13:00 + your risk rules,TP 2R,370,46.7,0.332,0.367,0.0,0.665,-0.101,0.86,-33.7,-5.1,42.7,16,6 of 8,22,4.4
+1. London 07:00-13:00 + your risk rules,"TP 2R, BE at 1R",406,51.3,0.268,0.368,0.227,0.505,-0.071,0.88,-27.3,-3.9,32.9,9,8 of 8,23,1.1
+1. London 07:00-13:00 + your risk rules,"TP 4R, BE at 2R",337,42.6,0.211,0.22,0.122,0.656,0.118,1.16,39.2,4.3,18.4,16,3 of 8,16,13.5
+2. + 15M trend filter,TP 2R,209,26.4,0.359,0.37,0.0,0.641,-0.034,0.95,-8.8,-1.2,16.9,11,5 of 8,14,-8.9
+2. + 15M trend filter,"TP 2R, BE at 1R",214,27.0,0.304,0.37,0.182,0.514,-0.017,0.97,-5.3,-0.7,18.1,4,5 of 8,15,-5.3
+2. + 15M trend filter,"TP 4R, BE at 2R",206,26.0,0.243,0.222,0.117,0.641,0.22,1.3,50.5,5.3,11.9,11,1 of 8,14,-5.3
+3. + skip spiky legs  (= optimised),TP 2R,141,17.8,0.426,0.368,0.0,0.574,0.172,1.27,25.4,2.9,6.7,6,1 of 8,7,-1.6
+3. + skip spiky legs  (= optimised),"TP 2R, BE at 1R",142,17.9,0.345,0.368,0.169,0.486,0.099,1.18,13.6,1.6,10.1,5,3 of 8,7,-2.6
+3. + skip spiky legs  (= optimised),"TP 4R, BE at 2R",140,17.7,0.293,0.221,0.136,0.571,0.495,1.77,93.0,8.7,8.5,6,0 of 8,7,2.3
+4. optimised + stop 0.17 x leg,TP 2R,141,17.8,0.454,0.362,0.0,0.546,0.275,1.46,45.0,4.8,6.3,6,1 of 8,7,1.4
+4. optimised + stop 0.17 x leg,"TP 2R, BE at 1R",142,17.9,0.366,0.362,0.183,0.451,0.194,1.39,30.1,3.4,8.3,4,1 of 8,7,-1.5
+4. optimised + stop 0.17 x leg,"TP 4R, BE at 2R",139,17.6,0.281,0.217,0.158,0.547,0.525,1.86,100.6,9.2,7.3,6,0 of 8,7,-0.6
+5. optimised + wick-heavy pullbacks only,TP 2R,71,9.0,0.507,0.369,0.0,0.493,0.414,1.76,33.1,3.7,4.6,3,2 of 8,3,-3.2
+5. optimised + wick-heavy pullbacks only,"TP 2R, BE at 1R",71,9.0,0.408,0.369,0.155,0.437,0.273,1.55,20.6,2.4,4.5,3,3 of 8,3,-3.2
+5. optimised + wick-heavy pullbacks only,"TP 4R, BE at 2R",71,9.0,0.324,0.221,0.183,0.493,0.696,2.24,60.8,6.2,4.5,3,2 of 8,3,-3.2
