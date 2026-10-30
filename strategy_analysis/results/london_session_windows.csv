@@ -1,0 +1,6 @@
+window,journal_trades,journal_loss_rate,journal_R_per_trade (3R/0/-1),backtest_trades,backtest_recall,backtest_precision,backtest_loss_rate,backtest_R_per_trade
+02:00-05:00 NY = 07:00-10:00 UK (London kill zone),111,0.171,1.99,187,0.586,0.348,0.668,0.037
+05:00-08:00 NY = 10:00-13:00 UK (rest of London morning),93,0.151,2.01,187,0.624,0.31,0.61,0.337
+"08:00-09:30 NY = 13:00-14:30 UK (NY pre-open, 08:30 news)",46,0.152,1.67,155,0.761,0.226,0.71,-0.09
+As journaled: 02:00-09:30 NY,250,0.16,1.94,447,0.568,0.318,0.667,0.085
+London only: 07:00-13:00 UK clock,203,0.153,2.02,347,0.571,0.334,0.637,0.21

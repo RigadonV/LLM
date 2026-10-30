@@ -1,12 +1,18 @@
 # Model 2 – London: reconstructed strategy rules (NQ)
 
 Reverse-engineered from `Model2_London_Journal_V4.xlsx`: 250 NQ (Nasdaq-100 E-mini) trades,
-10 Mar – 16 Oct 2026, all times **New York (ET)**. The journal records no direction, prices, stops
-or size, so these were reconstructed from 1-minute Nasdaq-100 data (Dukascopy CFD, which tracks NQ
-with 0.9965 5-minute return correlation). See `VALIDATION.md` for how well the rules reproduce
-the trades and what they cannot explain.
+10 Mar – 16 Oct 2026. The journal records no direction, prices, stops or size, so these were
+reconstructed from 1-minute Nasdaq-100 data (Dukascopy CFD, which tracks NQ with 0.9965 5-minute
+return correlation). See `VALIDATION.md` for how well the rules reproduce the trades and what they
+cannot explain.
 
-**In one sentence:** during the London session and the NY pre-open, wait for a 15-minute swing leg
+**About the times.** The journal's "Session Time (London)" column names the *session*; the times in
+it are written on the **New York clock** (like the journal's news times, 8:30 CPI, and its 18:00 /
+00:00 key opens). Read as UK clock times, the trades no longer line up with the price data at all
+(section 2). Times below are given on both clocks; the UK clock is New York + 5 hours (+4 hours
+from 8 to 28 March and from 25 October to 1 November, when only one country is on summer time).
+
+**In one sentence:** during the London session (07:00–13:00 UK), wait for a 15-minute swing leg
 to retrace into the 0.705–0.79 zone of its fib, enter there with a limit order, put the stop about
 a seventh of the leg beyond the entry (still inside the swing point), move it to break-even at +2R
 and take profit at 3R.
@@ -35,7 +41,7 @@ was checked against the journal and the price data.
 Scored the way the checklist implies (Win = +3R, BE = 0R, Loss = −1R), the journal averages
 **+1.94R per trade**, not the +2.54R that the "RR Achieved" column adds up to.
 
-Not on the checklist but found in the trades: the 02:00–09:30 ET window, the exact swing definition,
+Not on the checklist but found in the trades: the session window, the exact swing definition,
 entries only at an untouched 0.705/0.79 level, and a stop of ~14% of the leg (well inside the 50-pt cap).
 
 ---
@@ -48,14 +54,31 @@ entries only at an untouched 0.705/0.79 level, and a stop of ~14% of the leg (we
 3. Confluence timeframes: 15M, 30M and 1H order blocks / fair value gaps (journal tags).
 4. Execution: intraday limit orders; trades last minutes (median 21 min, 90% under 70 min).
 
-## 2. Session window — *High*
+## 2. Session window — London only — *High (timing) / Medium (London-only improvement)*
 
-5. Only place entries between **02:00 and 09:30 ET** (London open to NY cash open).
-   Observed entries: 02:00 to 09:22, spread evenly across the hours
-   (02:00–09:00 each hold 23–33 trades; 7 after 09:00).
-   The timestamps fit New York time for 93.6% of trades, versus at most 64% for any other
-   offset (`results/timezone_test.csv`), so the "London" column in the journal is the session
-   name, not the clock.
+5. Only place entries **between 07:00 and 13:00 UK time** (02:00–08:00 New York): London open until
+   the New York session starts. No other sessions.
+   - The journal's entries run from 02:00 to 09:22 New York = **07:00 to 14:22 UK**, spread evenly
+     across the hours. 203 of the 250 trades fall in 07:00–13:00 UK; 43 were taken 13:00–14:30 UK
+     (the New York pre-open, including entries at the 08:30 New York data releases) and 4 just
+     before 07:00 UK in March, when the UK was only 4 hours ahead.
+   - That last stretch was the weakest in both the journal (+1.67R per trade, scored 3R / 0 / −1R,
+     vs about +2.0R in London) and the backtest (−0.09R per trade vs +0.04R to +0.34R in London).
+     Dropping it lifts the mechanical rules from +0.09R to **+0.21R per trade** (95% range +0.02 to
+     +0.40R; 6 of 8 months positive) — a real but small, same-sample improvement.
+   - Within London, the 07:00–10:00 UK kill zone and 10:00–13:00 UK did about equally well in the
+     journal (+1.99R and +2.01R per trade). `results/london_session_windows.csv`
+
+*Evidence that the logged times are New York clock time* (`results/timezone_reading_check.csv`):
+
+| Logged times read as… | Trades the price path explains | Entries on the logged fib of the latest leg (chance) | Journal trades the backtest reproduces |
+|---|---|---|---|
+| **New York clock** | **94%** | **69%** (11%) | **57%** |
+| UK clock | 56% | 9% (5%) | 8% |
+| UTC / Central Europe / South Africa | 54–56% | 5–7% (5–16%) | 7–9% |
+
+Read as UK clock times, 82% of the entries would fall before the 08:00 London open (02:00–09:22 UK
+is mostly the Asian session), and the fib-level match drops to chance.
 
 ## 3. Define the fib leg — *Medium–High*
 
@@ -66,8 +89,8 @@ entries only at an untouched 0.705/0.79 level, and a stop of ~14% of the leg (we
    For a **short**: mirror image — most recent unbroken 15M swing high to the lowest low since.
 8. Ignore legs smaller than **~1.5–2 × ATR(14) on 15M**. (Typical leg: 119 pts, 3.4 ATR,
    82 minutes from swing to extreme; entries come a median 63 minutes after the extreme.)
-9. Legs usually start in the overnight/Asian session (44%) or the 02:00–05:00 London window (31%);
-   the extreme is usually printed during London (42%) or 05:00–09:00 (36%).
+9. Legs usually start in the overnight/Asian session (44%) or 07:00–10:00 UK (31%); the extreme is
+   usually printed 07:00–10:00 UK (42%) or 10:00–14:00 UK (36%).
 
 *Evidence:* using only the entry price implied by the price path, the logged fib level (0.705 or
 0.79, ±0.05) lands on this exact leg for **77% of trades** with a known direction (69% if only
@@ -135,7 +158,7 @@ comes out at 0.152, 0.141 and 0.141 of the leg. As a fraction of the leg the sto
     and 24% above 4R (median 3.1R). Read it as the R at the logged time, not as the exit rule.
     Scored as TP 3R / BE 0R / SL −1R, the journal averages +1.94R per trade.
 24. Trades are short: median 23 min for winners, 15 min for losers; all but one were closed by
-    10:00 ET (latest exit 10:14).
+    15:00 UK (10:00 New York; the latest exit was 15:14 UK).
 
 ## 9. Position sizing and daily risk — *High (stated by the trader, consistent with the journal)*
 
@@ -146,10 +169,12 @@ comes out at 0.152, 0.141 and 0.141 of the leg. As a fraction of the leg the sto
 
 ## 10. When not to trade — *High for the window, Low for anything else*
 
-27. No entries before 02:00 or after ~09:20 ET (NY cash open at 09:30).
+27. No entries before 07:00 or after 13:00 UK (02:00 / 08:00 New York) — London only. The journal
+    itself ran to 14:22 UK (09:22 New York); see section 2.
 28. The trader did **not** avoid news: 40% of trades were on days with high-impact US data,
-    including entries right at the 08:30 CPI release, and the loss rate on news days was no worse
-    (10% vs 14%).
+    including entries right at the 08:30 New York (13:30 UK) CPI release, and the loss rate on news
+    days was no worse (10% vs 14%). Under the London-only window the 08:30 New York releases fall
+    after the cut-off; 10:00 and 14:00 New York releases are after it anyway.
 29. No trades on US market holidays (Good Friday, Memorial Day, 3 Jul, Labor Day) and none logged
     19–31 Aug.
 
@@ -159,9 +184,9 @@ comes out at 0.152, 0.141 and 0.141 of the leg. As a fraction of the leg the sto
 
 ![Trade #196 — long at 0.79](charts/trade_196_long_win.png)
 
-Trade #196 (4 Aug 2026). The 15M swing low at 01:00 (1.0) and the high at 04:21 (0.0) define a
-153-point leg (3.5 × ATR). Price retraces through 0.705 and fills the long at the untouched 0.79
-level at 05:17; the stop sits 22.5 pts below (0.15 of the leg, fib ≈ 0.94). The journal logs
+Trade #196 (4 Aug 2026, chart on the UK clock). The 15M swing low at 06:00 UK (1.0) and the high at
+09:21 UK (0.0) define a 153-point leg (3.5 × ATR). Price retraces through 0.705 and fills the long at
+the untouched 0.79 level at 10:17 UK (05:17 New York, as logged); the stop sits 22.5 pts below (0.15 of the leg, fib ≈ 0.94). The journal logs
 +2.1R twenty minutes later, around the 0.5 retracement; the trade went on to reach 3R (a "Win").
 
 More charts (one win each way, a loss, a "BE", and a trade the rules do **not** explain):
@@ -183,7 +208,7 @@ More charts (one win each way, a loss, a "BE", and a trade the rules do **not** 
 | Section | Rule | Confidence | Main evidence |
 |---|------|-----------|---------------|
 | 1 | NQ, 15M structure | High | 250/250 trades; journal checklist |
-| 2 | Entries 02:00–09:30 ET | High | 250/250; ET fits 93.6% vs ≤64% |
+| 2 | London only: entries 07:00–13:00 UK | High (timing) / Medium (London-only edge) | times are New York clock (fit 94% vs ≤56% for UK clock); London-only lifts the backtest from +0.09R to +0.21R per trade |
 | 3 | Leg = most recent unbroken 15M fractal → extreme, ≥1.5–2 ATR | Medium–High | 77% match vs 11% chance |
 | 4 | Trade with the leg; trend is a short-term discretionary read | High (no bias) / Low–Medium (trend) | 108 L / 105 S; 15M EMA50 agrees with 62% of "Y" vs 10% of "N" trades |
 | 5 | Fresh (untouched) level; OB/FVG present, key open optional | Medium | 2× higher take-rate in backtest; OB/FVG 95% logged, key open 24% |

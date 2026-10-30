@@ -1,0 +1,6 @@
+reading,entries_NY_clock,entries_UK_clock,in_London_session_08-16:30_UK,price_path_fit,direction_found,fib_match_clear_dir,fib_match_chance,backtest_recall,backtest_precision
+New York,02:00-09:22,06:06-14:22,0.84,0.936,213,0.688,0.106,0.568,0.318
+London (UK),21:00 prev. day-04:53,02:00-09:22,0.184,0.556,121,0.086,0.052,0.084,0.057
+UTC,22:00 prev. day-05:22,02:06-10:22,0.316,0.56,117,0.071,0.071,0.092,0.066
+Central Europe,20:00 prev. day-03:53,01:00-08:22,0.028,0.54,114,0.046,0.157,0.068,0.047
+South Africa,20:00 prev. day-03:22,00:06-08:22,0.028,0.54,112,0.056,0.047,0.068,0.05

@@ -8,9 +8,9 @@ Reverse-engineering of the "Model 2 – London" NQ trade journal (`Model2_London
 | `STRATEGY.md` | The strategy as numbered rules, with confidence levels and an example chart |
 | `VALIDATION.md` | How well the coded rules reproduce the journal, and the limitations |
 | `trade_context.csv` | One row per journal trade: journal fields + inferred direction/prices + market context |
-| `charts/` | Five representative trades (long win, short win, loss, "BE", one that does not fit) |
+| `charts/` | Five representative trades (long win, short win, loss, "BE", one that does not fit), drawn on the UK clock |
 | `replicate_strategy.py` | The validation backtest (baseline, two refinement rounds, exit alternatives, the trader's checklist) |
-| `results/` | Intermediate outputs: timezone test, direction inference, leg-definition test, condition table, sensitivity grid, backtest trades |
+| `results/` | Intermediate outputs: timezone test, time-zone re-reading check, London session windows, direction inference, leg-definition test, condition table, sensitivity grid, backtest trades |
 | `pipeline/` | The scripts that produce everything above |
 
 ## Reproduce
@@ -27,13 +27,15 @@ python build_context.py "$J"              # Step 3: ../trade_context.csv
 python find_patterns.py                   # Step 4: ../results/patterns_report.txt
 python sensitivity.py "$J"                # Step 5b: rule sensitivity grid
 python ../replicate_strategy.py "$J"      # Step 5: validation backtest -> ../results/validation_variants.csv
+python london_time_check.py "$J"          # journal times re-read in other time zones; London-only windows
 python make_charts.py --ids 196:long_win,246:short_win,167:loss,61:be_at_2R,10:does_not_fit
 python check_proxy.py nq_5m.json          # optional: CFD vs NQ futures check (Yahoo chart-API JSON)
 ```
 
 ## `trade_context.csv` columns
 
-Prices are **Dukascopy Nasdaq-100 CFD** prices, about 177 points below NQ futures over the sample.
+Times (`*_et`, `*_time`) are **New York clock**, as the journal logs them (UK = New York + 5h; +4h
+from 8 to 28 March and 25 Oct to 1 Nov). Prices are **Dukascopy Nasdaq-100 CFD** prices, about 177 points below NQ futures over the sample.
 Distances in points carry over to NQ within ~2%. Indicator values come from the last bar that
 *closed before* the entry, except `entrybar*`, which describe the candle containing the entry.
 

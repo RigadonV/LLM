@@ -19,6 +19,7 @@ UP, DOWN = "#2a78d6", "#e34948"            # diverging poles
 EMA_COL = {20: "#eb6834", 50: "#1baf7a", 200: "#6250d6"}  # categorical slots 2, 3, 7
 GOOD, CRITICAL = "#0ca30c", "#d03b3b"     # status: target / stop (always labelled)
 LONDON_BAND = "#f0efec"
+UK = "Europe/London"  # charts are drawn on the UK clock; trade_context.csv times are New York clock
 
 plt.rcParams.update({
     "font.family": "DejaVu Sans", "font.size": 9, "axes.edgecolor": AXIS, "axes.labelcolor": INK2,
@@ -30,7 +31,7 @@ plt.rcParams.update({
 def candles(ax, bars, width):
     for t, r in bars.iterrows():
         col = UP if r["close"] >= r["open"] else DOWN
-        x = mdates.date2num(t.tz_localize(None))
+        x = mdates.date2num(naive(t))
         ax.vlines(x, r["low"], r["high"], color=col, linewidth=0.8, zorder=2)
         lo, hi = sorted((r["open"], r["close"]))
         ax.add_patch(plt.Rectangle((x - width / 2, lo), width, max(hi - lo, 0.5), facecolor=col, edgecolor=col,
@@ -42,7 +43,13 @@ def tag(v):
 
 
 def naive(ts):
-    return pd.Timestamp(ts).tz_localize(None) if pd.Timestamp(ts).tzinfo else pd.Timestamp(ts)
+    """Timestamp on the UK clock without tz info, for plotting."""
+    ts = pd.Timestamp(ts)
+    return ts.tz_convert(UK).tz_localize(None) if ts.tzinfo else ts
+
+
+def uk_hm(ts_str):
+    return pd.Timestamp(ts_str).tz_localize(ET).tz_convert(UK).strftime("%H:%M")
 
 
 def chart_trade(tr, m1, path, title_prefix=""):
@@ -57,9 +64,9 @@ def chart_trade(tr, m1, path, title_prefix=""):
     m15 = resample(m1.loc[start - pd.Timedelta(days=5): end], "15min")
 
     fig, (ax, ax2) = plt.subplots(2, 1, figsize=(11, 7.0), sharex=True, gridspec_kw={"height_ratios": [4, 1.1], "hspace": 0.06})
-    # London kill-zone shading
-    for day in pd.date_range(start.normalize(), end.normalize(), freq="D"):
-        a, b = max(day + pd.Timedelta(hours=2), start), min(day + pd.Timedelta(hours=5), end)
+    # London-only window, 07:00-13:00 UK
+    for day in pd.date_range(start.tz_convert(UK).normalize(), end.tz_convert(UK).normalize(), freq="D"):
+        a, b = max(day + pd.Timedelta(hours=7), start), min(day + pd.Timedelta(hours=13), end)
         if a < b:
             ax.axvspan(naive(a), naive(b), color=LONDON_BAND, zorder=0, linewidth=0)
     candles(ax, bars, width)
@@ -110,13 +117,15 @@ def chart_trade(tr, m1, path, title_prefix=""):
     ax2.set_ylabel("RSI 14 (15m)")
     ax.set_ylabel("Nasdaq-100 (Dukascopy CFD)")
     ax2.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+    ax2.set_xlabel("UK time", color=INK2)
     ax.set_xlim(naive(start), naive(end) + pd.Timedelta(minutes=20 if span_h <= 7 else 50))
 
     res = {"Win": f"Win +{tr.rr:.2f}R", "Loss": "Loss -1R",
            "BE": f"BE (peaked +{tr.mfe_r:.2f}R, stopped at entry)"}[tr.result]
-    fig.suptitle(f"{title_prefix}Trade #{tr.trade_id} - {tr.date} {tr.entry_et[-5:]} ET - {tr.direction} at {tr.fib_level:g} - {res}",
+    fig.suptitle(f"{title_prefix}Trade #{tr.trade_id} - {tr.date} {uk_hm(tr.entry_et)} UK ({tr.entry_et[-5:]} NY) - "
+                 f"{tr.direction} at {tr.fib_level:g} - {res}",
                  x=0.07, ha="left", fontsize=11.5, color=INK, fontweight="bold", y=0.985)
-    sub = (f"Leg {tr.fib_anchor_time[-5:]} -> {tr.fib_extreme_time[-5:]} ({tr.leg_size_pts:.0f} pts), entry ratio {tr.fib_ratio_at_entry:.3f}; "
+    sub = (f"Leg {uk_hm(tr.fib_anchor_time)} -> {uk_hm(tr.fib_extreme_time)} UK ({tr.leg_size_pts:.0f} pts), entry ratio {tr.fib_ratio_at_entry:.3f}; "
            f"stop {tr.stop_pts_est:.1f} pts ({tr.stop_leg_frac:.2f} of leg); held {(exit_t - entry_t).total_seconds() / 60:.0f} min. "
            f"Journal: OB {tag(tr.ob_tf)}, FVG {tag(tr.fvg_tf)}, trend aligned {tr.trend_aligned}") if pd.notna(tr.fib_anchor_price) else ""
     fig.text(0.07, 0.945, sub, ha="left", fontsize=8.5, color=INK2)
@@ -132,7 +141,7 @@ def chart_trade(tr, m1, path, title_prefix=""):
                 Line2D([], [], color=CRITICAL, linewidth=1.6, label="stop"),
                 Line2D([], [], marker="^", color=INK, linestyle="", label="entry"),
                 Line2D([], [], marker="X", color=INK, linestyle="", label="exit"),
-                plt.Rectangle((0, 0), 1, 1, color=LONDON_BAND, label="02:00-05:00 ET")]
+                plt.Rectangle((0, 0), 1, 1, color=LONDON_BAND, label="07:00-13:00 UK (London only)")]
     if tr.result == "Win":
         handles.insert(5, Line2D([], [], color=GOOD, linewidth=1.6, label="exit level (RR achieved)"))
     fig.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.065, 0.925), fontsize=7.5, frameon=False,

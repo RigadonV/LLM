@@ -49,6 +49,40 @@ stop costs recall because the mechanical rules lose earlier in the day than the 
 stop before reaching the trader's later trades. "Key open level" was not coded: the trader logged
 it on only 24% of trades.
 
+## Time zone and London-only trading
+
+The journal's "Session Time (London)" column was re-read in five time zones and the whole chain
+repeated each time (`pipeline/london_time_check.py`, `results/timezone_reading_check.csv`):
+
+| Logged times read as… | Entries (UK clock) | Price path explains | Fib match (chance) | Backtest recall / precision |
+|---|---|---|---|---|
+| **New York clock** | 07:00–14:22 | **94%** | **69%** (11%) | **57% / 32%** |
+| UK clock | 02:00–09:22 | 56% | 9% (5%) | 8% / 6% |
+| UTC | 02:06–10:22 | 56% | 7% (7%) | 9% / 7% |
+| Central Europe | 01:00–08:22 | 54% | 5% (16%) | 7% / 5% |
+| South Africa | 00:06–08:22 | 54% | 6% (5%) | 7% / 5% |
+
+Only the New York reading fits; under any other, the entries stop sitting on the fib levels the
+trader logged. Read on the New York clock, the trades already are London-session trades
+(07:00–14:22 UK), so the earlier analysis stands.
+
+Restricted to the London session (`results/london_session_windows.csv`; journal scored 3R / 0 / −1R):
+
+| Window | Journal trades | Journal R / trade | Backtest trades | Backtest recall | Backtest R / trade |
+|---|---|---|---|---|---|
+| 07:00–10:00 UK (London kill zone) | 111 | +1.99 | 187 | 59% | +0.04 |
+| 10:00–13:00 UK | 93 | +2.01 | 187 | 62% | +0.34 |
+| 13:00–14:30 UK (NY pre-open, 08:30 NY news) | 46 | +1.67 | 155 | 76% | −0.09 |
+| As journaled (07:00–14:30 UK) | 250 | +1.94 | 447 | 57% | +0.09 |
+| **London only (07:00–13:00 UK clock)** | **203** | **+2.02** | **347** | **57%** | **+0.21** |
+
+The first four rows use the New York-clock windows the journal was logged on (UK = New York + 5h;
++4h from 8 to 28 March); the last row is the go-forward rule, set on the UK clock.
+The 13:00–14:30 UK stretch is the weakest in both the journal and the backtest. Dropping it
+(`replicate_strategy.py --variant london_only`) raises the mechanical result to +0.21R per trade:
+95% bootstrap range +0.02R to +0.40R, positive in 6 of 8 months. It is a small edge, measured
+on the same seven months, and still far below the journal's +2R.
+
 ## Outcomes do not reproduce
 
 The journal is scored the way the checklist implies: Win = +3R, BE = 0R, Loss = −1R. The

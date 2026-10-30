@@ -21,6 +21,7 @@ Run `python pipeline/fetch_data.py` first if data/ is empty.
 Usage:
   python replicate_strategy.py JOURNAL.xlsx                       # all rounds -> results/validation_variants.csv
   python replicate_strategy.py JOURNAL.xlsx --variant refine2_both_levels
+  python replicate_strategy.py JOURNAL.xlsx --variant london_only          # 07:00-13:00 UK clock only
 """
 import argparse
 import os
@@ -40,7 +41,8 @@ class Rules:
     pivot_n: int = 2               # fractal strength for 15M swing points
     lookback_h: float = 30         # how far back a swing anchor may be
     fib_levels: tuple = (0.79,)    # retracement level(s) that get a limit order
-    window: tuple = (2.0, 9.5)     # hours (ET) during which orders are live
+    window: tuple = (2.0, 9.5)     # hours during which orders are live (clock of window_tz)
+    window_tz: str = ""            # "" = New York clock; e.g. "Europe/London" for a UK-clock session
     stop_leg_frac: float = 0.14    # stop distance as a fraction of the leg
     target_r: float = 3.0          # take profit in R
     be_at_r: float = 2.0           # move stop to entry after this much open profit (None = never)
@@ -51,7 +53,7 @@ class Rules:
     target_mode: str = "r"         # "r": target_r x R; "fib0": the leg extreme, but at least min_target_r
     min_target_r: float = 2.0
     max_trades_day: int = 5
-    exit_by: float = 12.0          # flat by this hour if neither stop nor target is hit
+    exit_by: float = 12.0          # flat by this hour (window_tz clock) if neither stop nor target is hit
     # options mirroring the trader's own Model 2 checklist (0 / "none" / False = off)
     max_losses_day: int = 0        # "2 losses = done for the day"
     max_stop_pts: float = 0.0      # "SL < 50pts": skip legs whose stop would be wider
@@ -73,6 +75,10 @@ EXIT_VARIANTS = {r.name: r for r in (
     Rules(**{**FINAL.__dict__, "name": "exit_3R_noBE", "be_at_r": None}),
     Rules(**{**FINAL.__dict__, "name": "exit_fib0_min2R", "target_mode": "fib0", "be_at_r": None}),
 )}
+# London session only, defined on the UK clock: 07:00-13:00 UK (= 02:00-08:00 New York, except in the
+# weeks when only one of the two countries is on summer time)
+LONDON_ONLY = Rules(**{**FINAL.__dict__, "name": "london_only", "window": (7.0, 13.0),
+                       "window_tz": "Europe/London", "exit_by": 17.0})
 # the trader's stated checklist (TP 3R and BE at 2R are already the final rules' exits)
 CHECKLIST_RISK = Rules(**{**FINAL.__dict__, "name": "checklist_risk", "max_losses_day": 2, "max_stop_pts": 50.0})
 CHECKLIST_VARIANTS = {r.name: r for r in (
@@ -221,9 +227,10 @@ def backtest(mk, rules, start, end):
     for day in days:
         if day.weekday() >= 5:
             continue
-        i0 = mk.t.searchsorted(day + pd.Timedelta(hours=rules.window[0]))
-        i1 = mk.t.searchsorted(day + pd.Timedelta(hours=rules.window[1]))
-        iend = mk.t.searchsorted(day + pd.Timedelta(hours=rules.exit_by))
+        base = pd.Timestamp(day.date()).tz_localize(rules.window_tz) if rules.window_tz else day
+        i0 = mk.t.searchsorted(base + pd.Timedelta(hours=rules.window[0]))
+        i1 = mk.t.searchsorted(base + pd.Timedelta(hours=rules.window[1]))
+        iend = mk.t.searchsorted(base + pd.Timedelta(hours=rules.exit_by))
         if i1 - i0 < 60:
             continue
         used_legs, n_day, losses, i = set(), 0, 0, i0
@@ -355,7 +362,7 @@ def main():
     m1 = load_prices("m1")
     start, end = journal.date.min(), journal.date.max()
     covered = journal.entry_et.between(m1.index.min() + pd.Timedelta(days=2), m1.index.max())
-    all_variants = {**VARIANTS, **EXIT_VARIANTS, **CHECKLIST_VARIANTS}
+    all_variants = {**VARIANTS, **EXIT_VARIANTS, **CHECKLIST_VARIANTS, LONDON_ONLY.name: LONDON_ONLY}
     groups = {"single": {args.variant: all_variants[args.variant]}} if args.variant else \
         {"entry rules (refinement rounds)": VARIANTS, "exit alternatives on the final entry rules": EXIT_VARIANTS,
          "the trader's own checklist added to the final rules": CHECKLIST_VARIANTS}
