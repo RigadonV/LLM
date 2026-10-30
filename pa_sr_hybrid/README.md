@@ -1,8 +1,8 @@
 # pa_sr_hybrid/
 
 A hybrid of **price action** and **support/resistance**, built from published research and
-tested on real historical prices (forex majors, gold, silver, Brent, five stock indices,
-2008 to September 2026).
+tested on the last 24 months of real prices, October 2024 to September 2026 (forex majors, gold,
+silver, Brent, five stock indices).
 
 | File | What it is |
 |---|---|
@@ -29,7 +29,8 @@ python report.py                # ../results/summary_*.csv, ../results/report_ta
 python charts.py                # ../charts/*.png
 ```
 
-`strategy.py` holds every rule and parameter; `backtest.py` holds the order-execution engine.
+`strategy.py` holds every rule and parameter; `backtest.py` holds the order-execution engine;
+`common.py` sets the test window (`TEST_START`, `TEST_END`).
 
 ## `results/trades.csv.gz` columns
 

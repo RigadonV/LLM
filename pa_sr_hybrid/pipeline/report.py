@@ -2,7 +2,8 @@
 
   python pipeline/report.py
 
-Writes results/data_summary.csv, results/summary_variants.csv, results/hybrid_breakdown.csv, results/hybrid_by_market.csv, results/equity_daily.csv and
+Writes results/data_summary.csv, results/summary_variants.csv, results/hybrid_vs_baselines.csv,
+results/hybrid_breakdown.csv, results/hybrid_by_market.csv, results/equity_daily.csv and
 results/report_tables.md (the tables used in BACKTEST.md).
 R is profit or loss divided by the risk planned at entry, after spread and commission.
 """
@@ -11,12 +12,12 @@ import os
 import numpy as np
 import pandas as pd
 
-from common import INSTRUMENTS, RESULTS_DIR, atr, load_daily
-from strategy import TREND_DAYS, VARIANTS
+from common import INSTRUMENTS, RESULTS_DIR, TEST_END, TEST_START, atr, load_daily
+from strategy import VARIANTS
 
-START, END = pd.Timestamp("2008-01-01"), pd.Timestamp("2026-09-30")
-YEARS = (END - START).days / 365.25
-SPLIT = pd.Timestamp("2017-01-01")
+START, END = TEST_START, TEST_END
+YEARS = ((END - START).days + 1) / 365.25
+SPLIT = pd.Timestamp("2025-10-01")  # the two 12-month halves of the window
 RISK = 0.01
 rng = np.random.default_rng(7)
 
@@ -79,16 +80,18 @@ def equity_stats(s):
 
 
 def data_summary():
-    """What went in: the bars of each market and its typical spread (at the 00:00 UTC daily close)."""
+    """What went in: history used for warm-up, bars in the test window and the window's typical spread
+    (at the 00:00 UTC daily close)."""
     rows = []
     for sym, (label, cls, _, pip, _) in INSTRUMENTS.items():
         d = load_daily(sym)
-        spread = d["ask_close"] - d["bid_close"]
         a = atr(d)
-        rows.append(dict(market=label, symbol=sym, asset_class=cls, first_day=d.index[0].date(),
-                         trading_from=d.index[TREND_DAYS].date(), last_day=d.index[-1].date(), bars=len(d),
+        w = (d.index >= START) & (d.index <= END)
+        spread = (d["ask_close"] - d["bid_close"])[w]
+        rows.append(dict(market=label, symbol=sym, asset_class=cls, history_from=d.index[0].date(),
+                         window_from=d.index[w][0].date(), window_to=d.index[w][-1].date(), bars=int(w.sum()),
                          median_spread=spread.median(), pip=pip, median_spread_pips=spread.median() / pip,
-                         median_spread_pct_atr=100 * (spread / a).median()))
+                         median_spread_pct_atr=100 * (spread / a[w]).median()))
     return pd.DataFrame(rows)
 
 
@@ -128,7 +131,7 @@ def main():
     summ.to_csv(os.path.join(RESULTS_DIR, "summary_variants.csv"), index=False, float_format="%.4f")
 
     hyb = hourly[(hourly["variant"] == "V4") & (hourly["rule"] == "cons") & hourly["costs"]].copy()
-    hyb["period"] = np.where(hyb["entry_day"] < SPLIT, "2008–2016", "2017–2026")
+    hyb["period"] = np.where(hyb["entry_day"] < SPLIT, "Oct 2024 – Sep 2025", "Oct 2025 – Sep 2026")
     hyb["side"] = np.where(hyb["dir"] > 0, "long", "short")
     hyb["touch_group"] = np.where(hyb["touches"] >= 3, "3+ touches", "2 touches")
     hyb["flip_group"] = np.where(hyb["flipped"].astype(bool), "flipped level", "same-side level")
@@ -142,6 +145,18 @@ def main():
     by_mkt = pd.DataFrame([dict(market=k, **stats(g)) for k, g in hyb.groupby("market")]).sort_values("avg_r")
     by_mkt.to_csv(os.path.join(RESULTS_DIR, "hybrid_by_market.csv"), index=False, float_format="%.4f")
 
+    # does the hybrid's level + signal logic add anything over its baselines, market type by market type?
+    cmp_rows = []
+    for (cls, side), g in main_runs.assign(side=np.where(main_runs["dir"] > 0, "long", "short")).groupby(
+            ["asset_class", "side"]):
+        row = dict(asset_class=cls, side=side)
+        for vk in ("V4", "V3", "V0"):
+            x = g[g["variant"] == vk]["r"]
+            row[f"{vk}_trades"], row[f"{vk}_avg_r"] = len(x), x.mean()
+        cmp_rows.append(row)
+    cmp = pd.DataFrame(cmp_rows)
+    cmp.to_csv(os.path.join(RESULTS_DIR, "hybrid_vs_baselines.csv"), index=False, float_format="%.4f")
+
     curves = {vk: equity(main_runs[main_runs["variant"] == vk]) for vk in VARIANTS}
     eq = pd.DataFrame(curves).sort_index().ffill().fillna(1.0)
     eq.index.name = "day"
@@ -150,11 +165,11 @@ def main():
     pct = lambda c: (lambda r: f"{100 * r[c]:.0f}%")
     num = lambda c, d=2: (lambda r: f"{r[c]:+.{d}f}" if pd.notna(r[c]) else "–")
     out = ["## Data\n",
-           fmt_table(data, ["Market", "Dukascopy symbol", "Bars", "From", "Trading from", "To",
+           fmt_table(data, ["Market", "Dukascopy symbol", "History used from", "Bars in test window",
                             "Median spread (pips/points)", "Median spread (% of ATR)"],
-                     [lambda r: r["market"], lambda r: r["symbol"], lambda r: f"{r['bars']:,}",
-                      lambda r: str(r["first_day"]), lambda r: str(r["trading_from"]), lambda r: str(r["last_day"]),
-                      lambda r: f"{r['median_spread_pips']:.1f}", lambda r: f"{r['median_spread_pct_atr']:.2f}%"]),
+                     [lambda r: r["market"], lambda r: r["symbol"], lambda r: str(r["history_from"]),
+                      lambda r: f"{r['bars']:,}", lambda r: f"{r['median_spread_pips']:.1f}",
+                      lambda r: f"{r['median_spread_pct_atr']:.2f}%"]),
            "\n## Variants (same-day cases replayed on hourly bars; any left over counted the worse way)\n",
            fmt_table(summ, ["Variant", "Trades", "Per year", "Win rate", "Avg R", "95% CI", "p(avg ≤ 0)",
                             "Profit factor", "Max DD (R)", "CAGR at 1%", "Max DD at 1%", "Settled by rule"],
@@ -175,6 +190,11 @@ def main():
                      [lambda r: r["split"], lambda r: str(r["group"]), lambda r: f"{r['trades']:.0f}", pct("win_rate"),
                       num("avg_r", 3), lambda r: f"{r['ci_lo']:+.2f} to {r['ci_hi']:+.2f}",
                       lambda r: f"{r['profit_factor']:.2f}" if pd.notna(r["profit_factor"]) else "–"]),
+           "\n## Hybrid vs baselines by asset class and side\n",
+           fmt_table(cmp, ["Asset class", "Side", "Hybrid trades", "Hybrid avg R", "PA only (V3) avg R",
+                           "Trend only (V0) avg R"],
+                     [lambda r: r["asset_class"], lambda r: r["side"], lambda r: f"{r['V4_trades']:.0f}",
+                      num("V4_avg_r", 3), num("V3_avg_r", 3), num("V0_avg_r", 3)]),
            "\n## Hybrid (V4) by market\n",
            fmt_table(by_mkt, ["Market", "Trades", "Win rate", "Avg R", "Total R"],
                      [lambda r: r["market"], lambda r: f"{r['trades']:.0f}", pct("win_rate"), num("avg_r", 3),

@@ -35,6 +35,9 @@ LAST_FULL_YEAR = 2025   # yearly daily files exist up to here
 RECENT_MONTHS = pd.period_range("2026-01", "2026-09", freq="M")  # 2026 comes from monthly hourly files
 COLS = ["open", "high", "low", "close"]
 MAX_GAP_DAYS = 7  # longer gaps in a daily series are feed holes, not market holidays
+# Test window: the last 24 months of data. Earlier history is only used to warm up the 12-month
+# trend, the 250-day swing levels and the ATR, so the first trade can enter on TEST_START.
+TEST_START, TEST_END = pd.Timestamp("2024-10-01"), pd.Timestamp("2026-09-30")
 
 
 def raw_path(symbol, kind, side, year, month=None):

@@ -2,6 +2,9 @@
 
   python pipeline/backtest.py
 
+Trades enter from TEST_START (common.py: the last 24 months); earlier bars only warm up the
+indicators.
+
 Buys fill at the ask and sells at the bid, plus commission. When a daily bar holds both the stop
 and the target (or the entry and the stop) the order of events is unknown. Every variant is run
 on daily bars alone with such cases settled the worse way ('cons') and the better way ('opt'),
@@ -17,7 +20,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from common import INSTRUMENTS, RESULTS_DIR, hourly_month, load_daily, raw_path, trading_day
+from common import INSTRUMENTS, RESULTS_DIR, TEST_START, hourly_month, load_daily, raw_path, trading_day
 from strategy import MAX_BARS, TARGET_R, VARIANTS, Market, make_order
 
 COMMISSION = 0.000035  # per side, fraction of the price: IC Markets Raw Spread, $3.50 per lot per side
@@ -179,7 +182,7 @@ def simulate(sym, m, v, rule, costs, hourly):
                     trades.append(close_trade(p2, px, why, t, m, costs))
                     p2 = None
             pend, pos = None, p2
-        if pos is None and t < m.n - 1:
+        if pos is None and t < m.n - 1 and m.d.index[t + 1] >= TEST_START:
             pend = make_order(m, t, v)
     if pos is not None:  # still open when the data ends
         trades.append(close_trade(pos, bars[-1][3] if pos["dir"] > 0 else bars[-1][7], "end", m.n - 1, m, costs))

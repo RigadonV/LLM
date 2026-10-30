@@ -47,6 +47,12 @@ it is a bearish pin bar (upper wick at least half the range) or a bearish engulf
 **Data:** Dukascopy daily bid and ask candles, 2007 to September 2026 (index and oil CFDs start
 later). Trading begins once a market has 12 months of history.
 
+> **Changed after this plan was committed, at the user's request:** the backtest covers the
+> **last 24 months only, 1 October 2024 – 30 September 2026.** Earlier history is used only to warm
+> up the 12-month trend, the 250-day swing levels and the ATR. The 2008–2016 vs 2017–2026 check
+> below becomes the two 12-month halves of the window. Every same-day case in the window is
+> settled from hourly bars. The rules themselves are unchanged.
+
 **Costs:** buys fill at Dukascopy's ask and sells at its bid, so the real historical spread is
 paid on every entry and exit. On top of that, a commission of 0.0035% of the position value per
 side (IC Markets' published $3.50 per lot per side on its Raw Spread account). Overnight

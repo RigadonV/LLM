@@ -105,7 +105,7 @@ def equity_chart(eq, mode):
                     color=th["ink2"], annotation_clip=False)
         if abs(yl - y) > 1e-9:
             ax.texts[-1].remove()
-            ax.annotate(text, (x, y), xytext=(x + pd.Timedelta(days=330), yl), textcoords="data", va="center",
+            ax.annotate(text, (x, y), xytext=(x + 0.05 * (eq.index[-1] - eq.index[0]), yl), textcoords="data", va="center",
                         fontsize=8.5, color=th["ink2"], annotation_clip=False,
                         arrowprops=dict(arrowstyle="-", color=th["muted"], linewidth=0.7, shrinkA=0, shrinkB=2))
     ax.set_ylabel("Account return (%)", color=th["muted"], fontsize=9)
