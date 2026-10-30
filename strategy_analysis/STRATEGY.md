@@ -190,6 +190,17 @@ comes out at 0.152, 0.141 and 0.141 of the leg. As a fraction of the leg the sto
 
 ---
 
+## Upgrades worth forward-testing
+
+Not part of what the trader did, but found by testing the rules above (`RR_IMPROVEMENTS.md`):
+
+- **Skip spiky impulse legs:** legs that moved faster than 2.5 × ATR(15M) per hour. They tend to snap
+  back through the fib zone. This is confirmed in the backtest and in the trader's own journal.
+- **Take profit at 4R** instead of 3R (BE at 2R as now), inside the trader's own "TP 3–4R" rule.
+- Together: +0.55R per trade instead of +0.21R, and +96% instead of +44% over the seven months.
+- Alternatives: a stop at 0.17 × leg instead of TP 4R. For fewer, higher-quality trades, also require
+  a wick-heavy pullback (5-minute candle bodies < 50% of their range).
+
 ## Example: a typical trade
 
 ![Trade #196 — long at 0.79](charts/trade_196_long_win.png)

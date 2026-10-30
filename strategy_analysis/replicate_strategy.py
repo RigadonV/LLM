@@ -63,6 +63,12 @@ class Rules:
     # optional daily bias (e.g. from an outside model such as TradingAgents): {date: +1 longs only, -1 shorts only,
     # 0 no trades}; dates missing from the map trade both ways
     bias: object = field(default=None, compare=False, hash=False)
+    # optional chart-pattern filter, called when an order would fill: f(mk, d, i, k, anchor, extreme, j_ext, px) -> bool
+    entry_filter: object = field(default=None, compare=False, hash=False)
+    # trade management: stop moves to entry + be_lock_r x R at the BE trigger; optional partial exit
+    be_lock_r: float = 0.0
+    partial_at_r: float = 0.0        # 0 = no partial; else book partial_frac of the position at this R
+    partial_frac: float = 0.5
 
 
 BASE = Rules()
@@ -206,6 +212,8 @@ def simulate_exit(mk, i_fill, d, entry, stop, rules, day_end_i, leg_extreme):
         tgt = leg_extreme if s * (leg_extreme - entry) >= rules.min_target_r * r else entry + s * rules.min_target_r * r
     cur_stop = stop
     be_done = False
+    banked, open_frac = 0.0, 1.0  # R already booked by a partial exit, and the share of the position still open
+    part_px = entry + s * rules.partial_at_r * r if rules.partial_at_r else None
     # fill bar: only count the stop if the bar *closes* beyond it (intrabar order unknown)
     if s * (mk.c[i_fill] - stop) < 0:
         return i_fill, stop, -1.0, "Loss"
@@ -213,16 +221,19 @@ def simulate_exit(mk, i_fill, d, entry, stop, rules, day_end_i, leg_extreme):
         hit_stop = mk.l[i] <= cur_stop if s == 1 else mk.h[i] >= cur_stop
         hit_tgt = mk.h[i] >= tgt if s == 1 else mk.l[i] <= tgt
         if hit_stop:  # conservative: stop before target when both are inside one bar
-            res = 0.0 if be_done else -1.0
-            return i, cur_stop, res, "BE" if be_done else "Loss"
+            res = banked + open_frac * s * (cur_stop - entry) / r
+            outcome = "Loss" if not be_done else ("BE" if abs(res) < 1e-9 else "Locked")
+            return i, cur_stop, round(res, 2), outcome
         if hit_tgt:
-            return i, tgt, round(s * (tgt - entry) / r, 2), "Win"
-        if rules.be_at_r is not None and not be_done:
-            fav = (mk.h[i] - entry) if s == 1 else (entry - mk.l[i])
-            if fav >= rules.be_at_r * r:
-                cur_stop, be_done = entry, True
+            return i, tgt, round(banked + open_frac * s * (tgt - entry) / r, 2), "Win"
+        fav = (mk.h[i] - entry) if s == 1 else (entry - mk.l[i])
+        if part_px is not None and open_frac == 1.0 and fav >= rules.partial_at_r * r:
+            banked, open_frac = rules.partial_frac * rules.partial_at_r, 1.0 - rules.partial_frac
+            cur_stop, be_done = entry + s * rules.be_lock_r * r, True
+        if rules.be_at_r is not None and not be_done and fav >= rules.be_at_r * r:
+            cur_stop, be_done = entry + s * rules.be_lock_r * r, True
     last = day_end_i - 1
-    return last, mk.c[last], s * (mk.c[last] - entry) / r, "Time"
+    return last, mk.c[last], round(banked + open_frac * s * (mk.c[last] - entry) / r, 2), "Time"
 
 
 def backtest(mk, rules, start, end):
@@ -277,9 +288,8 @@ def backtest(mk, rules, start, end):
                             continue
                     if rules.require_zone and not mk.zone_covers(d, mk.piv[d]["start"][k], i, px):
                         continue
-                    if d == "long" and prev_close > px and mk.l[i] <= px:
-                        fill = (d, f, px, k, a, ext, size, j_ext)
-                    elif d == "short" and prev_close < px and mk.h[i] >= px:
+                    touched = (prev_close > px and mk.l[i] <= px) if d == "long" else (prev_close < px and mk.h[i] >= px)
+                    if touched and (rules.entry_filter is None or rules.entry_filter(mk, d, i, k, a, ext, j_ext, px)):
                         fill = (d, f, px, k, a, ext, size, j_ext)
                     if fill:
                         break

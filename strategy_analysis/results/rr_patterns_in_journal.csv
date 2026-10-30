@@ -1,0 +1,5 @@
+pattern,journal_trades_kept,R_kept,loss_rate_kept,journal_trades_skipped,R_skipped,loss_rate_skipped
+no_spike_leg,88,2.09,0.125,46,1.89,0.196
+no_slow_pullback,79,1.95,0.139,55,2.13,0.164
+wicky_pullback,71,2.11,0.127,63,1.92,0.175
+no_counter_fvgs,58,1.91,0.155,76,2.11,0.145

@@ -34,6 +34,9 @@ Month by month for the leaders (`results/best_return_monthly.csv`):
 
 ![Equity curves of the best configurations](charts/best_return_equity.png)
 
+> **Update:** `RR_IMPROVEMENTS.md` builds on this configuration. Skipping spiky impulse legs and
+> taking profit at 4R raises it to +96% over the same months (+0.55R per trade, 8.5% max drawdown).
+
 ## The answer
 
 **Best so far: the London session (07:00–13:00 UK) with your risk rules and a 15-minute trend filter.**

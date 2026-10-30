@@ -1,0 +1,47 @@
+group,configuration,trades,win_rate,net_R,net_R_per_trade,R_per_trade_ci,total_return_pct,per_month_pct,max_drawdown_pct,return_to_drawdown,losing_months,Mar-Aug_return_pct,Sep-Oct_return_pct
+baseline,best config (baseline),189,0.317,39.8,0.21,-0.03 to +0.49,44.2,5.2,9.7,4.54,0 of 8,36.9,5.3
+entry filter,no_spike_leg,128,0.375,57.3,0.448,+0.12 to +0.78,73.2,7.9,6.7,10.87,0 of 8,53.6,12.7
+entry filter,no_slow_pullback,133,0.346,39.8,0.3,-0.03 to +0.63,45.4,5.3,7.5,6.05,2 of 8,32.2,10.0
+entry filter,wicky_pullback,102,0.363,38.5,0.377,+0.01 to +0.74,44.1,5.2,9.5,4.65,3 of 8,40.8,2.4
+entry filter,no_counter_fvgs,117,0.359,43.0,0.368,+0.04 to +0.71,50.5,5.8,10.6,4.76,1 of 8,37.5,9.5
+entry filter,no_spike_leg + no_slow_pullback,107,0.364,42.1,0.394,+0.03 to +0.76,49.4,5.7,7.4,6.71,2 of 8,30.6,14.4
+entry filter,no_spike_leg + no_slow_pullback + no_counter_fvgs,72,0.403,39.1,0.542,+0.12 to +0.97,45.7,5.4,5.3,8.57,1 of 8,27.0,14.7
+entry filter,no_spike_leg + wicky_pullback,62,0.5,57.2,0.922,+0.44 to +1.40,74.6,8.0,3.8,19.69,2 of 8,60.1,9.0
+entry filter,all four,40,0.575,48.1,1.202,+0.59 to +1.79,60.1,6.8,4.4,13.64,1 of 8,43.7,11.4
+take profit x break-even,"TP 2.0R, BE at 1.0R",193,0.0,-0.7,-0.004,-0.18 to +0.18,-2.4,-0.3,18.1,-0.13,5 of 8,2.2,-4.5
+take profit x break-even,"TP 2.0R, BE at 1.5R",192,0.0,0.4,0.002,-0.20 to +0.20,-1.5,-0.2,18.0,-0.08,4 of 8,3.1,-4.5
+take profit x break-even,"TP 2.0R, no BE",189,0.0,-0.2,-0.001,-0.19 to +0.20,-2.2,-0.3,16.9,-0.13,4 of 8,2.4,-4.5
+take profit x break-even,"TP 2.5R, BE at 1.0R",193,0.0,14.3,0.074,-0.14 to +0.29,12.9,1.7,11.2,1.15,3 of 8,11.5,1.3
+take profit x break-even,"TP 2.5R, BE at 1.5R",192,0.0,18.9,0.098,-0.11 to +0.33,17.9,2.3,9.7,1.84,3 of 8,15.8,1.8
+take profit x break-even,"TP 2.5R, BE at 2.0R",189,0.0,17.3,0.091,-0.14 to +0.33,15.9,2.1,9.4,1.68,3 of 8,13.9,1.8
+take profit x break-even,"TP 2.5R, no BE",189,0.0,17.3,0.091,-0.14 to +0.33,15.8,2.1,9.4,1.67,3 of 8,13.8,1.8
+take profit x break-even,"TP 3.0R, BE at 1.0R",193,0.259,29.3,0.152,-0.08 to +0.40,30.5,3.8,10.8,2.84,2 of 8,25.1,4.3
+take profit x break-even,"TP 3.0R, BE at 1.5R",192,0.302,40.4,0.21,-0.04 to +0.48,45.2,5.3,9.5,4.78,1 of 8,37.9,5.3
+take profit x break-even,"TP 3.0R, BE at 2.0R",189,0.317,39.8,0.21,-0.05 to +0.48,44.2,5.2,9.7,4.54,0 of 8,36.9,5.3
+take profit x break-even,"TP 3.0R, no BE",189,0.333,41.8,0.221,-0.04 to +0.50,46.8,5.5,10.6,4.4,0 of 8,35.4,8.4
+take profit x break-even,"TP 4.0R, BE at 1.0R",191,0.209,40.5,0.212,-0.06 to +0.49,44.6,5.3,14.7,3.03,1 of 8,29.7,11.5
+take profit x break-even,"TP 4.0R, BE at 1.5R",189,0.243,52.8,0.279,-0.01 to +0.58,62.7,7.0,14.7,4.26,1 of 8,43.1,13.7
+take profit x break-even,"TP 4.0R, BE at 2.0R",186,0.258,54.2,0.291,+0.00 to +0.61,64.7,7.2,11.9,5.45,1 of 8,44.9,13.7
+take profit x break-even,"TP 4.0R, no BE",183,0.268,41.5,0.227,-0.10 to +0.55,44.9,5.3,14.4,3.11,1 of 8,40.4,3.2
+take profit x break-even,"TP 5.0R, BE at 1.0R",190,0.174,45.8,0.241,-0.06 to +0.55,51.3,5.9,13.2,3.88,3 of 8,26.6,19.5
+take profit x break-even,"TP 5.0R, BE at 1.5R",188,0.191,49.1,0.261,-0.06 to +0.59,55.7,6.3,13.9,4.0,2 of 8,33.0,17.1
+take profit x break-even,"TP 5.0R, BE at 2.0R",185,0.205,52.5,0.284,-0.05 to +0.63,60.6,6.8,11.7,5.2,2 of 8,37.2,17.1
+take profit x break-even,"TP 5.0R, no BE",182,0.231,55.0,0.302,-0.07 to +0.67,63.7,7.1,14.4,4.41,0 of 8,49.5,9.5
+lock / partial,"TP 4R, at +2R lock +1R",189,0.185,34.8,0.184,-0.08 to +0.47,36.8,4.4,14.0,2.62,2 of 8,25.1,9.4
+lock / partial,"TP 5R, at +2R lock +1R",188,0.144,35.0,0.186,-0.11 to +0.50,36.3,4.4,13.6,2.67,3 of 8,18.8,14.7
+lock / partial,"half off at 2R, rest to 4R (BE)",186,0.258,28.2,0.151,-0.09 to +0.40,28.9,3.6,10.7,2.71,2 of 8,23.6,4.3
+lock / partial,"half off at 2R, rest to 5R (BE)",185,0.205,23.9,0.129,-0.13 to +0.39,23.3,3.0,11.4,2.05,2 of 8,16.5,5.9
+lock / partial,"half off at 3R, rest to 5R (BE)",185,0.216,45.9,0.248,-0.06 to +0.55,52.2,6.0,10.7,4.89,1 of 8,33.6,13.9
+stop size,stop 0.12 x leg (baseline 0.14),190,0.295,20.0,0.105,-0.15 to +0.37,18.5,2.4,12.1,1.53,3 of 8,14.5,3.5
+stop size,stop 0.17 x leg (baseline 0.14),191,0.346,63.4,0.332,+0.08 to +0.61,82.1,8.7,10.3,7.94,1 of 8,70.0,7.1
+stop size,stop 0.20 x leg (baseline 0.14),185,0.319,59.9,0.324,+0.06 to +0.59,76.5,8.2,10.3,7.46,2 of 8,62.3,8.7
+entry level,0.79 level only (deeper entry),144,0.285,15.6,0.109,-0.17 to +0.41,14.3,1.9,10.1,1.42,4 of 8,22.7,-6.8
+threshold check,no_spike_leg at 2.0 ATR/h (chosen 2.5),98,0.378,45.9,0.469,+0.09 to +0.86,55.4,6.3,6.5,8.55,0 of 8,36.6,13.7
+threshold check,no_spike_leg at 3.0 ATR/h (chosen 2.5),152,0.336,43.3,0.285,-0.01 to +0.59,50.1,5.8,8.5,5.93,2 of 8,40.9,6.5
+threshold check,stop 0.16 x leg,190,0.332,54.3,0.286,+0.02 to +0.55,66.6,7.3,8.4,7.91,0 of 8,51.3,10.1
+threshold check,stop 0.18 x leg,191,0.351,71.3,0.373,+0.11 to +0.64,97.0,9.9,10.3,9.39,1 of 8,83.6,7.3
+combined,A no_spike_leg + B TP 4R/BE 2R,127,0.307,70.4,0.554,+0.17 to +0.94,95.6,9.8,8.5,11.26,0 of 8,63.8,19.4
+combined,A no_spike_leg + C stop 0.17,129,0.395,70.7,0.548,+0.22 to +0.88,97.6,9.9,7.3,13.36,0 of 8,72.8,14.4
+combined,B TP 4R/BE 2R + C stop 0.17,188,0.266,67.7,0.36,+0.06 to +0.66,88.4,9.2,10.3,8.55,1 of 8,66.4,13.2
+combined,A + B + C,127,0.291,67.9,0.535,+0.16 to +0.93,91.1,9.4,7.3,12.47,0 of 8,61.2,18.6
+combined,A + B + C + wicky pullback,62,0.403,67.4,1.087,+0.53 to +1.67,92.2,9.5,3.5,26.29,1 of 8,59.6,20.5

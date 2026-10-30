@@ -1,0 +1,131 @@
+set,feature,bucket,n_mar_aug,R_mar_aug,n_sep_oct,R_sep_oct,win_rate_all
+"risk rules, no trend filter",fib_level,0.705,233,0.084,57,-0.195,0.266
+"risk rules, no trend filter",fib_level,0.79,35,0.027,9,-0.206,0.227
+"risk rules, no trend filter",leg_atr,low (<2.61),89,-0.026,23,0.117,0.268
+"risk rules, no trend filter",leg_atr,mid,89,-0.013,17,-0.411,0.245
+"risk rules, no trend filter",leg_atr,high (>=3.72),90,0.268,26,-0.332,0.267
+"risk rules, no trend filter",leg_minutes,low (<68.00),89,-0.015,27,-0.356,0.241
+"risk rules, no trend filter",leg_minutes,mid,89,-0.049,15,0.025,0.25
+"risk rules, no trend filter",leg_minutes,high (>=120.00),90,0.293,24,-0.154,0.289
+"risk rules, no trend filter",leg_speed_atr_per_h,low (<1.74),89,0.235,23,-0.347,0.286
+"risk rules, no trend filter",leg_speed_atr_per_h,mid,89,0.223,16,0.461,0.314
+"risk rules, no trend filter",leg_speed_atr_per_h,high (>=2.56),90,-0.225,27,-0.457,0.188
+"risk rules, no trend filter",displacement_atr,low (<0.91),89,-0.009,20,-0.538,0.239
+"risk rules, no trend filter",displacement_atr,mid,89,0.202,24,0.226,0.301
+"risk rules, no trend filter",displacement_atr,high (>=1.24),90,0.038,22,-0.346,0.241
+"risk rules, no trend filter",leg_fvgs_15m,low (<1.00),66,0.162,19,-0.237,0.282
+"risk rules, no trend filter",leg_fvgs_15m,mid,79,-0.057,24,-0.247,0.243
+"risk rules, no trend filter",leg_fvgs_15m,high (>=2.00),123,0.117,23,-0.109,0.26
+"risk rules, no trend filter",leg_broke_structure,False,73,-0.059,17,0.099,0.256
+"risk rules, no trend filter",leg_broke_structure,True,195,0.128,49,-0.299,0.262
+"risk rules, no trend filter",swing_swept_6h_liquidity,False,173,0.158,40,-0.252,0.277
+"risk rules, no trend filter",swing_swept_6h_liquidity,True,95,-0.07,26,-0.11,0.231
+"risk rules, no trend filter",extreme_is_session_extreme,False,146,-0.094,30,0.002,0.239
+"risk rules, no trend filter",extreme_is_session_extreme,True,122,0.281,36,-0.361,0.285
+"risk rules, no trend filter",pullback_minutes,low (<31.00),87,-0.017,26,0.134,0.265
+"risk rules, no trend filter",pullback_minutes,mid,90,0.085,17,-0.51,0.262
+"risk rules, no trend filter",pullback_minutes,high (>=86.00),91,0.158,23,-0.337,0.254
+"risk rules, no trend filter",pullback_vs_leg_time,low (<0.34),89,-0.014,19,0.36,0.278
+"risk rules, no trend filter",pullback_vs_leg_time,mid,89,0.351,26,-0.256,0.313
+"risk rules, no trend filter",pullback_vs_leg_time,high (>=0.83),90,-0.104,21,-0.624,0.189
+"risk rules, no trend filter",pullback_speed_atr_per_h,low (<1.77),89,0.089,21,-0.472,0.236
+"risk rules, no trend filter",pullback_speed_atr_per_h,mid,89,0.157,22,-0.417,0.27
+"risk rules, no trend filter",pullback_speed_atr_per_h,high (>=3.71),90,-0.014,23,0.267,0.274
+"risk rules, no trend filter",pullback_biggest_counter_candle_atr,low (<0.58),89,0.063,12,-0.708,0.257
+"risk rules, no trend filter",pullback_biggest_counter_candle_atr,mid,89,-0.222,14,-0.119,0.204
+"risk rules, no trend filter",pullback_biggest_counter_candle_atr,high (>=0.79),90,0.387,40,-0.069,0.308
+"risk rules, no trend filter",pullback_counter_fvgs_5m,low (<1.00),59,0.078,20,0.122,0.291
+"risk rules, no trend filter",pullback_counter_fvgs_5m,mid,112,0.069,24,-0.414,0.257
+"risk rules, no trend filter",pullback_counter_fvgs_5m,high (>=3.00),97,0.085,22,-0.248,0.244
+"risk rules, no trend filter",pullback_body_ratio,low (<0.47),89,0.441,17,-0.359,0.349
+"risk rules, no trend filter",pullback_body_ratio,mid,88,-0.216,22,0.038,0.209
+"risk rules, no trend filter",pullback_body_ratio,high (>=0.53),89,-0.017,27,-0.285,0.224
+"risk rules, no trend filter",hour_uk,low (<8.00),45,0.07,19,-0.486,0.234
+"risk rules, no trend filter",hour_uk,mid,114,-0.063,31,0.122,0.241
+"risk rules, no trend filter",hour_uk,high (>=10.00),109,0.226,16,-0.468,0.296
+"risk rules, no trend filter",atr15,low (<30.67),89,0.05,25,-0.455,0.254
+"risk rules, no trend filter",atr15,mid,89,0.049,35,0.026,0.266
+"risk rules, no trend filter",atr15,high (>=41.24),90,0.13,6,-0.412,0.26
+"risk rules, no trend filter",atr_vs_5day,low (<0.68),89,0.175,6,-0.518,0.295
+"risk rules, no trend filter",atr_vs_5day,mid,89,-0.108,25,-0.232,0.219
+"risk rules, no trend filter",atr_vs_5day,high (>=0.87),90,0.163,35,-0.115,0.272
+"risk rules, no trend filter",day_range_used,low (<0.37),89,0.28,14,-0.543,0.311
+"risk rules, no trend filter",day_range_used,mid,89,-0.148,28,0.459,0.239
+"risk rules, no trend filter",day_range_used,high (>=0.52),90,0.098,24,-0.758,0.237
+"risk rules, no trend filter",trend_1h_with_trade,False,123,0.019,36,0.003,0.252
+"risk rules, no trend filter",trend_1h_with_trade,True,145,0.126,30,-0.435,0.269
+"risk rules, no trend filter",ob_fvg_at_level,False,42,-0.051,15,-0.251,0.228
+"risk rules, no trend filter",ob_fvg_at_level,True,226,0.101,51,-0.18,0.267
+"risk rules, no trend filter",discount_vs_0000_open,False,88,0.42,23,-0.372,0.324
+"risk rules, no trend filter",discount_vs_0000_open,True,180,-0.091,43,-0.102,0.229
+"risk rules, no trend filter",stop_pts,low (<13.18),89,0.078,24,-0.115,0.283
+"risk rules, no trend filter",stop_pts,mid,88,-0.05,21,-0.287,0.229
+"risk rules, no trend filter",stop_pts,high (>=19.80),91,0.198,21,-0.197,0.268
+"risk rules, no trend filter",nth_trade_today,low (<1.00),0,,0,,
+"risk rules, no trend filter",nth_trade_today,mid,120,-0.177,33,-0.258,0.209
+"risk rules, no trend filter",nth_trade_today,high (>=2.00),148,0.282,33,-0.134,0.304
+best config (with 15M trend),fib_level,0.705,139,0.13,36,0.253,0.303
+best config (with 15M trend),fib_level,0.79,11,1.448,3,-1.1,0.5
+best config (with 15M trend),leg_atr,low (<2.56),50,0.335,13,0.473,0.365
+best config (with 15M trend),leg_atr,mid,50,0.021,12,-0.109,0.258
+best config (with 15M trend),leg_atr,high (>=3.44),50,0.323,14,0.068,0.328
+best config (with 15M trend),leg_minutes,low (<67.67),50,0.04,15,-0.523,0.246
+best config (with 15M trend),leg_minutes,mid,50,0.126,12,0.886,0.339
+best config (with 15M trend),leg_minutes,high (>=112.33),50,0.513,12,0.25,0.371
+best config (with 15M trend),leg_speed_atr_per_h,low (<1.74),50,0.398,12,0.234,0.355
+best config (with 15M trend),leg_speed_atr_per_h,mid,50,0.465,12,0.893,0.403
+best config (with 15M trend),leg_speed_atr_per_h,high (>=2.57),50,-0.184,15,-0.516,0.2
+best config (with 15M trend),displacement_atr,low (<0.87),50,0.432,12,0.536,0.387
+best config (with 15M trend),displacement_atr,mid,50,0.333,16,-0.048,0.318
+best config (with 15M trend),displacement_atr,high (>=1.19),50,-0.085,11,0.012,0.246
+best config (with 15M trend),leg_fvgs_15m,low (<1.00),34,0.715,11,0.061,0.4
+best config (with 15M trend),leg_fvgs_15m,mid,53,-0.109,14,-0.272,0.239
+best config (with 15M trend),leg_fvgs_15m,high (>=2.00),63,0.246,14,0.638,0.338
+best config (with 15M trend),leg_broke_structure,False,23,-0.452,4,0.879,0.222
+best config (with 15M trend),leg_broke_structure,True,127,0.349,35,0.065,0.333
+best config (with 15M trend),swing_swept_6h_liquidity,False,143,0.209,39,0.149,0.313
+best config (with 15M trend),swing_swept_6h_liquidity,True,7,0.581,0,,0.429
+best config (with 15M trend),extreme_is_session_extreme,False,59,-0.062,10,0.471,0.275
+best config (with 15M trend),extreme_is_session_extreme,True,91,0.414,29,0.038,0.342
+best config (with 15M trend),pullback_minutes,low (<25.00),47,0.113,10,0.866,0.333
+best config (with 15M trend),pullback_minutes,mid,53,0.38,16,-0.054,0.333
+best config (with 15M trend),pullback_minutes,high (>=64.33),50,0.17,13,-0.154,0.286
+best config (with 15M trend),pullback_vs_leg_time,low (<0.29),50,0.229,10,0.881,0.35
+best config (with 15M trend),pullback_vs_leg_time,mid,50,0.341,14,0.323,0.359
+best config (with 15M trend),pullback_vs_leg_time,high (>=0.74),50,0.11,15,-0.503,0.246
+best config (with 15M trend),pullback_speed_atr_per_h,low (<2.10),50,0.323,11,0.003,0.328
+best config (with 15M trend),pullback_speed_atr_per_h,mid,50,0.206,18,-0.158,0.294
+best config (with 15M trend),pullback_speed_atr_per_h,high (>=4.73),50,0.15,10,0.86,0.333
+best config (with 15M trend),pullback_biggest_counter_candle_atr,low (<0.60),50,0.263,12,0.213,0.339
+best config (with 15M trend),pullback_biggest_counter_candle_atr,mid,50,0.094,6,0.396,0.286
+best config (with 15M trend),pullback_biggest_counter_candle_atr,high (>=0.79),50,0.323,21,0.041,0.324
+best config (with 15M trend),pullback_counter_fvgs_5m,low (<1.00),36,0.184,15,0.543,0.333
+best config (with 15M trend),pullback_counter_fvgs_5m,mid,48,0.509,12,0.211,0.383
+best config (with 15M trend),pullback_counter_fvgs_5m,high (>=2.00),66,0.045,12,-0.407,0.256
+best config (with 15M trend),pullback_body_ratio,low (<0.46),50,0.657,10,0.586,0.433
+best config (with 15M trend),pullback_body_ratio,mid,50,-0.001,15,-0.041,0.262
+best config (with 15M trend),pullback_body_ratio,high (>=0.54),50,0.024,14,0.04,0.266
+best config (with 15M trend),hour_uk,low (<8.00),23,-0.07,10,-0.326,0.242
+best config (with 15M trend),hour_uk,mid,61,0.186,14,0.101,0.293
+best config (with 15M trend),hour_uk,high (>=10.00),66,0.368,15,0.51,0.37
+best config (with 15M trend),atr15,low (<29.34),50,0.159,10,-0.337,0.3
+best config (with 15M trend),atr15,mid,50,0.211,17,0.831,0.358
+best config (with 15M trend),atr15,high (>=40.03),50,0.31,12,-0.414,0.29
+best config (with 15M trend),atr_vs_5day,low (<0.68),50,0.249,4,0.815,0.352
+best config (with 15M trend),atr_vs_5day,mid,50,0.077,12,-0.363,0.258
+best config (with 15M trend),atr_vs_5day,high (>=0.86),50,0.354,23,0.3,0.342
+best config (with 15M trend),day_range_used,low (<0.37),50,0.415,7,-0.557,0.351
+best config (with 15M trend),day_range_used,mid,50,-0.041,13,0.49,0.27
+best config (with 15M trend),day_range_used,high (>=0.52),50,0.305,19,0.175,0.333
+best config (with 15M trend),trend_1h_with_trade,False,38,0.116,12,0.64,0.32
+best config (with 15M trend),trend_1h_with_trade,True,112,0.264,27,-0.07,0.317
+best config (with 15M trend),ob_fvg_at_level,False,24,0.528,10,0.865,0.441
+best config (with 15M trend),ob_fvg_at_level,True,126,0.169,29,-0.099,0.29
+best config (with 15M trend),discount_vs_0000_open,False,93,0.337,26,0.002,0.328
+best config (with 15M trend),discount_vs_0000_open,True,57,0.046,13,0.441,0.3
+best config (with 15M trend),stop_pts,low (<12.34),50,0.328,15,0.513,0.369
+best config (with 15M trend),stop_pts,mid,50,0.315,8,-1.099,0.293
+best config (with 15M trend),stop_pts,high (>=16.97),50,0.037,16,0.431,0.288
+best config (with 15M trend),nth_trade_today,low (<1.00),0,,0,,
+best config (with 15M trend),nth_trade_today,mid,100,0.106,24,-0.115,0.282
+best config (with 15M trend),nth_trade_today,high (>=1.33),50,0.467,15,0.57,0.385

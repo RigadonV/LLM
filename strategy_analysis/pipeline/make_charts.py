@@ -52,7 +52,7 @@ def uk_hm(ts_str):
     return pd.Timestamp(ts_str).tz_localize(ET).tz_convert(UK).strftime("%H:%M")
 
 
-def chart_trade(tr, m1, path, title_prefix=""):
+def chart_trade(tr, m1, path, title_prefix="", subtitle=None):
     entry_t = pd.Timestamp(tr.entry_et).tz_localize(ET)
     exit_t = pd.Timestamp(tr.exit_time_est if pd.notna(tr.exit_time_est) else tr.exit_et).tz_localize(ET)
     anchor_t = pd.Timestamp(tr.fib_anchor_time).tz_localize(ET) if pd.notna(tr.fib_anchor_time) else entry_t - pd.Timedelta(hours=3)
@@ -128,7 +128,7 @@ def chart_trade(tr, m1, path, title_prefix=""):
     sub = (f"Leg {uk_hm(tr.fib_anchor_time)} -> {uk_hm(tr.fib_extreme_time)} UK ({tr.leg_size_pts:.0f} pts), entry ratio {tr.fib_ratio_at_entry:.3f}; "
            f"stop {tr.stop_pts_est:.1f} pts ({tr.stop_leg_frac:.2f} of leg); held {(exit_t - entry_t).total_seconds() / 60:.0f} min. "
            f"Journal: OB {tag(tr.ob_tf)}, FVG {tag(tr.fvg_tf)}, trend aligned {tr.trend_aligned}") if pd.notna(tr.fib_anchor_price) else ""
-    fig.text(0.07, 0.945, sub, ha="left", fontsize=8.5, color=INK2)
+    fig.text(0.07, 0.945, subtitle if subtitle is not None else sub, ha="left", fontsize=8.5, color=INK2)
     def ema_label(n):
         e = emas[n]
         if e.max() < lo - pad:
