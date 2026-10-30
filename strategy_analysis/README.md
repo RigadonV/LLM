@@ -8,6 +8,7 @@ Reverse-engineering of the "Model 2 – London" NQ trade journal (`Model2_London
 | `STRATEGY.md` | The strategy as numbered rules, with confidence levels and an example chart |
 | `VALIDATION.md` | How well the coded rules reproduce the journal, and the limitations |
 | `ONE_MONTH_AND_TRADINGAGENTS.md` | September 2026 under forex-style rules, and whether TradingAgents would help |
+| `BEST_RETURN.md` | Every configuration on one common basis, and which gives the best return |
 | `trade_context.csv` | One row per journal trade: journal fields + inferred direction/prices + market context |
 | `charts/` | Five representative trades (long win, short win, loss, "BE", one that does not fit), drawn on the UK clock |
 | `replicate_strategy.py` | The validation backtest, London session 07:00–13:00 UK (baseline, two refinement rounds, exit alternatives, the trader's checklist, the journal's own window for reference) |
@@ -32,6 +33,7 @@ python london_time_check.py "$J"          # journal times re-read in other time 
 python best_window.py "$J"                # best return window inside 07:00-13:00 UK (+ ../charts/london_hours.png)
 python one_month.py "$J"                  # one month (Sep 2026) under forex-style rules (+ ../charts/one_month_equity.png)
 python agent_overlay.py                   # TradingAgents-style daily bias at different accuracies
+python compare_results.py                 # every configuration on one basis (+ ../charts/best_return_equity.png)
 python make_charts.py --ids 196:long_win,246:short_win,167:loss,61:be_at_2R,10:does_not_fit
 python check_proxy.py nq_5m.json          # optional: CFD vs NQ futures check (Yahoo chart-API JSON)
 ```

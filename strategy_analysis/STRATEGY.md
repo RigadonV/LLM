@@ -109,11 +109,14 @@ larger size filters all fit worse (`results/leg_definition_test.csv`).
 
 10. Trade **with the leg**: buy retracements of up-legs, sell retracements of down-legs.
     The sample is evenly split: 108 longs, 105 shorts, with near-identical loss rates (12.0% vs 12.4%).
-11. **Trend is a short-term, discretionary read — not a moving-average rule.** Across all trades,
-    price vs EMA 20/50/200 on 15M, 1H, 4H or daily agrees with the trade direction only 46–57% of
-    the time. The trader's own "aligned with trend" tag (83% Y) lines up best with the 15M EMA50
-    trend: 62% of "Y" trades vs 10% of "N" trades. As a mechanical filter it halves the number of
-    trades and only nudges expectancy (see `VALIDATION.md`). *Low–Medium.*
+11. **Trend: the trader's read is short-term and discretionary, but a 15M EMA50 filter works best
+    mechanically.** Across all trades, price vs EMA 20/50/200 on 15M, 1H, 4H or daily agrees with the
+    trade direction only 46–57% of the time. The trader's own "aligned with trend" tag (83% Y) lines up
+    best with the 15M EMA50 trend: 62% of "Y" trades vs 10% of "N" trades. As a mechanical filter
+    (longs only when the last closed 15M candle is above a rising EMA50, shorts only below a falling
+    one) it roughly halves the number of trades but, with the risk rules, gives the best result of
+    every configuration tested: +44% over the seven months vs +3% without it (`BEST_RETURN.md`).
+    *Low–Medium* as a description of the trader; *Medium* as a rule to forward-test.
 
 ## 5. Setup filters
 

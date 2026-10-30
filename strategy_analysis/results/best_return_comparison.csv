@@ -1,0 +1,11 @@
+configuration,trades,win_rate,net_R,net_R_per_trade,R_per_trade_ci,total_return_pct,per_month_pct,max_drawdown_pct,return_to_drawdown,losing_months,Mar-Aug_return_pct,Sep-Oct_return_pct
+"Journal's own window 07:00-14:30 UK, final rules",534,0.247,-11.4,-0.021,-0.16 to +0.12,-17.3,-2.6,38.8,-0.45,4 of 8,9.3,-24.3
+"London 07:00-13:00 UK, final rules",413,0.259,18.4,0.044,-0.12 to +0.21,13.1,1.7,22.1,0.59,4 of 8,29.1,-12.4
+London 07:00-13:00 + your risk rules,334,0.26,7.6,0.023,-0.16 to +0.21,2.7,0.4,19.4,0.14,4 of 8,17.9,-12.9
+London 07:00-13:00 + risk rules + 15M trend,189,0.317,39.8,0.21,-0.05 to +0.48,44.2,5.2,9.7,4.54,0 of 8,36.9,5.3
+London 07:00-13:00 + risk rules + 1H trend,205,0.278,13.9,0.068,-0.18 to +0.31,11.3,1.5,15.1,0.75,4 of 8,13.2,-1.7
+London 07:00-13:00 + risk rules + OB/FVG,292,0.267,13.1,0.045,-0.15 to +0.24,9.1,1.2,17.3,0.53,4 of 8,21.3,-10.0
+London 07:00-13:00 + risk rules + 15M trend + OB/FVG,162,0.284,15.9,0.098,-0.17 to +0.37,14.2,1.9,10.8,1.32,3 of 8,19.3,-4.3
+10:00-13:00 UK + risk rules (one-month test setup),195,0.292,29.6,0.152,-0.09 to +0.40,30.2,3.7,17.9,1.69,3 of 8,33.1,-2.2
+12:00-13:00 UK + risk rules (best single hour),101,0.356,39.7,0.393,+0.03 to +0.76,45.9,5.4,10.6,4.32,1 of 8,32.7,9.9
+NEW combination: 10:00-13:00 UK + risk rules + 15M trend,93,0.355,32.7,0.352,-0.01 to +0.76,36.3,4.4,10.2,3.58,0 of 8,29.5,5.3
