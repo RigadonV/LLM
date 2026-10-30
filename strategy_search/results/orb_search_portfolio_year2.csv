@@ -1,0 +1,2 @@
+scope,trades,weeks,avg_week_pct,median_week_pct,compound_week_pct,positive_weeks_pct,weeks_at_4pct_pct,worst_week_pct,best_week_pct,final_balance,total_return_pct,cagr_pct,max_drawdown_pct
+"chosen ORB variants, year 2",1028,53,-0.0065,-3.3741,-0.4996,37.7358,30.1887,-17.2208,31.5903,7668.6687,-23.3133,-23.3832,59.0941

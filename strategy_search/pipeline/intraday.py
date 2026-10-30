@@ -112,7 +112,7 @@ def account(trades, risk=RISK, start_balance=START_BALANCE, max_leverage=None):
                 lev_open[i] = need * f / risk
             stake[i] = f * bal
         else:
-            bal += stake.pop(i) * t.at[i, "r"]
+            bal = max(0.0, bal + stake.pop(i) * t.at[i, "r"])  # negative-balance protection: a wiped-out account stops
             lev_open.pop(i, None)
             curve.append((when, bal))
     return pd.Series([b for _, b in curve], index=pd.DatetimeIndex([w for w, _ in curve]))
