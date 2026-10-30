@@ -69,8 +69,9 @@ def avg_r_chart(summ, mode):
         ax.plot([r["ci_lo"], r["ci_hi"]], [i, i], color=col, linewidth=2, solid_capstyle="round", zorder=2)
         ax.scatter([r["avg_r"]], [i], s=60, color=col, edgecolor=th["surface"], linewidth=2, zorder=3)
         if hyb:
-            ax.annotate(f"{r['avg_r']:+.2f}R", (r["ci_hi"], i), xytext=(6, 0), textcoords="offset points",
-                        va="center", fontsize=9, color=th["ink"], fontweight="bold")
+            ax.annotate(f"{r['avg_r']:+.2f}R".replace("-", "\u2212"), (r["avg_r"], i), xytext=(0, 10),
+                        textcoords="offset points", ha="center", va="bottom", fontsize=9, color=th["ink"],
+                        fontweight="bold")
     ax.set_yticks(range(len(s)))
     ax.set_yticklabels([f"{r['variant']}  {r['name']}  ({r['trades']:.0f})" for _, r in s.iterrows()],
                        color=th["ink2"], fontsize=9)
@@ -156,8 +157,8 @@ def example_chart(tr, mode, name):
     side = "long" if tr["dir"] > 0 else "short"
     result = f"{tr['r']:+.2f}R, {tr['reason']}"
     titles(fig, th, f"{tr['market']}: hybrid {side}, signal {pd.Timestamp(tr['signal_day']):%d %b %Y} ({result})",
-           f"Daily bid candles (lighter grey = up day). Level from {tr['touches']:.0f} swing points in the last {LOOKBACK} days "
-           f"(swing = {PIVOT_N} bars either side); zone ±¼ ATR.")
+           f"Daily bid candles, lighter grey = up day. Key level: {tr['touches']:.0f} swing points "
+           f"({PIVOT_N} bars either side) in {LOOKBACK} days; zone ±¼ ATR.")
     return save(fig, name, mode)
 
 

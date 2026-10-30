@@ -79,8 +79,8 @@ The two disciplines fail in opposite ways, which is the case for combining them:
 | 10. 2R target, 20-day exit | Trader's equation | Arithmetic |
 
 **Two things this research cannot settle,** which is why there is a backtest: whether the
-combination beats its parts, and whether any edge survives real spreads and commissions after
-2008, when most simple technical rules had already stopped working.
+combination beats its parts, and whether any edge survives real spreads and commissions in
+today's markets, long after most simple technical rules stopped working (early 1990s).
 
 ## 4. The base rate: most retail traders lose
 

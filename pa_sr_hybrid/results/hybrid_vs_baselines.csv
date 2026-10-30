@@ -1,0 +1,7 @@
+asset_class,side,V4_trades,V4_avg_r,V3_trades,V3_avg_r,V0_trades,V0_avg_r
+Commodity,long,11,0.2182,105,0.3388,165,0.4251
+Commodity,short,5,-0.4025,30,-0.2992,49,-0.1477
+FX,long,31,-0.0414,167,-0.0460,246,-0.0038
+FX,short,20,-0.0549,137,-0.2596,208,-0.1641
+Index,long,29,0.4004,202,0.1654,303,0.0427
+Index,short,2,-0.0276,9,-0.4379,18,-0.2491

@@ -19,6 +19,8 @@ START, END = TEST_START, TEST_END
 YEARS = ((END - START).days + 1) / 365.25
 SPLIT = pd.Timestamp("2025-10-01")  # the two 12-month halves of the window
 RISK = 0.01
+SPLIT_LABELS = {"period": "Period", "asset_class": "Asset class", "side": "Side", "touch_group": "Level touches",
+                "flip_group": "Level type", "round_group": "Round number", "reason": "Exit"}
 rng = np.random.default_rng(7)
 
 
@@ -187,7 +189,8 @@ def main():
                       lambda r: f"{r['cost_per_trade']:.3f}R"]),
            "\n## Hybrid (V4) breakdown (hourly-settled, cons)\n",
            fmt_table(brk, ["Split", "Group", "Trades", "Win rate", "Avg R", "95% CI", "Profit factor"],
-                     [lambda r: r["split"], lambda r: str(r["group"]), lambda r: f"{r['trades']:.0f}", pct("win_rate"),
+                     [lambda r: SPLIT_LABELS[r["split"]], lambda r: str(r["group"]), lambda r: f"{r['trades']:.0f}",
+                      pct("win_rate"),
                       num("avg_r", 3), lambda r: f"{r['ci_lo']:+.2f} to {r['ci_hi']:+.2f}",
                       lambda r: f"{r['profit_factor']:.2f}" if pd.notna(r["profit_factor"]) else "–"]),
            "\n## Hybrid vs baselines by asset class and side\n",

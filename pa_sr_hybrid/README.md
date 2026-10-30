@@ -10,6 +10,7 @@ silver, Brent, five stock indices).
 | `STRATEGY.md` | The hybrid's rules and the test plan, committed before any backtest was run |
 | `BACKTEST.md` | The results: the hybrid against its parts, after real spreads and commission |
 | `results/` | Every trade (`trades.csv.gz`), summary tables, equity curves |
+| `results/full_history_2008_2026/` | The earlier run over 2008 – Sep 2026 that `BACKTEST.md` quotes for context |
 | `charts/` | Charts used in `BACKTEST.md` (light and dark versions) |
 | `pipeline/` | The scripts that produce everything above |
 
