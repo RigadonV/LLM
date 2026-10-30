@@ -9,7 +9,7 @@ tested on real historical prices (forex majors, gold, silver, Brent, five stock 
 | `RESEARCH.md` | The core principles of each discipline, what the research says about each one, and what the hybrid keeps |
 | `STRATEGY.md` | The hybrid's rules and the test plan, committed before any backtest was run |
 | `BACKTEST.md` | The results: the hybrid against its parts, after real spreads and commission |
-| `results/` | Every trade (`trades.csv`), summary tables, equity curves |
+| `results/` | Every trade (`trades.csv.gz`), summary tables, equity curves |
 | `charts/` | Charts used in `BACKTEST.md` (light and dark versions) |
 | `pipeline/` | The scripts that produce everything above |
 
@@ -22,7 +22,7 @@ Python 3 with pandas, numpy and matplotlib. Needs network access to `datafeed.du
 cd pa_sr_hybrid/pipeline
 python fetch_data.py            # daily bid/ask candles 2007-2025 + hourly Jan-Sep 2026 -> ../data/ (git-ignored)
 python test_engine.py           # checks of the order-execution engine on hand-made bars
-python backtest.py              # every variant -> ../results/trades.csv, ../results/hourly_needed.csv
+python backtest.py              # every variant -> ../results/trades.csv.gz, ../results/hourly_needed.csv
 python fetch_data.py --needed   # hourly months that settle same-day stop/target cases
 python backtest.py              # run again with those hours
 python report.py                # ../results/summary_*.csv, ../results/report_tables.md
@@ -31,7 +31,7 @@ python charts.py                # ../charts/*.png
 
 `strategy.py` holds every rule and parameter; `backtest.py` holds the order-execution engine.
 
-## `results/trades.csv` columns
+## `results/trades.csv.gz` columns
 
 | Column | Meaning |
 |---|---|

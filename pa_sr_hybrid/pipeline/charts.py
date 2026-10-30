@@ -76,7 +76,7 @@ def avg_r_chart(summ, mode):
                        color=th["ink2"], fontsize=9)
     ax.set_xlabel("Average R per trade, after spread and commission", color=th["muted"], fontsize=9)
     titles(fig, th, "Average result per trade, by variant",
-           "Dot: average R; line: 95% interval (bootstrap by month of entry); (trades). Same-day ambiguities counted the worse way.")
+           "Dot: average R; line: 95% interval (bootstrap by month of entry); (trades). After spread and commission.")
     return save(fig, "avg_r_by_variant", mode)
 
 
@@ -114,7 +114,7 @@ def equity_chart(eq, mode):
     for txt in leg.get_texts():
         txt.set_color(th["ink2"])
     titles(fig, th, "Account growth at 1% risk per trade, all markets in one account",
-           "Compounded, after spread and commission, no swap. Same-day ambiguities counted the worse way.")
+           "Compounded, after spread and commission, no swap.")
     return save(fig, "equity", mode)
 
 
@@ -166,9 +166,9 @@ def main():
     summ = pd.read_csv(os.path.join(RESULTS_DIR, "summary_variants.csv"))
     summ = summ.set_index("variant").loc[list(VARIANTS)].reset_index()
     eq = pd.read_csv(os.path.join(RESULTS_DIR, "equity_daily.csv"), parse_dates=["day"], index_col="day")
-    t = pd.read_csv(os.path.join(RESULTS_DIR, "trades.csv"))
-    hyb = t[(t["variant"] == "V4") & (t["rule"] == "cons") & t["costs"] & (t["settled"] == "daily")]
-    hyb = hyb[hyb["entry_day"] >= "2017-01-01"]
+    t = pd.read_csv(os.path.join(RESULTS_DIR, "trades.csv.gz"))
+    hyb = t[(t["variant"] == "V4") & (t["rule"] == "cons") & t["costs"] & t["hourly"] & (t["settled"] == "daily")]
+    hyb = hyb.sort_values(["entry_day", "symbol"])
     # examples: the most recent clean target hit and the most recent clean stop-out
     win = hyb[hyb["reason"] == "target"].iloc[-1]
     loss = hyb[hyb["reason"] == "stop"].iloc[-1]

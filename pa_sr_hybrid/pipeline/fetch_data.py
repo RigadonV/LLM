@@ -31,8 +31,8 @@ def base_jobs(symbols):
     return jobs
 
 
-def needed_jobs():
-    need = pd.read_csv(os.path.join(RESULTS_DIR, "hourly_needed.csv"))
+def needed_jobs(path):
+    need = pd.read_csv(path)
     return [("h1", r.symbol, side, int(r.year), int(r.month)) for r in need.itertuples() for side in ("BID", "ASK")]
 
 
@@ -74,10 +74,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--symbols", nargs="*", default=list(INSTRUMENTS))
     ap.add_argument("--needed", action="store_true")
+    ap.add_argument("--needed-file", default=os.path.join(RESULTS_DIR, "hourly_needed.csv"))
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--no-build", action="store_true")
     args = ap.parse_args()
-    jobs = needed_jobs() if args.needed else base_jobs(args.symbols)
+    jobs = needed_jobs(args.needed_file) if args.needed else base_jobs(args.symbols)
     todo = [j for j in jobs if not have(j)]
     print(f"{len(jobs)} files, {len(todo)} to fetch", flush=True)
     counts, t0 = {}, time.time()

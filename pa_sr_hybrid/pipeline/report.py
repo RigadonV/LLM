@@ -1,9 +1,8 @@
-"""Step 3: summary tables from results/trades.csv.
+"""Step 3: summary tables from results/trades.csv.gz.
 
   python pipeline/report.py
 
-Writes results/data_summary.csv, results/summary_variants.csv, results/summary_hybrid_hourly.csv,
-results/hybrid_breakdown.csv, results/hybrid_by_market.csv, results/equity_daily.csv and
+Writes results/data_summary.csv, results/summary_variants.csv, results/hybrid_breakdown.csv, results/hybrid_by_market.csv, results/equity_daily.csv and
 results/report_tables.md (the tables used in BACKTEST.md).
 R is profit or loss divided by the risk planned at entry, after spread and commission.
 """
@@ -104,34 +103,29 @@ def fmt_table(df, cols, fmts):
 def main():
     data = data_summary()
     data.to_csv(os.path.join(RESULTS_DIR, "data_summary.csv"), index=False, float_format="%.6g")
-    t = pd.read_csv(os.path.join(RESULTS_DIR, "trades.csv"), parse_dates=["signal_day", "entry_day", "exit_day"])
+    t = pd.read_csv(os.path.join(RESULTS_DIR, "trades.csv.gz"), parse_dates=["signal_day", "entry_day", "exit_day"])
     t = t[(t["entry_day"] >= START) & (t["entry_day"] <= END)]
     daily, hourly = t[~t["hourly"]], t[t["hourly"]]
-    # variants side by side: daily bars only, every variant treated the same way
-    main_runs = daily[(daily["rule"] == "cons") & daily["costs"]]
+
+    def pick(df, vk, rule, costs=True):
+        return df[(df["variant"] == vk) & (df["rule"] == rule) & (df["costs"] == costs)]
+
+    # every variant with same-day cases replayed on hourly bars where downloaded; leftovers counted
+    # the worse way. The daily-bars-only runs give the bounds when no hourly data is used at all.
+    main_runs = hourly[(hourly["rule"] == "cons") & hourly["costs"]]
     rows = []
     for vk, v in VARIANTS.items():
         g = main_runs[main_runs["variant"] == vk]
         s = stats(g)
         s.update(equity_stats(equity(g)))
-        opt = daily[(daily["variant"] == vk) & (daily["rule"] == "opt") & daily["costs"]]["r"]
-        free = daily[(daily["variant"] == vk) & (daily["rule"] == "cons") & ~daily["costs"]]["r"]
-        s.update(variant=vk, name=v["name"], avg_r_opt=opt.mean(), avg_r_no_costs=free.mean())
+        s.update(variant=vk, name=v["name"], avg_r_hourly_opt=pick(hourly, vk, "opt")["r"].mean(),
+                 avg_r_daily_cons=pick(daily, vk, "cons")["r"].mean(),
+                 avg_r_daily_opt=pick(daily, vk, "opt")["r"].mean(),
+                 avg_r_no_costs=pick(hourly, vk, "cons", False)["r"].mean())
+        s["cost_per_trade"] = s["avg_r_no_costs"] - s["avg_r"]
         rows.append(s)
     summ = pd.DataFrame(rows)
     summ.to_csv(os.path.join(RESULTS_DIR, "summary_variants.csv"), index=False, float_format="%.4f")
-
-    # the hybrid family with same-day cases settled from hourly bars where downloaded
-    hrows = []
-    for vk in [k for k in VARIANTS if k.startswith("V4")]:
-        for rule in ("cons", "opt"):
-            g = hourly[(hourly["variant"] == vk) & (hourly["rule"] == rule) & hourly["costs"]]
-            s = stats(g)
-            s.update(equity_stats(equity(g)))
-            s.update(variant=vk, name=VARIANTS[vk]["name"], rule=rule)
-            hrows.append(s)
-    hsumm = pd.DataFrame(hrows)
-    hsumm.to_csv(os.path.join(RESULTS_DIR, "summary_hybrid_hourly.csv"), index=False, float_format="%.4f")
 
     hyb = hourly[(hourly["variant"] == "V4") & (hourly["rule"] == "cons") & hourly["costs"]].copy()
     hyb["period"] = np.where(hyb["entry_day"] < SPLIT, "2008–2016", "2017–2026")
@@ -161,23 +155,21 @@ def main():
                      [lambda r: r["market"], lambda r: r["symbol"], lambda r: f"{r['bars']:,}",
                       lambda r: str(r["first_day"]), lambda r: str(r["trading_from"]), lambda r: str(r["last_day"]),
                       lambda r: f"{r['median_spread_pips']:.1f}", lambda r: f"{r['median_spread_pct_atr']:.2f}%"]),
-           "\n## Variants (lower bound: unresolved same-day cases counted the worse way)\n",
-           fmt_table(summ, ["Variant", "Trades", "Per year", "Win rate", "Avg R", "95% CI", "p(avg ≤ 0)", "Profit factor",
-                            "Max DD (R)", "CAGR at 1%", "Max DD at 1%", "Avg R, better way", "Avg R, no costs"],
+           "\n## Variants (same-day cases replayed on hourly bars; any left over counted the worse way)\n",
+           fmt_table(summ, ["Variant", "Trades", "Per year", "Win rate", "Avg R", "95% CI", "p(avg ≤ 0)",
+                            "Profit factor", "Max DD (R)", "CAGR at 1%", "Max DD at 1%", "Settled by rule"],
                      [lambda r: f"{r['variant']} {r['name']}", lambda r: f"{r['trades']:.0f}",
                       lambda r: f"{r['per_year']:.1f}", pct("win_rate"), num("avg_r", 3),
                       lambda r: f"{r['ci_lo']:+.2f} to {r['ci_hi']:+.2f}", lambda r: f"{r['p_le_zero']:.3f}",
                       lambda r: f"{r['profit_factor']:.2f}", lambda r: f"{r['max_dd_r']:.1f}",
                       lambda r: f"{100 * r['cagr']:+.1f}%", lambda r: f"{100 * r['max_dd']:.1f}%",
-                      num("avg_r_opt", 3), num("avg_r_no_costs", 3)]),
-           "\n## Hybrid family, same-day cases settled from hourly bars (cons = leftovers counted the worse way)\n",
-           fmt_table(hsumm, ["Variant", "Rule", "Trades", "Win rate", "Avg R", "95% CI", "p(avg ≤ 0)", "Profit factor",
-                             "Max DD (R)", "CAGR at 1%", "Max DD at 1%", "Settled by rule"],
-                     [lambda r: f"{r['variant']} {r['name']}", lambda r: r["rule"], lambda r: f"{r['trades']:.0f}",
-                      pct("win_rate"), num("avg_r", 3), lambda r: f"{r['ci_lo']:+.2f} to {r['ci_hi']:+.2f}",
-                      lambda r: f"{r['p_le_zero']:.3f}", lambda r: f"{r['profit_factor']:.2f}",
-                      lambda r: f"{r['max_dd_r']:.1f}", lambda r: f"{100 * r['cagr']:+.1f}%",
-                      lambda r: f"{100 * r['max_dd']:.1f}%", pct("settled_by_rule")]),
+                      pct("settled_by_rule")]),
+           "\n## Average R under each way of settling same-day cases, and the cost of trading\n",
+           fmt_table(summ, ["Variant", "Daily bars, worse way", "Daily bars, better way", "Hourly, worse way",
+                            "Hourly, better way", "Hourly, before costs", "Spread + commission per trade"],
+                     [lambda r: f"{r['variant']} {r['name']}", num("avg_r_daily_cons", 3), num("avg_r_daily_opt", 3),
+                      num("avg_r", 3), num("avg_r_hourly_opt", 3), num("avg_r_no_costs", 3),
+                      lambda r: f"{r['cost_per_trade']:.3f}R"]),
            "\n## Hybrid (V4) breakdown (hourly-settled, cons)\n",
            fmt_table(brk, ["Split", "Group", "Trades", "Win rate", "Avg R", "95% CI", "Profit factor"],
                      [lambda r: r["split"], lambda r: str(r["group"]), lambda r: f"{r['trades']:.0f}", pct("win_rate"),

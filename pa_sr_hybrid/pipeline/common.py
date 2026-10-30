@@ -34,6 +34,7 @@ INSTRUMENTS = {
 LAST_FULL_YEAR = 2025   # yearly daily files exist up to here
 RECENT_MONTHS = pd.period_range("2026-01", "2026-09", freq="M")  # 2026 comes from monthly hourly files
 COLS = ["open", "high", "low", "close"]
+MAX_GAP_DAYS = 7  # longer gaps in a daily series are feed holes, not market holidays
 
 
 def raw_path(symbol, kind, side, year, month=None):
@@ -120,7 +121,16 @@ def build_daily(symbol):
 
 
 def load_daily(symbol):
+    """Daily bars from the first bar after the last gap of more than MAX_GAP_DAYS.
+
+    The index and oil CFD feeds have holes of up to 94 days before late May 2013 (and about one bar
+    a week for FTSE and Nikkei in 2012); market holidays never close a market for more than 7 days.
+    """
     d = pd.read_csv(os.path.join(DATA_DIR, f"{symbol}_d1.csv.gz"), parse_dates=["day"], index_col="day")
+    gaps = d.index.to_series().diff().dt.days
+    holes = gaps[gaps > MAX_GAP_DAYS]
+    if len(holes):
+        d = d.loc[holes.index[-1]:]
     for c in COLS:  # signals are read off bid prices, the way a chart is drawn
         d[c] = d[f"bid_{c}"]
     return d

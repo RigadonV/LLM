@@ -8,7 +8,7 @@ on daily bars alone with such cases settled the worse way ('cons') and the bette
 so all variants are compared on the same footing with a lower and an upper bound. A second pass
 ('hourly' = True) settles them from hourly bars where those months have been downloaded.
 
-Writes results/trades.csv (every trade of every run) and results/hourly_needed.csv (the months
+Writes results/trades.csv.gz (every trade of every run) and results/hourly_needed.csv (the months
 whose hourly files would settle the remaining cases: fetch_data.py --needed, then run this again).
 """
 import argparse
@@ -190,7 +190,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--symbols", nargs="*", default=list(INSTRUMENTS))
     ap.add_argument("--variants", nargs="*", default=list(VARIANTS))
-    ap.add_argument("--out", default="trades.csv")
+    ap.add_argument("--out", default="trades.csv.gz")
     args = ap.parse_args()
     os.makedirs(RESULTS_DIR, exist_ok=True)
     rows, needed_rows = [], []
@@ -202,7 +202,7 @@ def main():
         for vk in args.variants:
             v = VARIANTS[vk]
             runs = [("cons", True, False), ("opt", True, False), ("cons", False, False),
-                    ("cons", True, True), ("opt", True, True)]
+                    ("cons", True, True), ("opt", True, True), ("cons", False, True)]
             for rule, costs, use_hourly in runs:
                 trades, needed = simulate(sym, m, v, rule, costs, hourly[costs] if use_hourly else None)
                 for tr in trades:
