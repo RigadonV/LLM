@@ -46,6 +46,7 @@ def main():
     grid["chosen"] = grid.get("chosen", False)
     grid.to_csv(os.path.join(RESULTS, "orb_search_grid.csv"), index=False, float_format="%.4f")
     port = pd.concat(chosen, ignore_index=True)
+    port.to_csv(os.path.join(RESULTS, "orb_search_chosen_trades_year2.csv"), index=False, float_format="%.6g")
     w, wk = weekly_stats(account(port), SPLIT, TEST_END)
     print("\nAll variants, year 2 average R: median %+.3f, best %+.3f, share positive %.0f%%" % (
         grid["y2_avg_r"].median(), grid["y2_avg_r"].max(), 100 * (grid["y2_avg_r"] > 0).mean()))

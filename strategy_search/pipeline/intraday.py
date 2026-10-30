@@ -96,20 +96,24 @@ def account(trades, risk=RISK, start_balance=START_BALANCE, max_leverage=None):
     """Compound 1% of the current balance per trade, booked at exit in time order.
 
     trades needs columns entry_time, exit_time, r (net R) and optionally leverage_at_1pct (notional / balance
-    if 1% were risked). With max_leverage, a trade that would need more is sized down to the cap.
+    if 1% were risked). With max_leverage, the notional of all open positions is kept at or under that multiple of
+    the balance, as broker margin does: a trade that would need more is sized down to the room left (or not taken).
     """
     t = trades.sort_values("entry_time").reset_index(drop=True)
     ev = [(row.entry_time, 0, i) for i, row in t.iterrows()] + [(row.exit_time, 1, i) for i, row in t.iterrows()]
     ev.sort(key=lambda e: (e[0], e[1]))
-    bal, stake, curve = start_balance, {}, []
+    bal, stake, lev_open, curve = start_balance, {}, {}, []
     for when, kind, i in ev:
         if kind == 0:
             f = risk
-            if max_leverage is not None and "leverage_at_1pct" in t and t.at[i, "leverage_at_1pct"] > max_leverage:
-                f = risk * max_leverage / t.at[i, "leverage_at_1pct"]
+            if max_leverage is not None and "leverage_at_1pct" in t:
+                need = t.at[i, "leverage_at_1pct"] * risk / 0.01
+                f = risk * min(1.0, max(0.0, max_leverage - sum(lev_open.values())) / need)
+                lev_open[i] = need * f / risk
             stake[i] = f * bal
         else:
             bal += stake.pop(i) * t.at[i, "r"]
+            lev_open.pop(i, None)
             curve.append((when, bal))
     return pd.Series([b for _, b in curve], index=pd.DatetimeIndex([w for w, _ in curve]))
 
