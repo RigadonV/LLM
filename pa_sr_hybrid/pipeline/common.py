@@ -80,16 +80,22 @@ def hourly_month(symbol, year, month):
                       decode_bi5(raw_path(symbol, "h1", "ASK", year, month), start, scale))
 
 
+def trading_day(index):
+    """UTC date, with Sunday-evening quotes moved to Monday and stray Saturday quotes to Friday."""
+    day = index.tz_convert("UTC").tz_localize(None).normalize()
+    wd = day.dayofweek
+    return day + pd.to_timedelta(np.where(wd == 6, 1, np.where(wd == 5, -1, 0)), unit="D")
+
+
 def to_trading_days(df):
     """UTC-midnight daily bars, with the short Sunday-evening session folded into Monday (5 bars a week)."""
-    day = df.index.tz_convert("UTC").tz_localize(None).normalize()
-    wd = day.dayofweek
-    day = day + pd.to_timedelta(np.where(wd == 6, 1, np.where(wd == 5, -1, 0)), unit="D")
+    df = df.sort_index()
+    day = trading_day(df.index)
     agg = {}
     for side in ("bid", "ask"):
         agg.update({f"{side}_open": "first", f"{side}_high": "max", f"{side}_low": "min", f"{side}_close": "last"})
     agg["volume"] = "sum"
-    out = df.sort_index().groupby(day).agg(agg)
+    out = df.groupby(day).agg(agg)
     out.index.name = "day"
     return out
 
