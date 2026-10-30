@@ -66,8 +66,15 @@ entries only at an untouched 0.705/0.79 level, and a stop of ~14% of the leg (we
      vs about +2.0R in London) and the backtest (−0.09R per trade vs +0.04R to +0.34R in London).
      Dropping it lifts the mechanical rules from +0.09R to **+0.21R per trade** (95% range +0.02 to
      +0.40R; 6 of 8 months positive) — a real but small, same-sample improvement.
-   - Within London, the 07:00–10:00 UK kill zone and 10:00–13:00 UK did about equally well in the
-     journal (+1.99R and +2.01R per trade). `results/london_session_windows.csv`
+   - **Best return window inside London: 10:00–13:00 UK.** Mechanically it earns +0.37R per trade
+     (95% range +0.08 to +0.65R, positive in both halves of the sample), against +0.07R for
+     07:00–10:00; 12:00–13:00 is the single best hour (+0.60R). In the journal every hour earns
+     +1.7R to +2.3R per trade with no reliable winner. Chosen from 21 windows on the same data, so
+     treat it as the window to forward-test first, not a proven rule. (`VALIDATION.md`,
+     `results/london_window_returns.csv`)
+   - Entries stop at 13:00 UK, but let open trades run until the 14:30 UK New York open: 41% of
+     12:00–13:00 entries are still open at 13:00, and closing everything at 13:00 cuts the
+     10:00–13:00 result from +0.37R to +0.22R per trade.
 
 *Evidence that the logged times are New York clock time* (`results/timezone_reading_check.csv`):
 

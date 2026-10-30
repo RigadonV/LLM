@@ -16,7 +16,7 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import infer_direction as inf  # noqa: E402
 from common import ET, LEG_MIN_ATR, LEG_PIVOT_N, RESULTS_DIR, load_journal, load_prices  # noqa: E402
-from replicate_strategy import FINAL, LONDON_ONLY, Market, Rules, backtest, match  # noqa: E402
+from replicate_strategy import FINAL, Market, Rules, backtest, match  # noqa: E402
 from structure import Structure  # noqa: E402
 
 ZONES = {
@@ -79,7 +79,7 @@ def part1(journal, m1, mk, st):
         # backtest window that covers this reading's entry times (hours after midnight of the trading day)
         h = (j.entry_et - trading_day(j.entry_et)).dt.total_seconds() / 3600
         window = (np.floor(h.min() * 2) / 2, np.ceil(h.max() * 2) / 2)
-        rules = Rules(**{**FINAL.__dict__, "window": window, "exit_by": window[1] + 2.5})
+        rules = Rules(**{**FINAL.__dict__, "window": window, "window_tz": "", "exit_by": window[1] + 2.5})
         bt = backtest(mk, rules, journal.date.min() - pd.Timedelta(days=1), journal.date.max())
         jt, bt = match(j, bt, res[["trade_id", "direction"]])
         days = set(trading_day(j.entry_et))
@@ -122,7 +122,7 @@ def part2(journal, mk):
         local = journal.entry_et.dt.tz_convert(tz) if tz else journal.entry_et
         h = local.dt.hour + local.dt.minute / 60
         sub = journal[(h >= a) & (h < b)]
-        rules = LONDON_ONLY if tz else Rules(**{**FINAL.__dict__, "window": (a, b)})
+        rules = FINAL if tz else Rules(**{**FINAL.__dict__, "window": (a, b), "window_tz": "", "exit_by": 12.0})
         bt = backtest(mk, rules, journal.date.min(), journal.date.max())
         jt, bt = match(sub, bt, inferred)
         logged = set(journal.entry_et.dt.normalize())

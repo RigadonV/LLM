@@ -1,17 +1,18 @@
 """Validation backtest for the reconstructed "Model 2 - London" NQ strategy (see STRATEGY.md).
 
-Rules (all times New York):
-  1. Structure: 15-minute candles; swing points are 2-left/2-right fractals, usable once confirmed.
-  2. Leg: for longs, the most recent confirmed 15M swing LOW that price has not traded below, and the
+Rules:
+  1. Session: orders are live 07:00-13:00 UK only (London session; 02:00-08:00 New York).
+  2. Structure: 15-minute candles; swing points are 2-left/2-right fractals, usable once confirmed.
+  3. Leg: for longs, the most recent confirmed 15M swing LOW that price has not traded below, and the
      highest high made since it (shorts: mirror image). Fib 1.0 = swing point, 0.0 = extreme.
-  3. Filters (refinements): leg >= 2 x ATR(14, 15M) and the fib level still untouched since the
+  4. Filters (refinements): leg >= 2 x ATR(14, 15M) and the fib level still untouched since the
      leg extreme. (Break-of-structure and an FVG-based level choice were tested and dropped.)
-  4. Entry: limit orders at the 0.705 and 0.79 retracements of that leg, live 02:00-09:30; the first
-     untouched level price trades into (from the correct side) is filled, the other is cancelled.
-  5. Stop: 14% of the leg beyond the entry (=~fib 0.845 for 0.705 entries, ~0.93 for 0.79 entries).
-  6. Exit: take profit at a fixed R multiple (or the leg extreme), stop moved to break-even once
-     price reaches +BE_AT R; flat by EXIT_BY.
-  7. One position at a time, each leg traded once, max trades per day.
+  5. Entry: limit orders at the 0.705 and 0.79 retracements of that leg; the first untouched level
+     price trades into (from the correct side) is filled, the other is cancelled.
+  6. Stop: 14% of the leg beyond the entry (=~fib 0.845 for 0.705 entries, ~0.93 for 0.79 entries).
+  7. Exit: take profit at a fixed R multiple (or the leg extreme), stop moved to break-even once
+     price reaches +BE_AT R; flat by EXIT_BY (17:00 UK).
+  8. One position at a time, each leg traded once, max trades per day.
   Optional, from the trader's own checklist: 2 losses = done for the day, SL < 50 pts, trend filter
   (15M or 1H EMA50 trend), and a 15M/30M/1H OB or FVG required at the entry.
 
@@ -21,7 +22,7 @@ Run `python pipeline/fetch_data.py` first if data/ is empty.
 Usage:
   python replicate_strategy.py JOURNAL.xlsx                       # all rounds -> results/validation_variants.csv
   python replicate_strategy.py JOURNAL.xlsx --variant refine2_both_levels
-  python replicate_strategy.py JOURNAL.xlsx --variant london_only          # 07:00-13:00 UK clock only
+  python replicate_strategy.py JOURNAL.xlsx --variant as_journaled_0200_0930_NY  # the journal's own window
 """
 import argparse
 import os
@@ -41,8 +42,8 @@ class Rules:
     pivot_n: int = 2               # fractal strength for 15M swing points
     lookback_h: float = 30         # how far back a swing anchor may be
     fib_levels: tuple = (0.79,)    # retracement level(s) that get a limit order
-    window: tuple = (2.0, 9.5)     # hours during which orders are live (clock of window_tz)
-    window_tz: str = ""            # "" = New York clock; e.g. "Europe/London" for a UK-clock session
+    window: tuple = (7.0, 13.0)    # hours during which orders are live (clock of window_tz): London session
+    window_tz: str = "Europe/London"  # "" = New York clock
     stop_leg_frac: float = 0.14    # stop distance as a fraction of the leg
     target_r: float = 3.0          # take profit in R
     be_at_r: float = 2.0           # move stop to entry after this much open profit (None = never)
@@ -53,7 +54,7 @@ class Rules:
     target_mode: str = "r"         # "r": target_r x R; "fib0": the leg extreme, but at least min_target_r
     min_target_r: float = 2.0
     max_trades_day: int = 5
-    exit_by: float = 12.0          # flat by this hour (window_tz clock) if neither stop nor target is hit
+    exit_by: float = 17.0          # flat by this hour (window_tz clock) if neither stop nor target is hit
     # options mirroring the trader's own Model 2 checklist (0 / "none" / False = off)
     max_losses_day: int = 0        # "2 losses = done for the day"
     max_stop_pts: float = 0.0      # "SL < 50pts": skip legs whose stop would be wider
@@ -75,10 +76,11 @@ EXIT_VARIANTS = {r.name: r for r in (
     Rules(**{**FINAL.__dict__, "name": "exit_3R_noBE", "be_at_r": None}),
     Rules(**{**FINAL.__dict__, "name": "exit_fib0_min2R", "target_mode": "fib0", "be_at_r": None}),
 )}
-# London session only, defined on the UK clock: 07:00-13:00 UK (= 02:00-08:00 New York, except in the
-# weeks when only one of the two countries is on summer time)
-LONDON_ONLY = Rules(**{**FINAL.__dict__, "name": "london_only", "window": (7.0, 13.0),
-                       "window_tz": "Europe/London", "exit_by": 17.0})
+# All rules trade the London session, 07:00-13:00 UK (= 02:00-08:00 New York, except in the weeks when only
+# one of the two countries is on summer time). For reference, the window the trader actually journaled:
+AS_JOURNALED = Rules(**{**FINAL.__dict__, "name": "as_journaled_0200_0930_NY", "window": (2.0, 9.5),
+                        "window_tz": "", "exit_by": 12.0})
+SESSION_VARIANTS = {FINAL.name: FINAL, AS_JOURNALED.name: AS_JOURNALED}
 # the trader's stated checklist (TP 3R and BE at 2R are already the final rules' exits)
 CHECKLIST_RISK = Rules(**{**FINAL.__dict__, "name": "checklist_risk", "max_losses_day": 2, "max_stop_pts": 50.0})
 CHECKLIST_VARIANTS = {r.name: r for r in (
@@ -302,6 +304,13 @@ def backtest(mk, rules, start, end):
     return pd.DataFrame(trades)
 
 
+def in_window(entry_et, rules):
+    """Mask of entry times whose wall-clock time (on the rules' window clock) is inside the order window."""
+    local = entry_et.dt.tz_convert(rules.window_tz) if rules.window_tz else entry_et
+    h = local.dt.hour + local.dt.minute / 60
+    return (h >= rules.window[0]) & (h < rules.window[1])
+
+
 def match(journal, bt, inferred, tol_min=15):
     """Pair journal trades with generated trades: same day, same direction (when known), entry within tol."""
     jt = journal.merge(inferred[["trade_id", "direction"]], on="trade_id", how="left")
@@ -323,11 +332,10 @@ def match(journal, bt, inferred, tol_min=15):
     return jt, bt
 
 
-def report(name, jt, bt, covered):
-    j = jt[covered]
+def report(name, jt, bt, data_start, data_end, logged_days):
+    j = jt[jt.entry_et.between(data_start, data_end)]
     n_j, n_m = len(j), int(j.matched.sum())
     # the trader logged nothing on some weekdays (holidays, a late-August gap); judge precision on logged days
-    logged_days = set(jt.entry_et.dt.normalize())
     on_logged = bt.entry_et.dt.normalize().isin(logged_days)
     extra_elsewhere = int((~on_logged).sum())
     bt = bt[on_logged]
@@ -361,11 +369,12 @@ def main():
     inferred = pd.read_csv(os.path.join(RESULTS_DIR, "direction_inference.csv"))
     m1 = load_prices("m1")
     start, end = journal.date.min(), journal.date.max()
-    covered = journal.entry_et.between(m1.index.min() + pd.Timedelta(days=2), m1.index.max())
-    all_variants = {**VARIANTS, **EXIT_VARIANTS, **CHECKLIST_VARIANTS, LONDON_ONLY.name: LONDON_ONLY}
+    data_start, data_end = m1.index.min() + pd.Timedelta(days=2), m1.index.max()
+    all_variants = {**VARIANTS, **EXIT_VARIANTS, **CHECKLIST_VARIANTS, **SESSION_VARIANTS}
     groups = {"single": {args.variant: all_variants[args.variant]}} if args.variant else \
         {"entry rules (refinement rounds)": VARIANTS, "exit alternatives on the final entry rules": EXIT_VARIANTS,
-         "the trader's own checklist added to the final rules": CHECKLIST_VARIANTS}
+         "the trader's own checklist added to the final rules": CHECKLIST_VARIANTS,
+         "session window": SESSION_VARIANTS}
 
     cache, table = {}, []
     for title, variants in groups.items():
@@ -374,8 +383,9 @@ def main():
             if rules.pivot_n not in cache:
                 cache[rules.pivot_n] = Market(m1, rules.pivot_n)
             bt = backtest(cache[rules.pivot_n], rules, start, end)
-            jt, bt = match(journal, bt, inferred, args.tol)
-            row = report(name, jt, bt, covered)
+            # recall is measured against the journal trades inside this variant's window
+            jt, bt = match(journal[in_window(journal.entry_et, rules)], bt, inferred, args.tol)
+            row = report(name, jt, bt, data_start, data_end, set(journal.entry_et.dt.normalize()))
             m = bt[bt.matched_trade_id.notna()].merge(journal[["trade_id", "rr", "result"]], left_on="matched_trade_id", right_on="trade_id")
             row["bt_avg_R_on_matched"] = round(m.r.mean(), 3) if len(m) else np.nan
             # journal outcome scored with its own TP 3R / BE / -1R classes (the logged "RR Achieved" overstates BE trades)

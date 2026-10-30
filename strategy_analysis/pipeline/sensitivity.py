@@ -6,7 +6,7 @@ import sys
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from replicate_strategy import Market, Rules, backtest, match  # noqa: E402
+from replicate_strategy import Market, Rules, backtest, in_window, match  # noqa: E402
 from common import RESULTS_DIR, load_journal, load_prices  # noqa: E402
 
 
@@ -14,7 +14,8 @@ def main(journal_path):
     journal = load_journal(journal_path)
     inferred = pd.read_csv(os.path.join(RESULTS_DIR, "direction_inference.csv"))
     mk = Market(load_prices("m1"), 2)
-    logged = set(journal.entry_et.dt.normalize())
+    logged = set(journal.entry_et.dt.normalize())  # every day the trader journaled
+    journal = journal[in_window(journal.entry_et, Rules())]  # London-session trades (07:00-13:00 UK)
     rows = []
     grid = itertools.product([("0.79 only", "fixed", (0.79,)), ("both", "fixed", (0.705, 0.79)), ("fvg choice", "fvg", (0.79,))],
                              [1.5, 2.0, 2.5], [False, True], [False, True])

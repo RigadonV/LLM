@@ -9,8 +9,8 @@ Reverse-engineering of the "Model 2 – London" NQ trade journal (`Model2_London
 | `VALIDATION.md` | How well the coded rules reproduce the journal, and the limitations |
 | `trade_context.csv` | One row per journal trade: journal fields + inferred direction/prices + market context |
 | `charts/` | Five representative trades (long win, short win, loss, "BE", one that does not fit), drawn on the UK clock |
-| `replicate_strategy.py` | The validation backtest (baseline, two refinement rounds, exit alternatives, the trader's checklist) |
-| `results/` | Intermediate outputs: timezone test, time-zone re-reading check, London session windows, direction inference, leg-definition test, condition table, sensitivity grid, backtest trades |
+| `replicate_strategy.py` | The validation backtest, London session 07:00–13:00 UK (baseline, two refinement rounds, exit alternatives, the trader's checklist, the journal's own window for reference) |
+| `results/` | Intermediate outputs: timezone test, time-zone re-reading check, London session windows, best London return window, direction inference, leg-definition test, condition table, sensitivity grid, backtest trades |
 | `pipeline/` | The scripts that produce everything above |
 
 ## Reproduce
@@ -28,6 +28,7 @@ python find_patterns.py                   # Step 4: ../results/patterns_report.t
 python sensitivity.py "$J"                # Step 5b: rule sensitivity grid
 python ../replicate_strategy.py "$J"      # Step 5: validation backtest -> ../results/validation_variants.csv
 python london_time_check.py "$J"          # journal times re-read in other time zones; London-only windows
+python best_window.py "$J"                # best return window inside 07:00-13:00 UK (+ ../charts/london_hours.png)
 python make_charts.py --ids 196:long_win,246:short_win,167:loss,61:be_at_2R,10:does_not_fit
 python check_proxy.py nq_5m.json          # optional: CFD vs NQ futures check (Yahoo chart-API JSON)
 ```
