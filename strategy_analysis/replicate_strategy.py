@@ -27,7 +27,7 @@ Usage:
 import argparse
 import os
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 import pandas as pd
@@ -60,6 +60,9 @@ class Rules:
     max_stop_pts: float = 0.0      # "SL < 50pts": skip legs whose stop would be wider
     trend_filter: str = "none"     # "15m" / "1h": EMA50 trend of the last closed bar must agree
     require_zone: bool = False     # "Either a HTF OB/FVG": a 15m/30m/1h OB or FVG formed in the leg covers the entry
+    # optional daily bias (e.g. from an outside model such as TradingAgents): {date: +1 longs only, -1 shorts only,
+    # 0 no trades}; dates missing from the map trade both ways
+    bias: object = field(default=None, compare=False, hash=False)
 
 
 BASE = Rules()
@@ -235,10 +238,15 @@ def backtest(mk, rules, start, end):
         iend = mk.t.searchsorted(base + pd.Timedelta(hours=rules.exit_by))
         if i1 - i0 < 60:
             continue
+        day_bias = rules.bias.get(day.date()) if rules.bias is not None else None
+        if day_bias == 0:
+            continue
         used_legs, n_day, losses, i = set(), 0, 0, i0
         while i < i1 and n_day < rules.max_trades_day and not (rules.max_losses_day and losses >= rules.max_losses_day):
             fill = None
             for d in ("long", "short"):
+                if day_bias is not None and day_bias != (1 if d == "long" else -1):
+                    continue
                 lg = mk.leg(i, d, lookback_bars)
                 if lg is None:
                     continue

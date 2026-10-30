@@ -1,0 +1,17 @@
+window_UK,trades,net_R_per_trade,net_R,table,run,win_rate,loss_rate,gross_R,return_pct,max_drawdown_pct,profit_factor,end_balance
+07:00-10:00,159,-0.025,-4.0,"window selection, Mar-Aug",,,,,,,,
+08:00-11:00,161,-0.021,-3.4,"window selection, Mar-Aug",,,,,,,,
+09:00-12:00,157,0.056,8.9,"window selection, Mar-Aug",,,,,,,,
+10:00-13:00,158,0.198,31.2,"window selection, Mar-Aug",,,,,,,,
+,25,,-2.6,September 2026,"Backtest 10:00-13:00 UK, Sep 2026",0.24,0.72,0.0,-2.9,8.2,0.87,9714.0
+,43,,-5.6,September 2026,"Backtest 07:00-13:00 UK, Sep 2026",0.233,0.721,-1.0,-6.0,16.3,0.84,9403.0
+,16,,22.2,September 2026,"Your journal 10:00-13:00 UK, Sep 2026",0.562,0.188,24.0,24.4,2.3,6.91,12436.0
+,35,,41.4,September 2026,"Your journal 07:00-13:00 UK, Sep 2026",0.514,0.257,45.0,50.1,2.2,4.93,15010.0
+,24,,8.1,every month,Mar 2026,0.333,0.583,10.0,8.0,5.4,1.53,10797.0
+,30,,15.7,every month,Apr 2026,0.4,0.533,20.0,16.4,6.1,1.83,11635.0
+,27,,-3.2,every month,May 2026,0.222,0.667,0.0,-3.5,7.9,0.84,9647.0
+,27,,4.3,every month,Jun 2026,0.296,0.63,7.0,4.0,10.8,1.23,10397.0
+,25,,9.0,every month,Jul 2026,0.32,0.6,11.0,8.9,4.7,1.55,10892.0
+,25,,-2.7,every month,Aug 2026,0.24,0.72,0.0,-3.0,9.1,0.87,9699.0
+,25,,-2.6,every month,Sep 2026,0.24,0.72,0.0,-2.9,8.2,0.87,9714.0
+,12,,0.9,every month,Oct 2026 (part),0.25,0.583,1.8,0.7,3.2,1.11,10073.0
