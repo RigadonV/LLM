@@ -1,0 +1,5 @@
+period,exit,trades,win_rate_pct,avg_r,profit_factor,total_r,r_per_week,weeks,avg_week_pct,compound_week_pct,positive_weeks_pct,worst_week_pct,max_drawdown_pct,total_return_pct
+out-of-sample Oct 2024 - Feb 2026,TP 2R,308,34.7403,-0.1363,0.8233,-41.9779,-0.5597,75,-0.5526,-0.6005,38.6667,-6.7929,42.2241,-36.3458
+out-of-sample Oct 2024 - Feb 2026,"TP 4R, BE at 2R",305,18.0328,-0.1347,0.8317,-41.0855,-0.5478,75,-0.5409,-0.6149,34.6667,-6.7929,40.4041,-37.0359
+in-sample Mar - Sep 2026,TP 2R,122,43.4426,0.1989,1.3186,24.2646,0.7827,31,0.7758,0.7415,58.0645,-3.4280,4.6765,25.7349
+in-sample Mar - Sep 2026,"TP 4R, BE at 2R",121,28.0992,0.4573,1.7179,55.3337,1.7850,31,1.7619,1.7047,67.7419,-3.6237,6.4456,68.8773
