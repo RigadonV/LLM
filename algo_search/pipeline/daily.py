@@ -56,7 +56,7 @@ def make_rec(name, sym, days):
     return rec
 
 
-def turtle(sym, d, sp, n_in, n_out, name):
+def turtle(sym, d, sp, n_in, n_out, name, k=2.0):
     o, h, l, c, N = prep(d)
     rec = make_rec(name, sym, d.index)
     hi_in, lo_in, hi_out, lo_out = prior(h, n_in, "max"), prior(l, n_in, "min"), prior(h, n_out, "max"), prior(l, n_out, "min")
@@ -68,7 +68,7 @@ def turtle(sym, d, sp, n_in, n_out, name):
                 continue
             s = 1 if up else -1
             fill = max(hi_in[t], o[t] + sp) if s > 0 else min(lo_in[t], o[t])
-            risk = 2 * N[t - 1]
+            risk = k * N[t - 1]
             pos = [s, t, fill, fill - s * risk, risk]
             level = max(pos[3], lo_out[t]) if s > 0 else min(pos[3], hi_out[t])
             if (s > 0 and l[t] <= level) or (s < 0 and h[t] + sp >= level):
@@ -98,27 +98,27 @@ def rsi(c, n=2):
     return (100 - 100 / (1 + up / dn)).values
 
 
-def rsi2(sym, d, sp, stops, name):
+def rsi2(sym, d, sp, stops, name, lo=5, hi=95, exit_ma=5, k=2.0):
     o, h, l, c, N = prep(d)
     rec = make_rec(name, sym, d.index)
-    r2, ma200, ma5 = rsi(c), pd.Series(c).rolling(200).mean().values, pd.Series(c).rolling(5).mean().values
+    r2, ma200, ma5 = rsi(c), pd.Series(c).rolling(200).mean().values, pd.Series(c).rolling(exit_ma).mean().values
     rows, pos = [], None
     for t in range(200, len(c)):
         if pos is None:
-            if c[t] > ma200[t] and r2[t] < 5:
+            if c[t] > ma200[t] and r2[t] < lo:
                 s = 1
-            elif c[t] < ma200[t] and r2[t] > 95:
+            elif c[t] < ma200[t] and r2[t] > hi:
                 s = -1
             else:
                 continue
             fill = c[t] + sp if s > 0 else c[t]
-            pos = [s, t, fill, fill - s * 2 * N[t], 2 * N[t]]
+            pos = [s, t, fill, fill - s * k * N[t], k * N[t]]
             continue
         s, t0, fill, stop, risk = pos
         if stops and ((s > 0 and l[t] <= stop) or (s < 0 and h[t] + sp >= stop)):
             px, reason, h_out = (min(stop, o[t]) if s > 0 else max(stop, o[t] + sp)), "stop", 12
         elif (s > 0 and c[t] > ma5[t]) or (s < 0 and c[t] < ma5[t]):
-            px, reason, h_out = (c[t] if s > 0 else c[t] + sp), "5-day average", 21
+            px, reason, h_out = (c[t] if s > 0 else c[t] + sp), f"{exit_ma}-day average", 21
         else:
             continue
         rows.append(rec(s, t0, t, fill, px, risk, reason, 21, h_out))

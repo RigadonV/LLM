@@ -1,0 +1,14 @@
+stream,hist_sharpe,window_sharpe,risk_pct_full,risk_pct_half
+"breakout 20/10, stop 2N (Bond)",0.0420,-1.0340,0.0497,0.0248
+"breakout 20/10, stop 4N (Crypto)",0.7610,1.3912,5.0000,2.5000
+"breakout 20/10, stop 4N (Energy)",0.3489,-0.8383,5.0000,2.5000
+"breakout 200/100, stop 2N (Metal)",0.1388,-0.2198,2.4029,1.2015
+"breakout 55/20, stop 4N (Agri)",0.3294,0.0582,4.3111,2.1555
+pairs L120 z1.5 (Commodity pairs),0.7718,2.2851,5.0000,2.5000
+"reversion 5/95, exit ma10, no stop (Metal)",0.2810,0.9450,5.0000,2.5000
+"reversion 5/95, exit ma5, no stop (Bond)",0.5162,-0.8964,5.0000,2.5000
+"reversion 5/95, exit ma5, no stop (Energy)",1.4389,1.0885,5.0000,2.5000
+"reversion 5/95, exit ma5, stop 2N (FX)",0.5607,0.3674,5.0000,2.5000
+"reversion 5/95, exit ma5, stop 2N (Index)",0.2669,1.1450,2.0099,1.0049
+"xsmom 12-1m, no stop (Metal)",0.1250,-0.6135,2.3763,1.1881
+"xsmom 1m, stop 3N (Energy)",0.1017,-0.3725,1.3343,0.6671

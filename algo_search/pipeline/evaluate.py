@@ -4,12 +4,14 @@
 
 Window: trades entered 1 Nov 2025 - 30 Oct 2026 (52 weeks ending Friday). History: trades entered from 1 Jan 2018
 (daily strategies; the daily data starts in 2017) or 1 Oct 2024 (intraday: the 1-minute data starts in Sep 2024)
-to 31 Oct 2025. Every account
-keeps all open positions under 20:1 leverage, the EU/UK retail limit on major indices. The Turtle rule of at most
-12 positions open in one direction is applied to the Turtle systems.
-"chosen on history" keeps each strategy-market pair whose average R before the window was positive over at least
-20 trades. The choice uses nothing from the window, so the window is a fair test of it.
-Risk scaling reruns the same trades at more than 1% per trade, to show what reaching 2% a week would have taken.
+to 31 Oct 2025. Every account keeps all open positions under 20:1 leverage, the EU/UK retail limit on major
+indices. The Turtle rule of at most 12 positions open in one direction is applied to the breakout systems.
+The target is compounded: 2% a week for 52 weeks turns $10,000 into $28,003. A plain average of weekly returns can
+show 2% while the account shrinks, when the weeks swing widely.
+"chosen on history" keeps each strategy-market pair whose own account had a positive Sharpe ratio before the
+window, over at least 30 trades. The choice uses nothing from the window, so the window is a fair test of it.
+Risk scaling reruns the same trades at more than 1% per trade, to show what reaching the target would have taken
+and what the same risk did before the window.
 """
 import os
 import sys
@@ -27,6 +29,9 @@ CAP, TARGET = 20, 2.0
 HIST_FROM = {"daily": pd.Timestamp("2018-01-01"), "intraday": pd.Timestamp("2024-10-01")}
 HIST_END = TEST_START - pd.Timedelta(days=1)
 WIN_END = TEST_END + pd.Timedelta(days=1)
+COLS = ["strategy", "markets", "hist_trades", "hist_avg_r", "hist_years_positive", "hist_compound_week_pct",
+        "hist_sharpe", "hist_max_dd_pct", "trades_per_week", "avg_r", "compound_week_pct", "sharpe",
+        "positive_weeks_pct", "worst_week_pct", "max_drawdown_pct", "final_balance"]
 
 
 def load():
@@ -36,7 +41,7 @@ def load():
             parts.append(pd.read_csv(os.path.join(RESULTS, name)).assign(kind=kind))
     t = pd.concat(parts, ignore_index=True)
     for col in ("entry_time", "exit_time"):
-        t[col] = pd.to_datetime(t[col], utc=True).dt.tz_localize(None)
+        t[col] = pd.to_datetime(t[col], utc=True, format="mixed").dt.tz_localize(None)  # daily naive, intraday UTC
     return t
 
 
@@ -54,8 +59,7 @@ def limit_direction(t, max_open=12):
 
 
 def prepare(t):
-    """Apply the Turtle direction limit to each Turtle system, leave the rest as they are."""
-    parts = [limit_direction(g) if s.startswith("turtle") else g for s, g in t.groupby("strategy")]
+    parts = [limit_direction(g) if s.startswith(("turtle", "breakout")) else g for s, g in t.groupby("strategy")]
     return pd.concat(parts).sort_values("entry_time")
 
 
@@ -64,8 +68,18 @@ def window(t):
 
 
 def history(t):
-    start = t["kind"].map(HIST_FROM)
-    return t[(t["entry_time"] >= start) & (t["entry_time"] < TEST_START)]
+    return t[(t["entry_time"] >= t["kind"].map(HIST_FROM)) & (t["entry_time"] < TEST_START)]
+
+
+def run(t, start, end, risk=0.01):
+    """Weekly statistics of the capped account, with the annualised Sharpe ratio of its weekly returns."""
+    w, wk = weekly_stats(account(t, risk=risk, max_leverage=CAP), start, end)
+    w["sharpe"] = float(np.sqrt(52) * wk.mean() / wk.std()) if wk.std() > 0 else 0.0
+    return w, wk
+
+
+def hist_run(h, risk=0.01):
+    return run(h, h["kind"].map(HIST_FROM).min(), HIST_END, risk)
 
 
 def summarize(name, t):
@@ -73,63 +87,77 @@ def summarize(name, t):
     out = dict(strategy=name, markets=t["symbol"].nunique(), hist_trades=len(h), hist_avg_r=h["r"].mean())
     if len(h):
         yr = h.groupby(h["entry_time"].dt.year)["r"].sum()
-        out["hist_years_positive"] = f"{(yr > 0).sum()}/{len(yr)}"
-        hw, _ = weekly_stats(account(h, max_leverage=CAP), h["kind"].map(HIST_FROM).min(), HIST_END)
-        out.update(hist_avg_week_pct=hw["avg_week_pct"], hist_max_dd_pct=hw["max_drawdown_pct"])
+        hw, _ = hist_run(h)
+        out.update(hist_years_positive=f"{(yr > 0).sum()}/{len(yr)}", hist_compound_week_pct=hw["compound_week_pct"],
+                   hist_sharpe=hw["sharpe"], hist_max_dd_pct=hw["max_drawdown_pct"])
     if len(w):
-        ww, wk = weekly_stats(account(w, max_leverage=CAP), TEST_START, TEST_END)
+        ww, wk = run(w, TEST_START, TEST_END)
         out.update(trades=len(w), trades_per_week=len(w) / ww["weeks"], avg_r=w["r"].mean(),
-                   r_per_week=w["r"].sum() / ww["weeks"], avg_week_pct=ww["avg_week_pct"],
-                   compound_week_pct=ww["compound_week_pct"], positive_weeks_pct=ww["positive_weeks_pct"],
-                   weeks_at_2pct_pct=100 * (wk >= 0.02).mean(), worst_week_pct=ww["worst_week_pct"],
-                   max_drawdown_pct=ww["max_drawdown_pct"], final_balance=ww["final_balance"])
+                   avg_week_pct=ww["avg_week_pct"], compound_week_pct=ww["compound_week_pct"], sharpe=ww["sharpe"],
+                   positive_weeks_pct=ww["positive_weeks_pct"], weeks_at_2pct_pct=100 * (wk >= 0.02).mean(),
+                   worst_week_pct=ww["worst_week_pct"], max_drawdown_pct=ww["max_drawdown_pct"],
+                   final_balance=ww["final_balance"])
     return out
 
 
 def risk_for_target(name, g):
-    """Smallest risk per trade (0.5% steps, up to 10%) that averages TARGET% a week in the window, and what the
-    same risk did before the window."""
+    """Smallest risk per trade (0.5% steps, up to 10%) whose account compounds TARGET% a week in the window, and
+    what the same risk did before the window."""
     w, h = window(g), history(g)
     rows = []
     for risk in np.round(np.arange(0.005, 0.1001, 0.005), 3):
-        ww, _ = weekly_stats(account(w, risk=risk, max_leverage=CAP), TEST_START, TEST_END)
-        rows.append(dict(strategy=name, risk_pct=100 * risk, avg_week_pct=ww["avg_week_pct"],
+        ww, _ = run(w, TEST_START, TEST_END, risk)
+        rows.append(dict(strategy=name, risk_pct=100 * risk, compound_week_pct=ww["compound_week_pct"],
                          max_drawdown_pct=ww["max_drawdown_pct"], worst_week_pct=ww["worst_week_pct"],
                          final_balance=ww["final_balance"]))
-        if ww["avg_week_pct"] >= TARGET:
+        if ww["compound_week_pct"] >= TARGET:
             break
     if len(h):
-        hw, _ = weekly_stats(account(h, risk=risk, max_leverage=CAP), h["kind"].map(HIST_FROM).min(), HIST_END)
-        rows[-1].update(hist_avg_week_pct=hw["avg_week_pct"], hist_max_drawdown_pct=hw["max_drawdown_pct"],
+        hw, _ = hist_run(h, risk)
+        rows[-1].update(hist_compound_week_pct=hw["compound_week_pct"], hist_max_drawdown_pct=hw["max_drawdown_pct"],
                         hist_final_balance=hw["final_balance"])
     return rows
 
 
+def pair_table(t, keys):
+    """History Sharpe (accounts with at least 30 trades before the window) and window result of every group."""
+    rows = []
+    for k, g in t.groupby(keys):
+        h, w = history(g), window(g)
+        row = dict(zip(keys, k), market=g["market"].iloc[0], hist_trades=len(h), hist_avg_r=h["r"].mean(),
+                   trades=len(w), avg_r=w["r"].mean(), total_r=w["r"].sum())
+        if len(h) >= 30:
+            row["hist_sharpe"] = hist_run(h)[0]["sharpe"]
+        if len(w):
+            row["sharpe"] = run(w, TEST_START, TEST_END)[0]["sharpe"]
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def report(groups, tag):
+    res = pd.DataFrame([summarize(n, g) for n, g in groups])
+    res.to_csv(os.path.join(RESULTS, f"{tag}_strategies.csv"), index=False, float_format="%.4f")
+    scale = pd.DataFrame([row for n, g in groups if len(window(g)) for row in risk_for_target(n, g)])
+    scale.to_csv(os.path.join(RESULTS, f"{tag}_risk_scaling.csv"), index=False, float_format="%.4f")
+    with pd.option_context("display.width", 250, "display.max_columns", 30, "display.max_colwidth", 48):
+        print(res[[c for c in COLS if c in res]].round(3).to_string(index=False))
+        print("\nRisk per trade needed to compound %.0f%% a week in the window (or the most tried):" % TARGET)
+        print(scale.groupby("strategy", sort=False).tail(1).round(2).to_string(index=False))
+    return res, scale
+
+
 def main():
     t = prepare(load())
-    groups = [(s, g) for s, g in t.groupby("strategy")]
-    pairs = []
-    for (s, sym), g in t.groupby(["strategy", "symbol"]):
-        h, w = history(g), window(g)
-        pairs.append(dict(strategy=s, symbol=sym, market=g["market"].iloc[0], hist_trades=len(h),
-                          hist_avg_r=h["r"].mean(), trades=len(w), avg_r=w["r"].mean(), total_r=w["r"].sum()))
-    pairs = pd.DataFrame(pairs)
+    pairs = pair_table(t, ["strategy", "symbol"])
     pairs.to_csv(os.path.join(RESULTS, "eval_pairs.csv"), index=False, float_format="%.4f")
-    good = pairs[(pairs["hist_trades"] >= 20) & (pairs["hist_avg_r"] > 0)]
+    good = pairs[pairs["hist_sharpe"] > 0]
     chosen = t.merge(good[["strategy", "symbol"]], on=["strategy", "symbol"])
-    groups += [("chosen on history: %d pairs" % len(good), chosen), ("everything together", t)]
-    res = pd.DataFrame([summarize(n, g) for n, g in groups])
-    res.to_csv(os.path.join(RESULTS, "eval_strategies.csv"), index=False, float_format="%.4f")
-    scale = [row for n, g in groups if len(window(g)) for row in risk_for_target(n, g)]
-    pd.DataFrame(scale).to_csv(os.path.join(RESULTS, "eval_risk_scaling.csv"), index=False, float_format="%.4f")
-    cols = ["strategy", "markets", "hist_trades", "hist_avg_r", "hist_years_positive", "hist_avg_week_pct",
-            "hist_max_dd_pct", "trades_per_week", "avg_r", "r_per_week", "avg_week_pct", "positive_weeks_pct",
-            "weeks_at_2pct_pct", "worst_week_pct", "max_drawdown_pct", "final_balance"]
-    with pd.option_context("display.width", 250, "display.max_columns", 30):
-        print(res[cols].round(3).to_string(index=False))
-        last = pd.DataFrame(scale).groupby("strategy").tail(1)
-        print("\nRisk per trade needed for %.0f%% a week in the window (or the most tried):" % TARGET)
-        print(last.round(2).to_string(index=False))
+    groups = [(s, g) for s, g in t.groupby("strategy")]
+    groups += [(f"chosen on history: {len(good)} pairs", chosen), ("everything together", t)]
+    report(groups, "eval")
+    ok = pairs.dropna(subset=["hist_sharpe", "sharpe"])
+    print("\nPairs: correlation of Sharpe before the window with Sharpe in the window: %.2f (%d pairs)" % (
+        ok["hist_sharpe"].corr(ok["sharpe"]), len(ok)))
 
 
 if __name__ == "__main__":

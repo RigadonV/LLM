@@ -1,0 +1,7 @@
+plan,period,compound_week_pct,avg_week_pct,sharpe,positive_weeks_pct,worst_week_pct,max_drawdown_pct,final_balance,peak_leverage
+1% risk per trade on every stream,before the window (fit here),0.3714,0.4111,1.0444,55.5012,-13.7780,23.4259,45557.9638,12.2757
+1% risk per trade on every stream,last 12 months,0.2186,0.2371,0.8961,65.3846,-7.6068,13.2422,11202.6974,10.3159
+half Kelly (set on history),before the window (fit here),0.7774,0.8972,1.2962,58.1907,-23.5164,32.0967,237409.8840,23.5961
+half Kelly (set on history),last 12 months,0.4418,0.5113,0.9985,61.5385,-11.8543,22.6813,12576.2658,19.8570
+full Kelly (set on history),before the window (fit here),1.3209,1.7945,1.2962,58.1907,-47.0329,58.6032,2142519.7115,47.1922
+full Kelly (set on history),last 12 months,0.7377,1.0225,0.9985,61.5385,-23.7085,41.8957,14655.2173,39.7141

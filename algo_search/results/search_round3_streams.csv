@@ -1,0 +1,183 @@
+strategy,cls,example_market,hist_trades,hist_avg_r,trades,avg_r,total_r,hist_sharpe,sharpe,family
+"breakout 100/50, stop 2N",Agri,Sugar,82,0.2537,7,0.7226,5.0582,0.1120,0.7149,breakout
+"breakout 100/50, stop 2N",Bond,UK Gilt,74,-0.6352,8,-0.9474,-7.5795,-1.1955,-2.0339,breakout
+"breakout 100/50, stop 2N",Crypto,Bitcoin,34,-0.0288,6,-0.2978,-1.7868,-0.0262,-0.5367,breakout
+"breakout 100/50, stop 2N",Energy,Natural gas,65,0.0803,6,0.3264,1.9585,0.1095,0.4669,breakout
+"breakout 100/50, stop 2N",FX,AUD/NZD,315,-0.3682,40,-0.4414,-17.6548,-0.8751,-1.2205,breakout
+"breakout 100/50, stop 2N",Index,Dow 30,212,-0.3290,27,-0.1634,-4.4124,-1.1097,-0.4759,breakout
+"breakout 100/50, stop 2N",Metal,Silver,64,0.2652,10,-0.1770,-1.7697,-0.4759,-0.3700,breakout
+"breakout 100/50, stop 4N",Agri,Cocoa,58,0.1886,4,1.2114,4.8457,0.1156,1.2210,breakout
+"breakout 100/50, stop 4N",Bond,UK Gilt,43,-0.5147,3,-0.4619,-1.3856,-0.9860,-1.0500,breakout
+"breakout 100/50, stop 4N",Crypto,Bitcoin,18,0.0938,5,-0.1555,-0.7774,,-0.3802,breakout
+"breakout 100/50, stop 4N",Energy,Natural gas,43,0.1588,4,0.0514,0.2054,0.3113,0.1189,breakout
+"breakout 100/50, stop 4N",FX,AUD/NZD,230,-0.2966,29,-0.5234,-15.1774,-1.0681,-2.4340,breakout
+"breakout 100/50, stop 4N",Index,Dow 30,130,-0.2811,21,-0.1887,-3.9631,-1.0781,-0.8051,breakout
+"breakout 100/50, stop 4N",Metal,Silver,39,0.3285,5,-0.4356,-2.1778,-0.5433,-1.5369,breakout
+"breakout 20/10, stop 2N",Agri,Sugar,295,-0.0423,35,0.3907,13.6761,-0.2335,1.1443,breakout
+"breakout 20/10, stop 2N",Bond,UK Gilt,186,0.0190,21,-0.1787,-3.7523,0.0420,-1.0340,breakout
+"breakout 20/10, stop 2N",Crypto,Bitcoin,86,0.2763,10,1.2653,12.6526,0.5344,2.1430,breakout
+"breakout 20/10, stop 2N",Energy,Brent crude,183,-0.0024,23,-0.1021,-2.3484,-0.0086,-0.6206,breakout
+"breakout 20/10, stop 2N",FX,CAD/JPY,1059,-0.1134,132,-0.2311,-30.5034,-0.9208,-1.7778,breakout
+"breakout 20/10, stop 2N",Index,Euro Stoxx 50,634,-0.1408,100,-0.2480,-24.8027,-0.8400,-1.6872,breakout
+"breakout 20/10, stop 2N",Metal,Silver,206,-0.1373,24,0.4726,11.3420,-0.5033,0.8837,breakout
+"breakout 20/10, stop 4N",Agri,Sugar,274,-0.0056,35,0.1741,6.0952,-0.0978,1.0266,breakout
+"breakout 20/10, stop 4N",Bond,UK Gilt,177,0.0088,21,-0.1637,-3.4371,0.0249,-1.6237,breakout
+"breakout 20/10, stop 4N",Crypto,Bitcoin,82,0.2817,7,0.4156,2.9093,0.7610,1.3912,breakout
+"breakout 20/10, stop 4N",Energy,Brent crude,178,0.0689,20,-0.0842,-1.6843,0.3489,-0.8383,breakout
+"breakout 20/10, stop 4N",FX,USD/CAD,980,-0.0560,122,-0.1201,-14.6485,-0.8567,-2.3728,breakout
+"breakout 20/10, stop 4N",Index,Nikkei 225,567,-0.0556,94,-0.1145,-10.7644,-0.5413,-1.3513,breakout
+"breakout 20/10, stop 4N",Metal,Silver,183,-0.0793,20,0.2092,4.1834,-0.5302,0.9376,breakout
+"breakout 200/100, stop 2N",Agri,Sugar,49,0.6805,5,-0.0817,-0.4087,0.2461,-0.0667,breakout
+"breakout 200/100, stop 2N",Bond,UK Gilt,29,-0.3339,7,-0.4308,-3.0155,,-0.7959,breakout
+"breakout 200/100, stop 2N",Crypto,Bitcoin,26,3.2746,3,-1.0813,-3.2438,,-1.7655,breakout
+"breakout 200/100, stop 2N",Energy,WTI crude,38,-0.5216,6,-1.0293,-6.1760,-0.6629,-2.5755,breakout
+"breakout 200/100, stop 2N",FX,EUR/AUD,232,-0.5576,20,0.2116,4.2314,-1.4066,0.3376,breakout
+"breakout 200/100, stop 2N",Index,Nikkei 225,144,-0.2728,19,-0.2458,-4.6706,-0.9224,-0.3979,breakout
+"breakout 200/100, stop 2N",Metal,Copper,33,1.0935,8,-0.1293,-1.0345,0.1388,-0.2198,breakout
+"breakout 200/100, stop 4N",Agri,Sugar,29,0.3657,2,0.4055,0.8111,,0.3849,breakout
+"breakout 200/100, stop 4N",Bond,UK Gilt,20,0.0085,3,0.6533,1.9599,,1.0000,breakout
+"breakout 200/100, stop 4N",Crypto,Bitcoin,10,-0.0802,2,-0.7704,-1.5409,,-1.3761,breakout
+"breakout 200/100, stop 4N",Energy,WTI crude,23,-0.4572,5,-0.8890,-4.4448,,-2.2094,breakout
+"breakout 200/100, stop 4N",FX,EUR/AUD,138,-0.4548,14,0.1675,2.3443,-1.3188,0.3187,breakout
+"breakout 200/100, stop 4N",Index,Nikkei 225,81,0.0434,13,-0.4326,-5.6243,-0.4584,-1.2160,breakout
+"breakout 200/100, stop 4N",Metal,Copper,23,0.7670,1,-1.0654,-1.0654,,-1.0000,breakout
+"breakout 55/20, stop 2N",Agri,Sugar,151,0.1299,18,0.4959,8.9259,0.1449,0.8598,breakout
+"breakout 55/20, stop 2N",Bond,Euro Bund,95,-0.1503,12,-0.3841,-4.6087,-0.2795,-1.2248,breakout
+"breakout 55/20, stop 2N",Crypto,Bitcoin,49,2.2702,6,0.5364,3.2187,0.6123,1.8877,breakout
+"breakout 55/20, stop 2N",Energy,Brent crude,116,0.2160,16,0.0091,0.1461,0.2844,0.0282,breakout
+"breakout 55/20, stop 2N",FX,CAD/JPY,568,-0.2951,69,-0.4397,-30.3403,-1.5997,-1.9795,breakout
+"breakout 55/20, stop 2N",Index,SMI,371,-0.1691,50,-0.1328,-6.6391,-0.6453,-0.6120,breakout
+"breakout 55/20, stop 2N",Metal,Silver,115,-0.0756,15,0.5825,8.7379,-0.5097,0.8761,breakout
+"breakout 55/20, stop 4N",Agri,Sugar,120,0.1776,14,0.0134,0.1877,0.3294,0.0582,breakout
+"breakout 55/20, stop 4N",Bond,Euro Bund,75,-0.0915,9,-0.3298,-2.9683,-0.2279,-1.3541,breakout
+"breakout 55/20, stop 4N",Crypto,Bitcoin,40,1.5236,5,0.0548,0.2742,0.6784,0.4596,breakout
+"breakout 55/20, stop 4N",Energy,Brent crude,89,0.1249,13,-0.2290,-2.9774,0.2469,-1.7152,breakout
+"breakout 55/20, stop 4N",FX,CAD/JPY,476,-0.1765,59,-0.3446,-20.3336,-1.5621,-2.6924,breakout
+"breakout 55/20, stop 4N",Index,CAC 40,287,-0.0807,42,-0.0957,-4.0200,-0.4799,-0.8213,breakout
+"breakout 55/20, stop 4N",Metal,Silver,95,-0.1568,13,0.4300,5.5900,-0.6353,1.2307,breakout
+"reversion 10/90, exit ma10, no stop",Agri,Cotton,323,-0.0797,49,-0.3157,-15.4716,-0.4405,-1.3297,reversion
+"reversion 10/90, exit ma10, no stop",Bond,UK Gilt,179,-0.0724,25,-0.0322,-0.8056,-0.3888,-0.1938,reversion
+"reversion 10/90, exit ma10, no stop",Crypto,Bitcoin,148,-0.1104,23,-0.1879,-4.3218,-0.4257,-0.7616,reversion
+"reversion 10/90, exit ma10, no stop",Energy,Natural gas,308,-0.0493,34,0.1318,4.4826,-0.1858,1.2185,reversion
+"reversion 10/90, exit ma10, no stop",FX,AUD/JPY,1325,0.0251,169,0.0359,6.0613,0.1927,0.5494,reversion
+"reversion 10/90, exit ma10, no stop",Index,FTSE 100,1158,-0.0795,153,0.0981,15.0150,0.0000,1.0244,reversion
+"reversion 10/90, exit ma10, no stop",Metal,Silver,265,-0.0500,37,0.0893,3.3030,-0.3495,0.8613,reversion
+"reversion 10/90, exit ma10, stop 2N",Agri,Cotton,364,-0.0560,57,-0.1102,-6.2841,-0.4802,-1.1961,reversion
+"reversion 10/90, exit ma10, stop 2N",Bond,UK Gilt,195,-0.0605,26,-0.0385,-1.0007,-0.3636,-0.2599,reversion
+"reversion 10/90, exit ma10, stop 2N",Crypto,Bitcoin,166,-0.0434,24,-0.0638,-1.5301,-0.2392,-0.4387,reversion
+"reversion 10/90, exit ma10, stop 2N",Energy,Natural gas,337,-0.0076,37,-0.0271,-1.0014,-0.0640,-0.2165,reversion
+"reversion 10/90, exit ma10, stop 2N",FX,AUD/JPY,1453,0.0026,182,0.0625,11.3669,0.0337,0.9359,reversion
+"reversion 10/90, exit ma10, stop 2N",Index,FTSE 100,1268,-0.0235,171,0.0178,3.0508,-0.2101,0.1931,reversion
+"reversion 10/90, exit ma10, stop 2N",Metal,Silver,290,-0.0661,40,-0.0452,-1.8088,-0.5249,-0.3183,reversion
+"reversion 10/90, exit ma10, stop 4N",Agri,Cotton,332,-0.0360,53,-0.0719,-3.8121,-0.5090,-1.0206,reversion
+"reversion 10/90, exit ma10, stop 4N",Bond,UK Gilt,182,-0.0590,25,-0.0736,-1.8400,-0.5795,-0.6300,reversion
+"reversion 10/90, exit ma10, stop 4N",Crypto,Bitcoin,155,-0.0463,23,-0.0546,-1.2558,-0.4118,-0.5456,reversion
+"reversion 10/90, exit ma10, stop 4N",Energy,Natural gas,313,-0.0192,34,0.0471,1.6009,-0.2289,0.7687,reversion
+"reversion 10/90, exit ma10, stop 4N",FX,AUD/JPY,1351,0.0104,170,0.0109,1.8585,0.2317,0.3131,reversion
+"reversion 10/90, exit ma10, stop 4N",Index,FTSE 100,1178,-0.0098,156,0.0417,6.5097,-0.1375,0.9401,reversion
+"reversion 10/90, exit ma10, stop 4N",Metal,Silver,268,-0.0330,37,0.0320,1.1840,-0.4635,0.6178,reversion
+"reversion 10/90, exit ma5, no stop",Agri,Cotton,355,-0.0589,55,-0.1166,-6.4131,-0.4115,-1.1634,reversion
+"reversion 10/90, exit ma5, no stop",Bond,UK Gilt,209,0.0250,28,0.0187,0.5223,0.2098,0.1177,reversion
+"reversion 10/90, exit ma5, no stop",Crypto,Bitcoin,168,-0.0715,27,-0.1617,-4.3650,-0.3394,-0.6600,reversion
+"reversion 10/90, exit ma5, no stop",Energy,Natural gas,349,0.0562,40,0.1631,6.5230,0.5399,2.2293,reversion
+"reversion 10/90, exit ma5, no stop",FX,AUD/JPY,1482,0.0083,184,0.0186,3.4190,0.0733,0.3718,reversion
+"reversion 10/90, exit ma5, no stop",Index,FTSE 100,1314,-0.0039,178,0.1005,17.8840,-0.0306,1.4407,reversion
+"reversion 10/90, exit ma5, no stop",Metal,Silver,287,-0.0729,41,0.0707,2.9006,-0.6102,0.8132,reversion
+"reversion 10/90, exit ma5, stop 2N",Agri,Cotton,384,-0.0434,60,-0.0936,-5.6183,-0.4452,-1.1501,reversion
+"reversion 10/90, exit ma5, stop 2N",Bond,UK Gilt,214,-0.0020,29,0.0423,1.2270,-0.0115,0.3319,reversion
+"reversion 10/90, exit ma5, stop 2N",Crypto,Bitcoin,179,-0.0575,28,-0.0383,-1.0729,-0.3847,-0.3433,reversion
+"reversion 10/90, exit ma5, stop 2N",Energy,Natural gas,365,0.0318,41,0.1359,5.5739,0.3027,1.6603,reversion
+"reversion 10/90, exit ma5, stop 2N",FX,AUD/JPY,1561,0.0063,192,0.0445,8.5533,0.1105,1.0398,reversion
+"reversion 10/90, exit ma5, stop 2N",Index,FTSE 100,1368,-0.0027,188,0.0541,10.1701,-0.0239,0.7698,reversion
+"reversion 10/90, exit ma5, stop 2N",Metal,Silver,304,-0.0741,43,0.0291,1.2532,-0.6994,0.3605,reversion
+"reversion 10/90, exit ma5, stop 4N",Agri,Cotton,362,-0.0306,57,-0.0713,-4.0624,-0.5295,-1.2934,reversion
+"reversion 10/90, exit ma5, stop 4N",Bond,UK Gilt,209,-0.0032,28,-0.0141,-0.3953,-0.0422,-0.1454,reversion
+"reversion 10/90, exit ma5, stop 4N",Crypto,Bitcoin,173,-0.0255,27,-0.0383,-1.0344,-0.2889,-0.4617,reversion
+"reversion 10/90, exit ma5, stop 4N",Energy,Natural gas,351,0.0237,40,0.0756,3.0234,0.4420,1.6721,reversion
+"reversion 10/90, exit ma5, stop 4N",FX,AUD/JPY,1488,0.0058,185,0.0048,0.8962,0.1695,0.1973,reversion
+"reversion 10/90, exit ma5, stop 4N",Index,FTSE 100,1322,-0.0027,179,0.0436,7.8097,-0.0475,1.3646,reversion
+"reversion 10/90, exit ma5, stop 4N",Metal,Silver,287,-0.0422,41,0.0320,1.3130,-0.7307,0.7065,reversion
+"reversion 25/75, exit ma10, no stop",Agri,Sugar,697,-0.0512,97,-0.2057,-19.9514,-0.4873,-1.5715,reversion
+"reversion 25/75, exit ma10, no stop",Bond,UK Gilt,369,-0.0925,59,-0.0459,-2.7073,-0.6720,-0.2927,reversion
+"reversion 25/75, exit ma10, no stop",Crypto,Bitcoin,291,-0.1324,39,-0.1854,-7.2320,-0.7653,-0.9598,reversion
+"reversion 25/75, exit ma10, no stop",Energy,Natural gas,603,-0.0672,79,0.0800,6.3195,-0.5146,1.0935,reversion
+"reversion 25/75, exit ma10, no stop",FX,CAD/JPY,2744,-0.0040,347,-0.0099,-3.4415,-0.0995,-0.2549,reversion
+"reversion 25/75, exit ma10, no stop",Index,Nasdaq-100,2316,-0.0812,309,0.0221,6.8247,0.0000,0.2050,reversion
+"reversion 25/75, exit ma10, no stop",Metal,Silver,612,-0.0236,93,0.1177,10.9470,-0.2559,1.7423,reversion
+"reversion 25/75, exit ma10, stop 2N",Agri,Sugar,831,-0.0486,118,-0.1202,-14.1892,-0.7874,-2.1695,reversion
+"reversion 25/75, exit ma10, stop 2N",Bond,UK Gilt,434,-0.0940,67,-0.0037,-0.2446,-0.8862,-0.0382,reversion
+"reversion 25/75, exit ma10, stop 2N",Crypto,Bitcoin,355,-0.0664,48,-0.0631,-3.0296,-0.5456,-0.6233,reversion
+"reversion 25/75, exit ma10, stop 2N",Energy,Natural gas,716,-0.0392,92,0.0071,0.6558,-0.4592,0.0916,reversion
+"reversion 25/75, exit ma10, stop 2N",FX,AUD/JPY,3185,-0.0077,397,-0.0052,-2.0715,-0.1821,-0.1331,reversion
+"reversion 25/75, exit ma10, stop 2N",Index,FTSE 100,2742,-0.0373,370,0.0184,6.8141,-0.5315,0.2835,reversion
+"reversion 25/75, exit ma10, stop 2N",Metal,Silver,696,-0.0315,105,0.0611,6.4196,-0.4422,0.8127,reversion
+"reversion 25/75, exit ma10, stop 4N",Agri,Sugar,726,-0.0233,106,-0.0588,-6.2306,-0.5780,-1.4601,reversion
+"reversion 25/75, exit ma10, stop 4N",Bond,UK Gilt,385,-0.0586,63,-0.0285,-1.7971,-0.8603,-0.4276,reversion
+"reversion 25/75, exit ma10, stop 4N",Crypto,Bitcoin,316,-0.0493,42,-0.0297,-1.2492,-0.5878,-0.4523,reversion
+"reversion 25/75, exit ma10, stop 4N",Energy,Natural gas,634,-0.0370,81,0.0409,3.3110,-0.7099,1.0874,reversion
+"reversion 25/75, exit ma10, stop 4N",FX,CAD/JPY,2848,-0.0061,362,-0.0042,-1.5068,-0.2257,-0.2052,reversion
+"reversion 25/75, exit ma10, stop 4N",Index,FTSE 100,2439,-0.0198,325,0.0069,2.2445,-0.4365,0.1559,reversion
+"reversion 25/75, exit ma10, stop 4N",Metal,Silver,634,-0.0114,95,0.0453,4.3077,-0.2800,1.1592,reversion
+"reversion 25/75, exit ma5, no stop",Agri,Sugar,784,-0.0480,113,-0.0976,-11.0243,-0.6176,-1.5925,reversion
+"reversion 25/75, exit ma5, no stop",Bond,UK Gilt,426,-0.0833,68,-0.0034,-0.2321,-0.8108,-0.0417,reversion
+"reversion 25/75, exit ma5, no stop",Crypto,Bitcoin,333,-0.1019,54,-0.0650,-3.5107,-0.6961,-0.4010,reversion
+"reversion 25/75, exit ma5, no stop",Energy,Natural gas,716,-0.0127,94,0.0927,8.7120,-0.1357,1.9460,reversion
+"reversion 25/75, exit ma5, no stop",FX,CAD/JPY,3114,-0.0087,387,-0.0401,-15.5364,-0.1983,-0.9193,reversion
+"reversion 25/75, exit ma5, no stop",Index,FTSE 100,2622,-0.0401,358,0.0392,14.0486,-0.4496,0.6757,reversion
+"reversion 25/75, exit ma5, no stop",Metal,Silver,682,-0.0313,111,0.0838,9.3073,-0.3966,1.5602,reversion
+"reversion 25/75, exit ma5, stop 2N",Agri,Sugar,866,-0.0441,128,-0.0822,-10.5210,-0.7748,-1.6415,reversion
+"reversion 25/75, exit ma5, stop 2N",Bond,UK Gilt,459,-0.1032,72,0.0262,1.8835,-1.0841,0.2721,reversion
+"reversion 25/75, exit ma5, stop 2N",Crypto,Bitcoin,374,-0.0725,59,0.0121,0.7163,-0.6525,0.1475,reversion
+"reversion 25/75, exit ma5, stop 2N",Energy,Natural gas,780,-0.0142,102,0.0435,4.4394,-0.1931,0.6604,reversion
+"reversion 25/75, exit ma5, stop 2N",FX,AUD/USD,3369,-0.0071,412,-0.0312,-12.8696,-0.1812,-0.7319,reversion
+"reversion 25/75, exit ma5, stop 2N",Index,FTSE 100,2878,-0.0330,397,0.0248,9.8275,-0.5357,0.4305,reversion
+"reversion 25/75, exit ma5, stop 2N",Metal,Silver,732,-0.0240,118,0.0607,7.1615,-0.3626,1.1066,reversion
+"reversion 25/75, exit ma5, stop 4N",Agri,Sugar,800,-0.0222,117,-0.0529,-6.1911,-0.6532,-1.7337,reversion
+"reversion 25/75, exit ma5, stop 4N",Bond,UK Gilt,430,-0.0500,69,-0.0088,-0.6040,-0.9527,-0.1529,reversion
+"reversion 25/75, exit ma5, stop 4N",Crypto,Bitcoin,342,-0.0421,54,0.0027,0.1452,-0.6446,0.0528,reversion
+"reversion 25/75, exit ma5, stop 4N",Energy,Natural gas,722,-0.0098,96,0.0368,3.5340,-0.2600,1.3017,reversion
+"reversion 25/75, exit ma5, stop 4N",FX,AUD/USD,3152,-0.0025,389,-0.0189,-7.3353,-0.1074,-0.9259,reversion
+"reversion 25/75, exit ma5, stop 4N",Index,Nasdaq-100,2676,-0.0168,366,0.0168,6.1439,-0.4424,0.5521,reversion
+"reversion 25/75, exit ma5, stop 4N",Metal,Silver,690,-0.0124,112,0.0381,4.2633,-0.3382,1.4200,reversion
+"reversion 5/95, exit ma10, no stop",Agri,Cotton,173,-0.1035,25,-0.2986,-7.4651,-0.4577,-0.9797,reversion
+"reversion 5/95, exit ma10, no stop",Bond,UK Gilt,96,0.0488,13,-0.1526,-1.9841,0.1956,-0.5954,reversion
+"reversion 5/95, exit ma10, no stop",Crypto,Bitcoin,78,-0.1048,13,-0.1880,-2.4435,-0.2877,-0.6704,reversion
+"reversion 5/95, exit ma10, no stop",Energy,Brent crude,163,0.0944,18,0.1425,2.5652,0.3891,1.2693,reversion
+"reversion 5/95, exit ma10, no stop",FX,USD/JPY,704,0.0625,87,-0.0457,-3.9745,0.4411,-0.4545,reversion
+"reversion 5/95, exit ma10, no stop",Index,FTSE 100,655,-0.1071,82,0.1757,14.4083,0.0000,1.5124,reversion
+"reversion 5/95, exit ma10, no stop",Metal,Silver,151,0.0506,20,0.1400,2.7997,0.2810,0.9450,reversion
+"reversion 5/95, exit ma10, stop 2N",Agri,Cotton,186,-0.0647,29,-0.2332,-6.7632,-0.4169,-1.7026,reversion
+"reversion 5/95, exit ma10, stop 2N",Bond,UK Gilt,99,-0.0564,14,-0.2342,-3.2788,-0.2146,-0.9158,reversion
+"reversion 5/95, exit ma10, stop 2N",Crypto,Bitcoin,83,-0.1442,14,-0.1360,-1.9035,-0.5349,-0.6367,reversion
+"reversion 5/95, exit ma10, stop 2N",Energy,Brent crude,173,0.1305,18,0.0725,1.3053,0.6545,0.5432,reversion
+"reversion 5/95, exit ma10, stop 2N",FX,USD/JPY,744,0.0374,94,-0.0223,-2.1003,0.3509,-0.2557,reversion
+"reversion 5/95, exit ma10, stop 2N",Index,FTSE 100,691,-0.0076,89,0.1180,10.5015,-0.0450,0.9849,reversion
+"reversion 5/95, exit ma10, stop 2N",Metal,Silver,159,0.0336,22,-0.0581,-1.2792,0.2102,-0.2513,reversion
+"reversion 5/95, exit ma10, stop 4N",Agri,Cotton,176,-0.0507,26,-0.1187,-3.0854,-0.4677,-1.5405,reversion
+"reversion 5/95, exit ma10, stop 4N",Bond,UK Gilt,97,0.0050,13,-0.1044,-1.3568,0.0371,-0.7318,reversion
+"reversion 5/95, exit ma10, stop 4N",Crypto,Bitcoin,82,-0.0576,13,-0.0925,-1.2027,-0.3403,-0.8159,reversion
+"reversion 5/95, exit ma10, stop 4N",Energy,WTI crude,163,0.0485,18,0.0327,0.5883,0.4350,0.4204,reversion
+"reversion 5/95, exit ma10, stop 4N",FX,USD/JPY,709,0.0316,87,-0.0369,-3.2130,0.5287,-0.7199,reversion
+"reversion 5/95, exit ma10, stop 4N",Index,FTSE 100,660,-0.0087,84,0.0682,5.7276,-0.0894,1.0442,reversion
+"reversion 5/95, exit ma10, stop 4N",Metal,Silver,151,0.0011,20,0.0321,0.6429,0.0094,0.3735,reversion
+"reversion 5/95, exit ma5, no stop",Agri,Cotton,182,-0.0903,28,-0.1430,-4.0044,-0.5097,-1.2380,reversion
+"reversion 5/95, exit ma5, no stop",Bond,UK Gilt,103,0.0859,13,-0.2130,-2.7689,0.5162,-0.8965,reversion
+"reversion 5/95, exit ma5, no stop",Crypto,Bitcoin,84,-0.1302,14,-0.1454,-2.0353,-0.4133,-0.5262,reversion
+"reversion 5/95, exit ma5, no stop",Energy,Brent crude,170,0.1725,20,0.1480,2.9606,1.4389,1.0885,reversion
+"reversion 5/95, exit ma5, no stop",FX,USD/JPY,742,0.0387,91,-0.0302,-2.7447,0.3245,-0.3497,reversion
+"reversion 5/95, exit ma5, no stop",Index,FTSE 100,709,0.0283,89,0.1764,15.6980,0.1909,1.9081,reversion
+"reversion 5/95, exit ma5, no stop",Metal,Silver,155,-0.0070,22,0.0957,2.1057,-0.0451,1.0849,reversion
+"reversion 5/95, exit ma5, stop 2N",Agri,Cotton,193,-0.0602,30,-0.1615,-4.8465,-0.4587,-1.5244,reversion
+"reversion 5/95, exit ma5, stop 2N",Bond,UK Gilt,105,0.0277,14,-0.2252,-3.1530,0.1583,-1.0397,reversion
+"reversion 5/95, exit ma5, stop 2N",Crypto,Bitcoin,89,-0.1323,15,-0.0380,-0.5700,-0.6079,-0.2240,reversion
+"reversion 5/95, exit ma5, stop 2N",Energy,WTI crude,175,0.1515,20,0.1745,3.4907,1.2322,1.4329,reversion
+"reversion 5/95, exit ma5, stop 2N",FX,USD/JPY,772,0.0461,97,0.0209,2.0273,0.5607,0.3674,reversion
+"reversion 5/95, exit ma5, stop 2N",Index,FTSE 100,727,0.0286,93,0.1162,10.8032,0.2669,1.1450,reversion
+"reversion 5/95, exit ma5, stop 2N",Metal,Silver,160,-0.0122,23,0.0104,0.2391,-0.0965,0.0992,reversion
+"reversion 5/95, exit ma5, stop 4N",Agri,Cotton,184,-0.0566,28,-0.0975,-2.7301,-0.6304,-1.3522,reversion
+"reversion 5/95, exit ma5, stop 4N",Bond,UK Gilt,103,0.0207,13,-0.1065,-1.3844,0.2225,-0.8967,reversion
+"reversion 5/95, exit ma5, stop 4N",Crypto,Bitcoin,88,-0.0665,14,-0.0638,-0.8933,-0.4691,-0.6331,reversion
+"reversion 5/95, exit ma5, stop 4N",Energy,WTI crude,170,0.0843,20,0.0621,1.2422,1.3664,0.8205,reversion
+"reversion 5/95, exit ma5, stop 4N",FX,USD/JPY,744,0.0239,91,-0.0237,-2.1572,0.5094,-0.5214,reversion
+"reversion 5/95, exit ma5, stop 4N",Index,FTSE 100,711,0.0029,90,0.0819,7.3669,0.0338,1.7445,reversion
+"reversion 5/95, exit ma5, stop 4N",Metal,Silver,155,-0.0103,22,0.0289,0.6365,-0.1384,0.5465,reversion

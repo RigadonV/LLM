@@ -100,22 +100,27 @@ def account(trades, risk=RISK, start_balance=START_BALANCE, max_leverage=None):
     the balance, as broker margin does: a trade that would need more is sized down to the room left (or not taken).
     """
     t = trades.sort_values("entry_time").reset_index(drop=True)
-    ev = [(row.entry_time, 0, i) for i, row in t.iterrows()] + [(row.exit_time, 1, i) for i, row in t.iterrows()]
-    ev.sort(key=lambda e: (e[0], e[1]))
-    bal, stake, lev_open, curve = start_balance, {}, {}, []
-    for when, kind, i in ev:
-        if kind == 0:
+    n, r = len(t), t["r"].to_numpy(float)
+    lev = t["leverage_at_1pct"].to_numpy(float) if max_leverage is not None and "leverage_at_1pct" in t else None
+    utc = lambda s: pd.to_datetime(s, utc=True).dt.tz_localize(None).to_numpy()  # noqa: E731
+    times = np.r_[utc(t["entry_time"]), utc(t["exit_time"])]
+    kinds, ids = np.r_[np.zeros(n, int), np.ones(n, int)], np.r_[np.arange(n), np.arange(n)]
+    bal, stake, lev_open, curve_t, curve_b = start_balance, np.zeros(n), {}, [], []
+    for j in np.lexsort((kinds, times)):  # in time order, entries before exits at the same moment
+        i = ids[j]
+        if kinds[j] == 0:
             f = risk
-            if max_leverage is not None and "leverage_at_1pct" in t:
-                need = t.at[i, "leverage_at_1pct"] * risk / 0.01
+            if lev is not None:
+                need = lev[i] * risk / 0.01
                 f = risk * min(1.0, max(0.0, max_leverage - sum(lev_open.values())) / need)
                 lev_open[i] = need * f / risk
             stake[i] = f * bal
         else:
-            bal = max(0.0, bal + stake.pop(i) * t.at[i, "r"])  # negative-balance protection: a wiped-out account stops
+            bal = max(0.0, bal + stake[i] * r[i])  # negative-balance protection: a wiped-out account stops
             lev_open.pop(i, None)
-            curve.append((when, bal))
-    return pd.Series([b for _, b in curve], index=pd.DatetimeIndex([w for w, _ in curve]))
+            curve_t.append(times[j])
+            curve_b.append(bal)
+    return pd.Series(curve_b, index=pd.DatetimeIndex(curve_t))
 
 
 def weekly_stats(curve, start=TEST_START, end=TEST_END, start_balance=START_BALANCE):
