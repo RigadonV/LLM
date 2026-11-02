@@ -90,6 +90,8 @@ def simulate(m, sp, v, session):
             continue
         hi, lo = rng["high"].max(), rng["low"].min()
         last = op + pd.Timedelta(hours=v["cutoff_h"])
+        lon = t.searchsorted(pd.Timestamp(f"{day.date()} 03:00", tz=TZ))  # the London open
+        bias = int(np.sign(o[a] - o[lon])) if lon < a else 0  # London's move up to the session open
         for k in np.flatnonzero((bt >= op + pd.Timedelta(minutes=v["or_min"])) & (bt + pd.Timedelta(minutes=15) <= last)):
             r = b.iloc[k]
             if v["trend"] == "ema":
@@ -100,7 +102,7 @@ def simulate(m, sp, v, session):
                 allowed = None
             body = r.close - r.open
             d = 1 if (r.close > hi and body > 0) else -1 if (r.close < lo and body < 0) else 0
-            if d == 0 or (allowed is not None and d != allowed):
+            if d == 0 or (allowed is not None and d != allowed) or (v.get("london") and d != bias):
                 continue
             if v["body"] and abs(body) < v["body"] * (r.high - r.low):
                 continue
@@ -114,23 +116,35 @@ def simulate(m, sp, v, session):
             risk = d * (fill - stop)
             if risk <= 0:
                 break  # the next open is already beyond the stop
-            tp = fill + d * v["target"] * risk
+            tp = fill + d * v["target"] * risk if v["target"] else None
+            manage = v.get("manage", "fixed")  # "be": stop to entry at +1R; "trail": then 1R behind the best price
+            sl, best, armed, reached = stop, fill, False, False
             exit_px, reason, y = None, None, None
             for y in range(x, z):
                 lo_y, hi_y, op_y = (l[y], h[y], o[y]) if d > 0 else (l[y] + sp[y], h[y] + sp[y], o[y] + sp[y])
-                if (lo_y <= stop) if d > 0 else (hi_y >= stop):
-                    exit_px, reason = (min(stop, op_y) if d > 0 else max(stop, op_y)), "stop"
+                if (lo_y <= sl) if d > 0 else (hi_y >= sl):
+                    exit_px = min(sl, op_y) if d > 0 else max(sl, op_y)
+                    reason = "stop" if not armed else "breakeven" if sl == fill else "trailing stop"
                     break
-                if (hi_y >= tp) if d > 0 else (lo_y <= tp):
+                if tp is not None and ((hi_y >= tp) if d > 0 else (lo_y <= tp)):
                     exit_px, reason = (max(tp, op_y) if d > 0 else min(tp, op_y)), "target"
+                    reached = reached or v["target"] >= 1
                     break
+                best = max(best, hi_y) if d > 0 else min(best, lo_y)
+                if d * (best - fill) >= risk:  # +1R reached: stop moves take effect from the next minute
+                    reached = True
+                    if manage != "fixed" and not armed:
+                        armed, sl = True, fill
+                if manage == "trail" and armed:
+                    sl = max(sl, best - risk) if d > 0 else min(sl, best + risk)
             if exit_px is None:
                 y = z - 1
                 exit_px, reason = c[y] + (sp[y] if d < 0 else 0.0), "session close"
-            rows.append(dict(day=day.date(), dir=d, range_high=hi, range_low=lo, breakout_candle=bt[k],
-                             entry_time=t[x].tz_convert("UTC"), exit_time=t[y].tz_convert("UTC"), entry=fill,
-                             stop=stop, target=tp, exit=exit_px, risk_pts=risk, r=d * (exit_px - fill) / risk,
-                             reason=reason, leverage_at_1pct=0.01 * fill / risk))
+            rows.append(dict(day=day.date(), dir=d, london_bias=bias, range_high=hi, range_low=lo,
+                             breakout_candle=bt[k], entry_time=t[x].tz_convert("UTC"),
+                             exit_time=t[y].tz_convert("UTC"), entry=fill, stop=stop, target=tp, exit=exit_px,
+                             risk_pts=risk, r=d * (exit_px - fill) / risk, reason=reason, reached_1r=reached,
+                             leverage_at_1pct=0.01 * fill / risk))
             break  # one trade a day
     return pd.DataFrame(rows)
 

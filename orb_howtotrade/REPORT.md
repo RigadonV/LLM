@@ -124,6 +124,139 @@ more often (59%) and reaches more targets (25%), but ends at about the same plac
 - **Ignore the volume variants:** they mostly reflect Dukascopy's changing volume reporting, as explained above.
   The same-time-of-day version left only 9 Nasdaq-100 trades and 26 gold trades.
 
+## Targets of 1R, 2R and 3R, breakeven and trailing stops, and the London bias
+
+This section uses the same strategy as above: EMA trend, 30-minute opening range, full-body breakout candle, no
+volume condition. It is run with both of the PDF's stops and with three ways of managing the trade:
+
+- **Fixed:** the stop stays where it was placed.
+- **Breakeven at 1R:** once price has gone 1R in the trade's favour, the stop moves to the entry price.
+- **Trailing from 1R:** at 1R the stop moves to breakeven, then follows the best price at 1R behind it.
+
+Stop moves count from the minute after 1R is reached. Script: `pipeline/orb15_manage.py`.
+
+### Average R per trade, and what $10,000 became (last 12 months)
+
+| Management, target | Nasdaq-100, range stop | Nasdaq-100, candle stop | Gold, range stop | Gold, candle stop |
+|---|---|---|---|---|
+| Fixed, 1R | +0.032 · $10,439 | +0.034 · $10,428 | −0.063 · $8,882 | −0.074 · $8,686 |
+| Fixed, 2R | +0.042 · $10,588 | +0.007 · $9,980 | −0.048 · $9,085 | −0.039 · $9,186 |
+| Fixed, 3R | +0.052 · $10,742 | +0.080 · $11,046 | −0.063 · $8,843 | −0.046 · $9,046 |
+| Breakeven at 1R, 2R | +0.037 · $10,503 | +0.060 · $10,793 | −0.062 · $8,883 | −0.036 · $9,263 |
+| Breakeven at 1R, 3R | +0.047 · $10,656 | +0.087 · $11,204 | −0.092 · $8,418 | −0.066 · $8,759 |
+| Trailing from 1R, 2R | +0.025 · $10,325 | +0.059 · $10,788 | −0.070 · $8,759 | −0.040 · $9,210 |
+| Trailing from 1R, 3R | +0.031 · $10,421 | +0.054 · $10,701 | −0.088 · $8,482 | −0.038 · $9,228 |
+| Trailing from 1R, no target | +0.027 · $10,362 | +0.063 · $10,845 | −0.093 · $8,416 | −0.051 · $9,015 |
+
+Trades: 145 on the Nasdaq-100 and 178 on gold. Win rates with a fixed stop at 1R / 2R / 3R:
+
+| | 1R | 2R | 3R |
+|---|---|---|---|
+| Nasdaq-100, range stop | 48% | 48% | 48% |
+| Nasdaq-100, candle stop | 52% | 37% | 36% |
+| Gold, range stop | 44% | 38% | 38% |
+| Gold, candle stop | 45% | 35% | 31% |
+
+Every combination stays within ±0.1R a trade of breakeven. In the 12 months before the window, the ranking
+changed (see below).
+
+### What happened to trades that reached 1R (last 12 months)
+
+Counts are numbers of trades. With the range stop on the Nasdaq-100, 1R averaged 231 points, so few trades got
+that far.
+
+| Market and stop | Reached 1R | Plan, target 2R | Target | Back to breakeven / full stop | Trailing stop (avg R) | Session close |
+|---|---|---|---|---|---|---|
+| Nasdaq-100, range | 29 of 145 | Fixed | 3 | 0 full stops | — | 26 |
+| | | Breakeven at 1R | 3 | 2 breakeven | — | 24 |
+| | | Trailing from 1R | 2 | — | 7 (+0.48R) | 20 |
+| Nasdaq-100, candle | 70 of 145 | Fixed | 36 | 19 full stops | — | 15 |
+| | | Breakeven at 1R | 31 | **28 breakeven** | — | 11 |
+| | | Trailing from 1R | 26 | — | 37 (+0.37R) | 7 |
+| Gold, range | 57 of 178 | Fixed | 24 | 6 full stops | — | 27 |
+| | | Breakeven at 1R | 22 | **21 breakeven** | — | 14 |
+| | | Trailing from 1R | 16 | — | 32 (+0.47R) | 9 |
+| Gold, candle | 79 of 178 | Fixed | 45 | 15 full stops | — | 19 |
+| | | Breakeven at 1R | 39 | **31 breakeven** | — | 9 |
+| | | Trailing from 1R | 32 | — | 43 (+0.39R) | 4 |
+
+**With a 3R target**, the trades that reached 1R ended like this:
+
+| | Breakeven at 1R | Trailing from 1R |
+|---|---|---|
+| Nasdaq-100, range | 1 target, 2 breakeven, 26 close | 1 target, 7 trailing (+0.48R), 21 close |
+| Nasdaq-100, candle | 16 target, 33 breakeven, 21 close | 8 target, 51 trailing (+0.67R), 11 close |
+| Gold, range | 8 target, 25 breakeven, 24 close | 4 target, 43 trailing (+0.69R), 10 close |
+| Gold, candle | 20 target, 42 breakeven, 17 close | 12 target, 61 trailing (+0.68R), 6 close |
+
+**With trailing and no target**, the trailing stop closed 8 Nasdaq-100 range-stop trades (+0.72R), 56 Nasdaq-100
+candle-stop trades (+0.91R), 46 gold range-stop trades (+0.83R) and 71 gold candle-stop trades (+0.97R). The rest
+closed at the session end.
+
+**Reading it:**
+- Of the trades that reached 1R, roughly 40% came back to breakeven once the stop was moved there.
+- With a fixed stop instead, about a quarter of them went on to the full −1R stop.
+- So breakeven at 1R turns those full losses into scratches, but it also stops out some trades that dipped to
+  the entry and would have gone on to the target. On the Nasdaq-100 candle stop with a 2R target, 36 targets
+  became 31.
+- The net effect is small either way: −0.03R to +0.05R a trade. Trailing gives similar results, with its
+  trailing-stop exits averaging +0.4R to +1.0R.
+
+### Did the London session's bias matter?
+
+London bias is bullish if price at the session open (09:30 Nasdaq-100, 08:20 gold) is above its 03:00 New York
+price, the London open, and bearish if below. It is known before the opening range forms. The table splits
+fixed-stop trades into those in London's direction and those against it. The t-statistic tests whether the gap
+could be chance; above about 2 it probably isn't.
+
+| Market, stop, target | Last 12 months: with London | Against London | t | Year before: with London | Against London | t |
+|---|---|---|---|---|---|---|
+| Nasdaq-100, range, 1R | +0.05R (87 trades) | −0.00R (58) | 0.5 | +0.02R (79) | −0.15R (53) | 1.2 |
+| Nasdaq-100, range, 2R | +0.08R | −0.01R | 0.7 | +0.07R | −0.17R | 1.6 |
+| Nasdaq-100, range, 3R | +0.08R | +0.01R | 0.6 | +0.06R | −0.15R | 1.3 |
+| Nasdaq-100, candle, 1R | +0.21R | −0.23R | **2.7** | −0.03R | −0.16R | 0.8 |
+| Nasdaq-100, candle, 2R | +0.16R | −0.22R | 1.7 | −0.07R | −0.27R | 0.9 |
+| Nasdaq-100, candle, 3R | +0.24R | −0.16R | 1.6 | −0.06R | −0.24R | 0.7 |
+| Gold, range, 1R | −0.15R (105) | +0.07R (73) | −1.7 | +0.11R (107) | +0.04R (63) | 0.5 |
+| Gold, range, 2R | −0.17R | +0.13R | −1.8 | +0.04R | +0.14R | −0.6 |
+| Gold, range, 3R | −0.17R | +0.09R | −1.5 | +0.02R | +0.11R | −0.6 |
+| Gold, candle, 1R | −0.09R | −0.05R | −0.2 | −0.13R | −0.12R | −0.0 |
+| Gold, candle, 2R | −0.08R | +0.02R | −0.5 | −0.13R | +0.09R | −1.1 |
+| Gold, candle, 3R | −0.11R | +0.04R | −0.7 | −0.18R | +0.10R | −1.3 |
+
+**Used as a filter** (only breakouts in London's direction, fixed stop, targets 1R / 2R / 3R):
+
+| | Last 12 months | Year before |
+|---|---|---|
+| Nasdaq-100, range stop | +0.06 / +0.08 / +0.08R; $10,485 – $10,728 | +0.03 / +0.05 / +0.04R; $10,255 – $10,412 |
+| Nasdaq-100, candle stop | +0.20 / +0.17 / +0.26R; $11,491 – $12,438 | −0.02 / −0.09 / −0.07R; $9,253 – $9,805 |
+| Gold, range stop | −0.16 / −0.18 / −0.17R | +0.11 / +0.04 / +0.02R |
+| Gold, candle stop | −0.11 / −0.10 / −0.12R | −0.13 / −0.13 / −0.18R |
+
+The year before is a robustness check only, outside the window asked for.
+
+**Reading it:**
+- **Nasdaq-100:** breakouts in London's direction beat those against it in all 12 comparisons over the two years.
+  Only one gap was clearly beyond chance (t = 2.7). The London filter with the range stop was positive in both
+  years, but only by +0.03R to +0.08R a trade, a few hundred dollars a year on $10,000. With the candle stop the
+  filter made +0.17R to +0.26R in the window, then lost the year before.
+- **Gold:** no consistent effect. In the window, breakouts against London's move did better; the year before it
+  was mixed.
+
+### The 12 months before the window, for comparison
+
+Fixed stop, targets 1R / 2R / 3R, average R per trade:
+
+| | Year before (Nov 2024 – Oct 2025) | Last 12 months |
+|---|---|---|
+| Nasdaq-100, range stop | −0.05 / −0.03 / −0.03R | positive |
+| Nasdaq-100, candle stop | −0.08 / −0.15 / −0.13R | positive |
+| Gold, range stop | +0.08 / +0.08 / +0.05R ($10,850 – $11,443) | negative |
+| Gold, candle stop | −0.13 / −0.04 / −0.08R | negative |
+
+Breakeven and trailing versions followed the same pattern. Which combination looks best changes from one year to
+the next.
+
 ## Limits
 
 - **Data:** the feed is Dukascopy's CFD feed, not exchange futures or stock data, and its volume is not exchange
@@ -141,6 +274,12 @@ more often (59%) and reaches more targets (25%), but ends at about the same plac
 - `results/orb15_trades.csv`: every trade, with its opening range, breakout candle, entry, stop, target, exit and
   R.
 - `results/USATECHIDXUSD_by_month.csv`, `results/XAUUSD_by_month.csv`: the first version by month.
+- `pipeline/orb15_manage.py` (`--period last|prior`): targets of 1R / 2R / 3R, breakeven and trailing from 1R, and
+  the London-bias split and filter.
+  - `results/orb15_management.csv`: one row per run, with the counts of what happened after 1R.
+  - `results/orb15_london_bias.csv`: with-London and against-London results with their t-statistics.
+  - `results/orb15_management_trades.csv`: every trade, with its London bias and whether it reached 1R.
+  - `_prior` files hold the year-before check.
 
 **To reproduce:** `python pipeline/orb15.py`. It uses the 1-minute data from `strategy_search/`; its
 `pipeline/fetch_m1.py` downloads it, with `--symbols USATECHIDXUSD XAUUSD`.

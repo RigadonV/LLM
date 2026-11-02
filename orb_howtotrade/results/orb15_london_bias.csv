@@ -1,0 +1,33 @@
+market,stop_rule,plan,with_trades,with_win_pct,with_avg_r,with_total_r,against_trades,against_win_pct,against_avg_r,against_total_r,t_stat
+Nasdaq-100,stop at other side of range,"fixed stop, target 1R",87,51.7241,0.0547,4.7593,58,43.1034,-0.0015,-0.0866,0.4724
+Nasdaq-100,stop at other side of range,"fixed stop, target 2R",87,51.7241,0.0760,6.6160,58,43.1034,-0.0084,-0.4869,0.6777
+Nasdaq-100,stop at other side of range,"fixed stop, target 3R",87,51.7241,0.0816,7.0973,58,43.1034,0.0088,0.5131,0.5526
+Nasdaq-100,stop at other side of range,"breakeven at 1R, target 2R",87,50.5747,0.0708,6.1558,58,41.3793,-0.0143,-0.8279,0.6836
+Nasdaq-100,stop at other side of range,"breakeven at 1R, target 3R",87,50.5747,0.0763,6.6371,58,41.3793,0.0030,0.1721,0.5579
+Nasdaq-100,stop at other side of range,"trailing from 1R, target 2R",87,51.7241,0.0524,4.5613,58,43.1034,-0.0167,-0.9684,0.5687
+Nasdaq-100,stop at other side of range,"trailing from 1R, target 3R",87,51.7241,0.0518,4.5066,58,43.1034,0.0005,0.0316,0.4019
+Nasdaq-100,stop at other side of range,"trailing from 1R, target none",87,51.7241,0.0518,4.5066,58,43.1034,-0.0095,-0.5525,0.4957
+Nasdaq-100,stop beyond breakout candle,"fixed stop, target 1R",87,60.9195,0.2086,18.1449,58,37.9310,-0.2287,-13.2626,2.6714
+Nasdaq-100,stop beyond breakout candle,"fixed stop, target 2R",87,43.6782,0.1575,13.7051,58,27.5862,-0.2183,-12.6636,1.7218
+Nasdaq-100,stop beyond breakout candle,"fixed stop, target 3R",87,42.5287,0.2404,20.9186,58,25.8621,-0.1605,-9.3118,1.5791
+Nasdaq-100,stop beyond breakout candle,"breakeven at 1R, target 2R",87,35.6322,0.2061,17.9319,58,25.8621,-0.1598,-9.2660,1.8096
+Nasdaq-100,stop beyond breakout candle,"breakeven at 1R, target 3R",87,32.1839,0.2537,22.0727,58,22.4138,-0.1622,-9.4087,1.8603
+Nasdaq-100,stop beyond breakout candle,"trailing from 1R, target 2R",87,58.6207,0.2055,17.8811,58,36.2069,-0.1611,-9.3441,1.8795
+Nasdaq-100,stop beyond breakout candle,"trailing from 1R, target 3R",87,58.6207,0.1991,17.3183,58,36.2069,-0.1645,-9.5420,1.8118
+Nasdaq-100,stop beyond breakout candle,"trailing from 1R, target none",87,58.6207,0.1973,17.1676,58,36.2069,-0.1377,-7.9840,1.5842
+Gold,stop at other side of range,"fixed stop, target 1R",105,40.0000,-0.1527,-16.0308,73,49.3151,0.0660,4.8172,-1.6823
+Gold,stop at other side of range,"fixed stop, target 2R",105,35.2381,-0.1721,-18.0675,73,42.4658,0.1293,9.4410,-1.8278
+Gold,stop at other side of range,"fixed stop, target 3R",105,35.2381,-0.1661,-17.4454,73,41.0959,0.0852,6.2190,-1.4512
+Gold,stop at other side of range,"breakeven at 1R, target 2R",105,29.5238,-0.1912,-20.0712,73,35.6164,0.1246,9.0933,-2.0324
+Gold,stop at other side of range,"breakeven at 1R, target 3R",105,29.5238,-0.1952,-20.4912,73,30.1370,0.0573,4.1818,-1.5825
+Gold,stop at other side of range,"trailing from 1R, target 2R",105,40.0000,-0.1845,-19.3763,73,49.3151,0.0944,6.8931,-1.9260
+Gold,stop at other side of range,"trailing from 1R, target 3R",105,40.0000,-0.1905,-20.0058,73,49.3151,0.0588,4.2891,-1.7538
+Gold,stop at other side of range,"trailing from 1R, target none",105,40.0000,-0.1956,-20.5374,73,49.3151,0.0551,4.0250,-1.7846
+Gold,stop beyond breakout candle,"fixed stop, target 1R",105,44.7619,-0.0882,-9.2632,73,45.2055,-0.0544,-3.9693,-0.2270
+Gold,stop beyond breakout candle,"fixed stop, target 2R",105,36.1905,-0.0806,-8.4581,73,34.2466,0.0199,1.4493,-0.5011
+Gold,stop beyond breakout candle,"fixed stop, target 3R",105,31.4286,-0.1067,-11.2051,73,31.5068,0.0425,3.0999,-0.6505
+Gold,stop beyond breakout candle,"breakeven at 1R, target 2R",105,25.7143,-0.1045,-10.9706,73,30.1370,0.0628,4.5827,-0.8977
+Gold,stop beyond breakout candle,"breakeven at 1R, target 3R",105,20.0000,-0.1376,-14.4434,73,23.2877,0.0368,2.6882,-0.8562
+Gold,stop beyond breakout candle,"trailing from 1R, target 2R",105,41.9048,-0.0801,-8.4114,73,45.2055,0.0184,1.3457,-0.5584
+Gold,stop beyond breakout candle,"trailing from 1R, target 3R",105,41.9048,-0.0914,-9.5941,73,45.2055,0.0388,2.8293,-0.6995
+Gold,stop beyond breakout candle,"trailing from 1R, target none",105,41.9048,-0.1027,-10.7875,73,45.2055,0.0223,1.6310,-0.6889
