@@ -17,14 +17,16 @@ check only, the same tests were also run on the 12 months before, 4 Nov 2024 –
   sweep) helped in some tests and hurt in others.
   - Across the four tests (two markets × two years), **no version made money in all four**.
   - Every version averaged between −0.14R and +0.003R a trade.
-  - The full ICT London model took only 12–20 trades a year, and its average swung from +0.75R to −0.80R between
-    years.
+  - The full ICT London model took only 12–20 trades a year, and its average ranged from +0.77R to −0.80R a trade
+    across tests.
 - **The PDF's statistics don't appear in either market:**
 
-  | | PDF | Backtests |
-  |---|---|---|
-  | Win rate | 84.4% | 10–28% |
-  | Trades reaching 3R | 82.1% | 17–29% |
+  | | PDF | Nasdaq-100 base | Gold base |
+  |---|---|---|---|
+  | Win rate | 84.4% | 15% | 12% |
+  | Trades reaching 3R | 82.1% | 24% | 21% |
+
+  None of the 17 versions came close; the highest was about 43%, on 12–14 trades.
 
 ## ICT's OTE according to public sources
 
@@ -152,7 +154,7 @@ How far trades went, compared with the PDF's own statistics:
 
 ## Why no version holds up
 
-- **Results flip between years and markets.** The best change on the Nasdaq-100 in the last 12 months was the stop
+- **Results flip between years and markets.** The best single change on the Nasdaq-100 in the last 12 months was the stop
   beyond the swing, at +0.19R. It lost in the year before (−0.07R) and on gold (−0.14R). The killzone-only rule
   made +0.21R in one test and lost in the other three. A version that is good in one year and bad in the next has
   no stable edge; it is showing the year's noise.
