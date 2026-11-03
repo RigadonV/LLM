@@ -247,6 +247,7 @@
   /* Steps and validation                                             */
   /* ---------------------------------------------------------------- */
   var MESSAGES = {
+    reasonDetails: "Please tell us a little about why you’re coming in.",
     firstName: "Please enter a first name.",
     lastName: "Please enter a surname.",
     dob: "Please enter a valid date of birth.",
@@ -265,6 +266,7 @@
     var field = input.closest(".field");
     var err = field && $(".field-error", field);
     var valid = input.checkValidity();
+    if (valid && input.required && input.type !== "checkbox" && !input.value.trim()) valid = false;
     if (input.id === "phone" && valid) valid = input.value.replace(/\D/g, "").length >= 7;
     if (field) field.classList.toggle("is-invalid", !valid);
     if (err) err.textContent = valid ? "" : (MESSAGES[input.name] || input.validationMessage);
@@ -274,16 +276,19 @@
 
   function validateStep(n) {
     if (n === 1) {
-      var ok = true;
       setGroupError("service", state.service ? "" : "Please choose the main reason for your visit.");
       setGroupError("date", state.date ? "" : "Please choose a date.");
       setGroupError("time", state.time ? "" : "Please choose a time.");
-      if (!state.service || !state.date || !state.time) {
-        ok = false;
-        var first = !state.service ? "service" : !state.date ? "date" : "time";
-        $('[data-group="' + first + '"]').scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return ok;
+      var reason = $("#reasonDetails");
+      var reasonOk = validateField(reason);
+      var target = !state.service ? $('[data-group="service"]')
+        : !reasonOk ? reason
+        : !state.date ? $('[data-group="date"]')
+        : !state.time ? $('[data-group="time"]') : null;
+      if (!target) return true;
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (target === reason) reason.focus({ preventScroll: true });
+      return false;
     }
     var section = $('[data-step="' + n + '"]');
     var inputs = $$("input[required], textarea[required], select[required]", section)
@@ -320,6 +325,7 @@
     return {
       visit: state.visit,
       service: state.service,
+      reasonDetails: f.reasonDetails.value.trim(),
       date: state.date,
       time: state.time,
       firstName: f.firstName.value.trim(),
@@ -387,28 +393,22 @@
       .then(function () {
         btn.disabled = false;
         btn.classList.remove("is-loading");
-        $(".btn-label", btn).textContent = "Confirm booking";
+        $(".btn-label", btn).textContent = "Book appointment";
       });
   }
 
   function showSuccess(data, res) {
-    var minutes = C.visitTypes[data.visit].minutes;
-    var start = slotEpoch(data.date, data.time);
-    var end = start + minutes * 60000;
-    var gcal = function (ms) { return new Date(ms).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); };
     var p = pretty12(data.time);
-
+    var invited = res.invited !== false;
     $('[data-success="name"]').textContent = data.firstName;
     $('[data-success="when"]').textContent = longDate(data.date) + " at " + p.time + " " + p.ampm;
+    $('[data-success="invite"]').textContent = invited
+      ? "Open the calendar invitation sent to " + data.email + " and tap Yes."
+      : "The clinic will contact you on " + data.phone + " to confirm.";
     $('[data-success="sub"]').textContent = LIVE
-      ? "Dr. Venter has your details. A confirmation has been sent to " + data.email + "."
-      : "Demo mode: nothing was saved. Connect the Google Calendar script to take real bookings.";
+      ? "Not in your inbox within a few minutes? Check your spam folder, or call " + C.clinic.phone + "."
+      : "Demo mode: nothing was saved or sent. Once connected, Dr. Venter and the patient both receive Google Calendar invitations.";
     $('[data-success="ref"]').textContent = res.ref;
-    $("#add-to-cal").href = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-      "&text=" + encodeURIComponent("Chiropractic appointment · " + C.clinic.name) +
-      "&dates=" + gcal(start) + "/" + gcal(end) +
-      "&location=" + encodeURIComponent(C.clinic.address) +
-      "&details=" + encodeURIComponent("With " + C.clinic.doctor + ". Ref " + res.ref + ". Questions: " + C.clinic.phone);
 
     $$(".step").forEach(function (s) { s.hidden = true; });
     $(".stepper").hidden = true;
@@ -426,7 +426,7 @@
     $$(".field").forEach(function (f) { f.classList.remove("is-invalid"); });
     $$(".field-error, .group-error").forEach(function (e) { e.textContent = ""; });
     $("#guardian-field").hidden = true;
-    $("#concerns-count").textContent = "0 / 2000";
+    $$("[data-counter-for]").forEach(function (c) { c.textContent = "0 / " + $("#" + c.dataset.counterFor).maxLength; });
     $("#success").hidden = true;
     $(".stepper").hidden = false;
     $("#demo-banner").hidden = LIVE;
@@ -459,7 +459,8 @@
     form.addEventListener("input", function (e) {
       var f = e.target.closest(".field.is-invalid");
       if (f) validateField(e.target);
-      if (e.target.id === "concerns") $("#concerns-count").textContent = e.target.value.length + " / 2000";
+      var counter = $('[data-counter-for="' + e.target.id + '"]');
+      if (counter) counter.textContent = e.target.value.length + " / " + e.target.maxLength;
     });
 
     $$("[data-next]").forEach(function (b) {

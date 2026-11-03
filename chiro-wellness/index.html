@@ -132,6 +132,16 @@
                 <p class="group-error" role="alert"></p>
               </fieldset>
 
+              <div class="field field-reason">
+                <label for="reasonDetails">Tell us more about why you're coming in</label>
+                <textarea id="reasonDetails" name="reasonDetails" rows="3" required maxlength="500"
+                  placeholder="e.g. Stiff neck and headaches since starting a new desk job a month ago."></textarea>
+                <div class="field-meta">
+                  <p class="field-error"></p>
+                  <span class="counter" data-counter-for="reasonDetails">0 / 500</span>
+                </div>
+              </div>
+
               <fieldset class="group" data-group="date">
                 <legend>Date</legend>
                 <div class="date-wrap">
@@ -196,6 +206,7 @@
                 <div class="field">
                   <label for="email">Email</label>
                   <input id="email" name="email" type="email" autocomplete="email" required maxlength="120" placeholder="you@example.com">
+                  <p class="field-hint">We'll send your calendar invitation here.</p>
                   <p class="field-error"></p>
                 </div>
                 <div class="field">
@@ -229,17 +240,17 @@
               <div class="field">
                 <label for="concerns">Describe your ailments or previous injuries</label>
                 <textarea id="concerns" name="concerns" rows="6" required maxlength="2000"
-                  placeholder="e.g. Lower back pain for 3 months, worse when sitting. Sprained left ankle playing football in 2022. No surgeries."></textarea>
+                  placeholder="e.g. Recurring lower back pain since 2021. Sprained left ankle playing football in 2022. Knee surgery in 2019. Mild asthma."></textarea>
                 <div class="field-meta">
                   <p class="field-error"></p>
-                  <span class="counter" id="concerns-count">0 / 2000</span>
+                  <span class="counter" data-counter-for="concerns">0 / 2000</span>
                 </div>
               </div>
 
               <label class="check">
                 <input type="checkbox" id="consent" name="consent" required>
                 <span class="box" aria-hidden="true"></span>
-                <span>I agree that Chiro Wellness may store and use these details to manage my care and contact me about this appointment.</span>
+                <span>I agree that Chiro Wellness may store and use these details to manage my care, and send me a calendar invitation for this appointment.</span>
               </label>
               <p class="field-error consent-error"></p>
 
@@ -253,7 +264,7 @@
               <div class="step-actions">
                 <button type="button" class="btn btn-text" data-back>Back</button>
                 <button type="submit" class="btn btn-gold" id="submit-btn">
-                  <span class="btn-label">Confirm booking</span>
+                  <span class="btn-label">Book appointment</span>
                   <span class="spinner" aria-hidden="true"></span>
                 </button>
               </div>
@@ -265,12 +276,25 @@
               <div class="success-mark" aria-hidden="true">
                 <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15 27 7 7 15-15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
-              <h3 id="success-title" tabindex="-1">You're booked, <span data-success="name"></span>.</h3>
+              <h3 id="success-title" tabindex="-1">Your time is reserved, <span data-success="name"></span>.</h3>
               <p class="success-when" data-success="when"></p>
+              <ol class="next-steps" aria-label="What happens next">
+                <li class="is-done">
+                  <span class="ns-dot" aria-hidden="true"></span>
+                  <div><strong>Time reserved</strong><span>Held for you in Dr.&nbsp;Venter's diary.</span></div>
+                </li>
+                <li class="is-current">
+                  <span class="ns-dot" aria-hidden="true"></span>
+                  <div><strong>Confirm from your inbox</strong><span data-success="invite"></span></div>
+                </li>
+                <li>
+                  <span class="ns-dot" aria-hidden="true"></span>
+                  <div><strong>You're confirmed</strong><span>Dr.&nbsp;Venter sees your reply on her calendar invitation.</span></div>
+                </li>
+              </ol>
               <p class="success-sub" data-success="sub"></p>
               <p class="success-ref">Reference <strong data-success="ref"></strong></p>
               <div class="success-actions">
-                <a class="btn btn-dark" id="add-to-cal" target="_blank" rel="noopener">Add to my Google Calendar</a>
                 <button type="button" class="btn btn-text" id="book-another">Book another appointment</button>
               </div>
             </section>

@@ -1,25 +1,40 @@
 /**
  * Chiro Wellness — Google Calendar booking backend
  * =================================================================
- * Runs as a Google Apps Script Web App under Dr. Venter's Google
- * account. The website calls it to:
+ * Runs as a Google Apps Script Web App under the clinic's BOOKING
+ * ACCOUNT (e.g. reception's Google account). For every booking it:
  *
- *   GET  ?action=availability&visit=new&from=YYYY-MM-DD&days=21
- *        -> free time slots, worked out from HOURS below minus anything
- *           already on her Google Calendar.
- *   POST {booking JSON}
- *        -> re-checks the slot, creates the calendar event, emails the
- *           clinic and the patient, and (optionally) logs to a Sheet.
+ *   1. checks the time is free on Dr. Venter's calendar (free/busy)
+ *      and on the bookings calendar,
+ *   2. creates the appointment and sends Google Calendar INVITATIONS
+ *      to Dr. Venter and to the patient,
+ *   3. the patient CONFIRMS by tapping "Yes" on the invitation.
+ *      Dr. Venter sees their answer in the event's guest list.
  *
- * Setup steps are in README.md. After editing this file you must
- * deploy a NEW VERSION (Deploy > Manage deployments > Edit > New version)
- * for the change to reach the website.
+ * A timed check (checkResponses, every 15 minutes) then:
+ *   - cancels the booking and frees the slot if the patient taps "No",
+ *   - optionally releases bookings never confirmed (RELEASE_UNCONFIRMED_AFTER_HOURS),
+ *   - emails reception if Dr. Venter declines an appointment.
+ *
+ * Website endpoints:
+ *   GET  ?action=availability&visit=new&from=YYYY-MM-DD&days=21  -> free slots
+ *   POST {booking JSON}                                          -> create booking
+ *
+ * Requires the "Google Calendar API" advanced service (Services > + in the editor).
+ * Setup steps are in README.md. After editing, deploy a NEW VERSION
+ * (Deploy > Manage deployments > Edit > New version).
  */
 
 const SETTINGS = {
-  // 'primary' = the main calendar of the account that deploys this script.
-  // Or paste a specific Calendar ID (Calendar settings > Integrate calendar).
-  CALENDAR_ID: 'primary',
+  // Calendar the bookings are created on, in the account running this script.
+  BOOKINGS_CALENDAR_ID: 'primary',
+
+  // Dr. Venter's Google account. She is invited to every booking, and her busy
+  // times are read from her calendar. She must share her calendar with the
+  // booking account ("See only free/busy" is enough).
+  // Leave '' only if this script runs as Dr. Venter herself: bookings then go
+  // straight into her calendar instead of arriving as invitations.
+  DOCTOR_EMAIL: '',
 
   CLINIC_NAME: 'Chiro Wellness',
   DOCTOR_NAME: 'Dr. Machere Venter',
@@ -48,16 +63,24 @@ const SETTINGS = {
     Sun: []
   },
 
-  // An all-day event (e.g. "Leave", "Conference") blocks that whole day.
+  // An all-day event on the BOOKINGS calendar (e.g. "Clinic closed") blocks that day.
   ALL_DAY_EVENTS_BLOCK_DAY: true,
 
-  NOTIFY_RECEPTION: true,          // email the clinic for every booking
-  SEND_PATIENT_CONFIRMATION: true, // email the patient a confirmation
-  EVENT_COLOR: CalendarApp.EventColor.CYAN,
+  // Invitations and confirmation
+  INVITE_PATIENT: true,               // patient gets an invitation and confirms by tapping "Yes"
+  PATIENTS_SEE_GUEST_LIST: true,      // lets Dr. Venter see the patient's Yes/No; patients also see her email address
+  HEALTH_DETAILS_IN_INVITE: true,     // reason, history etc. in the invitation (the patient sees their own answers)
+  CANCEL_WHEN_PATIENT_DECLINES: true, // patient taps "No" -> booking cancelled, slot freed
+  RELEASE_UNCONFIRMED_AFTER_HOURS: 0, // 0 = keep unconfirmed bookings; e.g. 24 = cancel if not confirmed within a day
+
+  NOTIFY_RECEPTION: true,             // email reception for every booking and every alert
+  EVENT_COLOR_ID: '7',                // 7 = Peacock (teal) in Google Calendar
 
   // Optional: paste a Google Sheet ID to keep a log of every booking.
   SHEET_ID: ''
 };
+
+const SOURCE_TAG = 'chirowellness-website';
 
 /* ------------------------------------------------------------------ */
 /* Web app entry points                                               */
@@ -115,20 +138,14 @@ function doPost(e) {
     b.minutes = minutes;
     b.whenText = Utilities.formatDate(start, SETTINGS.TIME_ZONE, "EEEE d MMMM yyyy 'at' HH:mm");
 
-    const event = calendar_().createEvent(
-      b.firstName + ' ' + b.lastName + ' · ' + b.visitLabel + ' (' + minutes + ' min)',
-      start, end,
-      { description: eventDescription_(b), location: SETTINGS.CLINIC_ADDRESS }
-    );
-    try { event.setColor(SETTINGS.EVENT_COLOR); } catch (ignore) {}
-    try { event.setTag('booking_ref', ref); } catch (ignore) {}
+    createBookingEvent_(b, start, end);
 
     // Notifications must never undo a booking that is already on the calendar.
     try { if (SETTINGS.NOTIFY_RECEPTION) notifyReception_(b); } catch (err) { console.error(err); }
-    try { if (SETTINGS.SEND_PATIENT_CONFIRMATION) confirmPatient_(b); } catch (err) { console.error(err); }
+    try { if (!SETTINGS.INVITE_PATIENT) confirmPatient_(b); } catch (err) { console.error(err); }
     try { if (SETTINGS.SHEET_ID) logToSheet_(b, start); } catch (err) { console.error(err); }
 
-    return json_({ ok: true, ref: ref, start: start.toISOString(), end: end.toISOString() });
+    return json_({ ok: true, ref: ref, invited: SETTINGS.INVITE_PATIENT, start: start.toISOString(), end: end.toISOString() });
   } catch (err) {
     console.error(err);
     return json_({ ok: false, code: 'SERVER_ERROR', message: 'Something went wrong. Please call or WhatsApp the clinic.' });
@@ -138,32 +155,114 @@ function doPost(e) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Creating the booking and its invitations                           */
+/* ------------------------------------------------------------------ */
+
+function createBookingEvent_(b, start, end) {
+  const attendees = [];
+  if (SETTINGS.DOCTOR_EMAIL) attendees.push({ email: SETTINGS.DOCTOR_EMAIL, displayName: SETTINGS.DOCTOR_NAME });
+  if (SETTINGS.INVITE_PATIENT) attendees.push({ email: b.email, displayName: b.firstName + ' ' + b.lastName });
+
+  return Calendar.Events.insert({
+    summary: SETTINGS.CLINIC_NAME + ' · ' + b.firstName + ' ' + b.lastName + ' · ' + b.visitLabel,
+    location: SETTINGS.CLINIC_ADDRESS,
+    description: eventDescription_(b),
+    start: { dateTime: start.toISOString(), timeZone: SETTINGS.TIME_ZONE },
+    end: { dateTime: end.toISOString(), timeZone: SETTINGS.TIME_ZONE },
+    attendees: attendees,
+    guestsCanSeeOtherGuests: SETTINGS.PATIENTS_SEE_GUEST_LIST,
+    guestsCanInviteOthers: false,
+    guestsCanModify: false,
+    colorId: SETTINGS.EVENT_COLOR_ID,
+    extendedProperties: {
+      private: {
+        source: SOURCE_TAG,
+        ref: b.ref,
+        patientEmail: b.email.toLowerCase(),
+        patientName: b.firstName + ' ' + b.lastName,
+        patientPhone: b.phone
+      }
+    }
+  }, SETTINGS.BOOKINGS_CALENDAR_ID, { sendUpdates: attendees.length ? 'all' : 'none' });
+}
+
+/* ------------------------------------------------------------------ */
+/* Timed check: patient confirmations, declines, doctor declines      */
+/* Installed by setup(); runs every 15 minutes.                        */
+/* ------------------------------------------------------------------ */
+
+function checkResponses() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return;
+  try {
+    const now = new Date();
+    const until = new Date(now.getTime() + SETTINGS.MAX_DAYS_AHEAD * 86400000);
+    listEvents_(now, until, { privateExtendedProperty: 'source=' + SOURCE_TAG }).forEach(function (ev) {
+      if (ev.status === 'cancelled' || !ev.start || !ev.start.dateTime) return;
+      const info = (ev.extendedProperties && ev.extendedProperties.private) || {};
+      const when = Utilities.formatDate(new Date(ev.start.dateTime), SETTINGS.TIME_ZONE, "EEEE d MMMM 'at' HH:mm");
+      const patient = responseOf_(ev, info.patientEmail);
+      const who = (info.patientName || 'The patient') + (info.patientPhone ? ' (' + info.patientPhone + ')' : '');
+
+      if (SETTINGS.CANCEL_WHEN_PATIENT_DECLINES && patient === 'declined') {
+        cancelEvent_(ev);
+        alert_('Booking cancelled by patient: ' + (info.patientName || '') + ', ' + when,
+          who + ' declined the invitation for ' + when + ', so the booking was cancelled and the time is free again. Ref ' + info.ref + '.');
+        return;
+      }
+
+      const hours = SETTINGS.RELEASE_UNCONFIRMED_AFTER_HOURS;
+      if (hours > 0 && patient === 'needsAction' && now.getTime() - Date.parse(ev.created) > hours * 3600000) {
+        cancelEvent_(ev);
+        alert_('Unconfirmed booking released: ' + (info.patientName || '') + ', ' + when,
+          who + ' did not confirm within ' + hours + ' hours, so the booking for ' + when + ' was cancelled. Ref ' + info.ref + '.');
+        return;
+      }
+
+      if (SETTINGS.DOCTOR_EMAIL && responseOf_(ev, SETTINGS.DOCTOR_EMAIL) === 'declined' && !info.doctorDeclinedAlerted) {
+        alert_('Dr. Venter declined: ' + (info.patientName || '') + ', ' + when,
+          SETTINGS.DOCTOR_NAME + ' declined the appointment with ' + who + ' on ' + when + '. Please contact the patient to rebook, ' +
+          'then delete the event from the bookings calendar. The time stays blocked until you do. Ref ' + info.ref + '.');
+        const updated = Object.assign({}, info, { doctorDeclinedAlerted: '1' });
+        Calendar.Events.patch({ extendedProperties: { private: updated } }, SETTINGS.BOOKINGS_CALENDAR_ID, ev.id, { sendUpdates: 'none' });
+      }
+    });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function cancelEvent_(ev) {
+  // Google emails a cancellation to Dr. Venter and the patient.
+  Calendar.Events.remove(SETTINGS.BOOKINGS_CALENDAR_ID, ev.id, { sendUpdates: 'all' });
+}
+
+function alert_(subject, text) {
+  if (!SETTINGS.NOTIFY_RECEPTION) return;
+  MailApp.sendEmail({ to: SETTINGS.RECEPTION_EMAIL, name: SETTINGS.CLINIC_NAME + ' Bookings', subject: subject, body: text });
+}
+
+function responseOf_(ev, email) {
+  if (!email) return null;
+  const target = String(email).toLowerCase();
+  const a = (ev.attendees || []).filter(function (x) { return String(x.email).toLowerCase() === target; })[0];
+  return a ? a.responseStatus : null;
+}
+
+/* ------------------------------------------------------------------ */
 /* Availability                                                       */
 /* ------------------------------------------------------------------ */
 
 function availability_(fromStr, days, minutes) {
   const step = SETTINGS.SLOT_STEP_MINUTES * 60000;
   const dur = minutes * 60000;
-  const buffer = SETTINGS.BUFFER_MINUTES * 60000;
   const now = Date.now();
   const earliest = now + SETTINGS.MIN_NOTICE_HOURS * 3600000;
   const latest = now + SETTINGS.MAX_DAYS_AHEAD * 86400000;
 
   const rangeStart = toDate_(fromStr, '00:00');
   const rangeEnd = new Date(rangeStart.getTime() + days * 86400000);
-  const busy = [];
-  calendar_().getEvents(rangeStart, rangeEnd).forEach(function (ev) {
-    try {
-      if (ev.getMyStatus && ev.getMyStatus() === CalendarApp.GuestStatus.NO) return; // she declined it
-    } catch (ignore) {}
-    if (ev.isAllDayEvent()) {
-      if (SETTINGS.ALL_DAY_EVENTS_BLOCK_DAY) {
-        busy.push([ev.getAllDayStartDate().getTime(), ev.getAllDayEndDate().getTime()]);
-      }
-      return;
-    }
-    busy.push([ev.getStartTime().getTime() - buffer, ev.getEndTime().getTime() + buffer]);
-  });
+  const busy = busyIntervals_(rangeStart, rangeEnd);
 
   const out = {};
   for (let d = 0; d < days; d++) {
@@ -185,6 +284,63 @@ function availability_(fromStr, days, minutes) {
   return out;
 }
 
+function busyIntervals_(start, end) {
+  const buffer = SETTINGS.BUFFER_MINUTES * 60000;
+  const busy = [];
+
+  // 1. Everything on the bookings calendar, including earlier website bookings.
+  listEvents_(start, end).forEach(function (ev) {
+    if (ev.status === 'cancelled') return;
+    if (ev.start && ev.start.date) {
+      if (SETTINGS.ALL_DAY_EVENTS_BLOCK_DAY) {
+        busy.push([toDate_(ev.start.date, '00:00').getTime(), toDate_(ev.end.date, '00:00').getTime()]);
+      }
+      return;
+    }
+    if (ev.transparency === 'transparent') return;
+    if ((ev.attendees || []).some(function (a) { return a.self && a.responseStatus === 'declined'; })) return;
+    const info = ev.extendedProperties && ev.extendedProperties.private;
+    if (info && info.source === SOURCE_TAG && responseOf_(ev, info.patientEmail) === 'declined') return;
+    busy.push([Date.parse(ev.start.dateTime) - buffer, Date.parse(ev.end.dateTime) + buffer]);
+  });
+
+  // 2. Dr. Venter's own calendar, via free/busy.
+  if (SETTINGS.DOCTOR_EMAIL) {
+    doctorBusy_(start, end).forEach(function (b) { busy.push([b[0] - buffer, b[1] + buffer]); });
+  }
+  return busy;
+}
+
+function doctorBusy_(start, end) {
+  const id = SETTINGS.DOCTOR_EMAIL;
+  const res = Calendar.Freebusy.query({
+    timeMin: start.toISOString(), timeMax: end.toISOString(), timeZone: SETTINGS.TIME_ZONE, items: [{ id: id }]
+  });
+  const cal = res.calendars && (res.calendars[id] || res.calendars[id.toLowerCase()]);
+  if (!cal || (cal.errors && cal.errors.length)) {
+    const reason = cal && cal.errors && cal.errors.length ? cal.errors[0].reason : 'no data';
+    throw new Error('Cannot read free/busy for ' + id + ' (' + reason + '). ' +
+      'Dr. Venter must share her calendar with this account: Google Calendar > Settings > her calendar > ' +
+      'Share with specific people > add this account > "See only free/busy".');
+  }
+  return (cal.busy || []).map(function (b) { return [Date.parse(b.start), Date.parse(b.end)]; });
+}
+
+function listEvents_(start, end, extra) {
+  const out = [];
+  let pageToken = null;
+  do {
+    const params = Object.assign({
+      timeMin: start.toISOString(), timeMax: end.toISOString(), singleEvents: true, maxResults: 2500
+    }, extra || {});
+    if (pageToken) params.pageToken = pageToken;
+    const res = Calendar.Events.list(SETTINGS.BOOKINGS_CALENDAR_ID, params);
+    (res.items || []).forEach(function (item) { out.push(item); });
+    pageToken = res.nextPageToken;
+  } while (pageToken);
+  return out;
+}
+
 /* ------------------------------------------------------------------ */
 /* Validation                                                         */
 /* ------------------------------------------------------------------ */
@@ -194,6 +350,7 @@ function validate_(d) {
   if (!SETTINGS.DURATIONS[d.visit]) return 'Please choose a visit type.';
   if (!/^\d{4}-\d{2}-\d{2}$/.test(d.date || '')) return 'Please choose a date.';
   if (!/^\d{2}:\d{2}$/.test(d.time || '')) return 'Please choose a time.';
+  if (!str_(d.reasonDetails)) return 'Please tell us a little about why you are coming in.';
   if (!str_(d.firstName) || !str_(d.lastName)) return 'Please enter the patient\'s name.';
   if (!/^[+0-9 ()-]{7,20}$/.test(str_(d.phone))) return 'Please enter a valid phone number.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str_(d.email))) return 'Please enter a valid email address.';
@@ -214,6 +371,7 @@ function clean_(d) {
     date: d.date,
     time: d.time,
     service: str_(d.service, 60) || 'Not specified',
+    reasonDetails: str_(d.reasonDetails, 500),
     firstName: str_(d.firstName, 60),
     lastName: str_(d.lastName, 60),
     dob: d.dob,
@@ -233,32 +391,46 @@ function str_(v, max) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Calendar event, emails, sheet                                      */
+/* Invitation text, emails, sheet                                     */
 /* ------------------------------------------------------------------ */
 
 function eventDescription_(b) {
-  return [
-    'Booking ref: ' + b.ref,
-    'Visit: ' + b.visitLabel + ' (' + b.minutes + ' min)',
-    'Reason: ' + b.service,
-    '',
-    'PATIENT',
-    'Name: ' + b.firstName + ' ' + b.lastName,
-    'Date of birth: ' + b.dob + ' (age ' + age_(b.dob) + ')',
-    b.gender ? 'Gender: ' + b.gender : null,
-    b.guardian ? 'Parent / guardian: ' + b.guardian : null,
+  const lines = ['Booking ref: ' + b.ref, b.visitLabel + ' · ' + b.minutes + ' minutes with ' + SETTINGS.DOCTOR_NAME, ''];
+  if (SETTINGS.INVITE_PATIENT) {
+    lines.push(
+      'FOR THE PATIENT',
+      'Please tap "Yes" on this invitation to confirm your booking.',
+      'To change or cancel, call ' + SETTINGS.CLINIC_PHONE + ' or email ' + SETTINGS.RECEPTION_EMAIL + '.'
+    );
+    if (b.visit === 'new') {
+      lines.push('First visit: please arrive 10 minutes early, wear comfortable clothing and bring any X-rays, scans or reports.');
+    }
+    lines.push('');
+  }
+  lines.push(
+    'BOOKING DETAILS',
+    'Patient: ' + b.firstName + ' ' + b.lastName,
     'Phone: ' + b.phone,
     'Email: ' + b.email,
-    'Medical aid: ' + (b.medicalAid || 'None given'),
-    '',
-    'AREAS OF CONCERN',
-    b.areas.length ? b.areas.join(', ') : 'None selected',
-    '',
-    'AILMENTS / PREVIOUS INJURIES',
-    b.concerns,
-    '',
-    'Booked online via the Chiro Wellness website.'
-  ].filter(function (line) { return line !== null; }).join('\n');
+    'Reason: ' + b.service
+  );
+  if (SETTINGS.HEALTH_DETAILS_IN_INVITE) {
+    lines.push(
+      'About the visit: ' + b.reasonDetails,
+      'Date of birth: ' + b.dob + ' (age ' + age_(b.dob) + ')',
+      b.gender ? 'Gender: ' + b.gender : null,
+      b.guardian ? 'Parent / guardian: ' + b.guardian : null,
+      'Medical aid: ' + (b.medicalAid || 'None given'),
+      'Areas of concern: ' + (b.areas.length ? b.areas.join(', ') : 'None selected'),
+      '',
+      'Ailments / previous injuries:',
+      b.concerns
+    );
+  } else {
+    lines.push('', 'Clinical details were emailed to the clinic.');
+  }
+  lines.push('', 'Booked online via the ' + SETTINGS.CLINIC_NAME + ' website.');
+  return lines.filter(function (line) { return line !== null; }).join('\n');
 }
 
 function notifyReception_(b) {
@@ -266,6 +438,7 @@ function notifyReception_(b) {
     ['When', b.whenText],
     ['Visit', b.visitLabel + ' (' + b.minutes + ' min)'],
     ['Reason', b.service],
+    ['About the visit', b.reasonDetails],
     ['Patient', b.firstName + ' ' + b.lastName],
     ['Date of birth', b.dob + ' (age ' + age_(b.dob) + ')'],
     ['Gender', b.gender || '—'],
@@ -280,19 +453,28 @@ function notifyReception_(b) {
     return '<tr><td style="padding:6px 12px 6px 0;color:#5b6f6b;vertical-align:top;white-space:nowrap">' + esc_(r[0]) +
       '</td><td style="padding:6px 0;color:#0D2E2A;white-space:pre-wrap">' + esc_(r[1]) + '</td></tr>';
   }).join('');
-  MailApp.sendEmail({
+  const invited = [SETTINGS.DOCTOR_EMAIL ? SETTINGS.DOCTOR_NAME : null, SETTINGS.INVITE_PATIENT ? 'the patient' : null]
+    .filter(Boolean).join(' and ');
+  const footer = invited
+    ? 'Calendar invitations were sent to ' + esc_(invited) + '. ' +
+      (SETTINGS.INVITE_PATIENT ? 'The booking is confirmed when the patient taps "Yes"; Google emails the booking account when they do.' : '')
+    : 'Added to the clinic Google Calendar.';
+  const mail = {
     to: SETTINGS.RECEPTION_EMAIL,
     replyTo: b.email,
     name: SETTINGS.CLINIC_NAME + ' Bookings',
     subject: 'New booking: ' + b.firstName + ' ' + b.lastName + ' — ' + b.whenText + ' [' + b.ref + ']',
     htmlBody: '<div style="font-family:Arial,sans-serif;font-size:14px"><h2 style="color:#1A8C78;margin:0 0 12px">New online booking</h2>' +
       '<table style="border-collapse:collapse">' + table + '</table>' +
-      '<p style="color:#5b6f6b">Ref ' + esc_(b.ref) + ' — already added to the clinic Google Calendar.</p></div>'
-  });
+      '<p style="color:#5b6f6b">Ref ' + esc_(b.ref) + '. ' + footer + '</p></div>'
+  };
+  // If health details are kept out of the invitation, Dr. Venter gets them here instead.
+  if (!SETTINGS.HEALTH_DETAILS_IN_INVITE && SETTINGS.DOCTOR_EMAIL) mail.cc = SETTINGS.DOCTOR_EMAIL;
+  MailApp.sendEmail(mail);
 }
 
+// Only used when INVITE_PATIENT is false, so the patient still hears back.
 function confirmPatient_(b) {
-  // Deliberately leaves out health details: email is not a secure channel.
   MailApp.sendEmail({
     to: b.email,
     replyTo: SETTINGS.RECEPTION_EMAIL,
@@ -315,11 +497,11 @@ function logToSheet_(b, start) {
   const ss = SpreadsheetApp.openById(SETTINGS.SHEET_ID);
   const sheet = ss.getSheetByName('Bookings') || ss.insertSheet('Bookings');
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Booked at', 'Ref', 'Appointment', 'Visit', 'Reason', 'First name', 'Last name',
+    sheet.appendRow(['Booked at', 'Ref', 'Appointment', 'Visit', 'Reason', 'About the visit', 'First name', 'Last name',
       'DOB', 'Gender', 'Guardian', 'Phone', 'Email', 'Medical aid', 'Areas', 'Ailments / injuries']);
     sheet.setFrozenRows(1);
   }
-  sheet.appendRow([new Date(), b.ref, start, b.visitLabel, b.service, b.firstName, b.lastName,
+  sheet.appendRow([new Date(), b.ref, start, b.visitLabel, b.service, b.reasonDetails, b.firstName, b.lastName,
     b.dob, b.gender, b.guardian, b.phone, b.email, b.medicalAid, b.areas.join(', '), b.concerns]
     .map(function (v) { return typeof v === 'string' && /^[=+\-@]/.test(v) ? "'" + v : v; }));
 }
@@ -327,14 +509,6 @@ function logToSheet_(b, start) {
 /* ------------------------------------------------------------------ */
 /* Helpers                                                            */
 /* ------------------------------------------------------------------ */
-
-function calendar_() {
-  const cal = SETTINGS.CALENDAR_ID === 'primary'
-    ? CalendarApp.getDefaultCalendar()
-    : CalendarApp.getCalendarById(SETTINGS.CALENDAR_ID);
-  if (!cal) throw new Error('Calendar not found: ' + SETTINGS.CALENDAR_ID);
-  return cal;
-}
 
 function toDate_(dateStr, timeStr) {
   return new Date(dateStr + 'T' + timeStr + ':00' + SETTINGS.UTC_OFFSET);
@@ -363,12 +537,29 @@ function json_(obj) {
 }
 
 /**
- * Run this once from the editor (select testSetup > Run) to grant
- * permissions and check the calendar connection before deploying.
+ * Run this once from the editor (select setup > Run) before deploying.
+ * It grants permissions, checks both calendars can be read, installs the
+ * 15-minute response check, and prints the next week's free slots.
  */
-function testSetup() {
-  const cal = calendar_();
-  console.log('Connected to calendar: ' + cal.getName());
+function setup() {
+  const cal = Calendar.Calendars.get(SETTINGS.BOOKINGS_CALENDAR_ID);
+  console.log('Bookings calendar: ' + cal.summary + ' (' + cal.id + ')');
+
+  if (SETTINGS.DOCTOR_EMAIL) {
+    doctorBusy_(new Date(), new Date(Date.now() + 7 * 86400000));
+    console.log('Can read free/busy for ' + SETTINGS.DOCTOR_EMAIL + '. She will be invited to every booking.');
+  } else {
+    console.log('DOCTOR_EMAIL is empty: bookings go straight into this account\'s calendar with no invitation for Dr. Venter.');
+  }
+
+  const installed = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'checkResponses'; });
+  if (!installed) {
+    ScriptApp.newTrigger('checkResponses').timeBased().everyMinutes(15).create();
+    console.log('Installed the 15-minute response check.');
+  } else {
+    console.log('Response check already installed.');
+  }
+
   const slots = availability_(todayStr_(), 7, SETTINGS.DURATIONS.new);
   Object.keys(slots).forEach(function (d) { console.log(d + ': ' + (slots[d].join(', ') || 'no free slots')); });
 }
