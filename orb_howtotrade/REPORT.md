@@ -329,6 +329,42 @@ The best version, candle stop with 1 + 2, year by year:
   - But it trades only about twice a month (about 24 trades a year), and its fresh-year t-statistic is 1.2. That
     is suggestive, not proven, and the 8-year $13,689 includes the two in-sample years.
 
+### Without the London and trend filters
+
+This takes the candle-stop version with 1 + 2 (narrow opening range, breakout by 10:30, stop beyond the breakout
+candle, target 2R) and drops the London filter, the 50/200 EMA trend filter, or both. Without the trend filter,
+the first qualifying breakout in either direction is traded.
+
+| Candle stop, 1 + 2 | Trades (8 years) | Win rate | Avg R | 2019–2024 avg R (t) | 2025–2026 avg R | $10k after 8 years | Max drawdown |
+|---|---|---|---|---|---|---|---|
+| With both filters | 188 | 43.1% | +0.176 | +0.137 (1.2) | +0.321 | $13,689 | 10.5% |
+| No London filter | 352 | 40.3% | +0.081 | +0.090 (1.1) | +0.038 | $12,897 | 13.8% |
+| No trend filter | 320 | 40.6% | +0.108 | +0.067 (0.8) | +0.267 | $13,724 | 15.3% |
+| **No London or trend filter** | **658** | **40.4%** | **+0.098** | **+0.107 (1.8)** | +0.060 | **$17,980** | 20.0% |
+
+With the range stop instead, dropping both filters gives 658 trades, a 47.3% win rate and +0.050R a trade,
+ending at $13,426.
+
+The no-filter version by year:
+
+| | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 (to Oct) |
+|---|---|---|---|---|---|---|---|---|
+| Avg R | +0.215 | −0.017 | +0.030 | +0.094 | −0.003 | +0.289 | +0.053 | +0.076 |
+| Win rate | 43% | 35% | 41% | 41% | 37% | 48% | 38% | 40% |
+| Trades | 81 | 89 | 73 | 91 | 90 | 105 | 87 | 42 |
+
+On a fresh $10,000 from January 2025 it made +3.93% in 2025 (87 trades) and +2.88% in Jan – Oct 2026 (42 trades).
+Its maximum drawdown was 10.2%, 12 of 22 months were positive, and the average month was +0.32%. Month by month:
+`results/orb15_monthly_1_plus_2_no_London_or_trend_filter.csv`.
+
+What changes without the filters:
+- **Trades:** about 3.5 times as many, roughly 7 a month instead of 2.
+- **Edge per trade:** the average falls from +0.18R to +0.10R, and the win rate from 43% to 40%.
+- **Total and statistics:** total R nearly doubles, and the fresh-year t-statistic is the highest of any version
+  tested (1.8 on 529 trades).
+- **The two recent years:** it was positive in 6 of 8 years (the other two about flat) but did worse in 2025–2026
+  than the filtered version. Those are the years the filtered version's rules partly came from.
+
 ## Limits
 
 - **Data:** the feed is Dukascopy's CFD feed, not exchange futures or stock data, and its volume is not exchange

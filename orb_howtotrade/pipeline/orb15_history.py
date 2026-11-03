@@ -38,6 +38,9 @@ CHANGES = {
     "1 + 2": dict(cutoff_h=1.0, max_or_atr=0.45),
     "1 + 2 + 3": dict(cutoff_h=1.0, max_or_atr=0.45, stop="mid"),
     "no London filter (reference)": dict(london=False),
+    "1 + 2, no London filter": dict(cutoff_h=1.0, max_or_atr=0.45, london=False),
+    "1 + 2, no trend filter": dict(cutoff_h=1.0, max_or_atr=0.45, trend=None),
+    "1 + 2, no London or trend filter": dict(cutoff_h=1.0, max_or_atr=0.45, london=False, trend=None),
 }
 
 

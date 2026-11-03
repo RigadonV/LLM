@@ -1,9 +1,9 @@
 """Month-by-month returns of the best version found, Jan 2025 - Oct 2026, on a fresh $10,000 account at 1% risk.
 
-  python pipeline/orb15_monthly.py
+  python pipeline/orb15_monthly.py [--variant "candle base | 1 + 2, no London or trend filter"]
 
-Best version: the highest average R and ending balance of the versions in orb15_history.py, over Jan 2019 -
-Oct 2026. Its rules:
+Default (best version): the highest average R and ending balance of the versions in orb15_history.py, over
+Jan 2019 - Oct 2026. Its rules:
 - Nasdaq-100, with the London filter;
 - the opening range at most 0.45 x the average session range of the previous 14 sessions;
 - the breakout candle closing by 10:30;
@@ -11,6 +11,7 @@ Oct 2026. Its rules:
 Its trades are read from results/orb15_history_trades.csv. Profit and loss is booked in the month a trade closes;
 all trades open and close on the same day.
 """
+import argparse
 import os
 
 import pandas as pd
@@ -22,8 +23,11 @@ START, LAST = pd.Timestamp("2025-01-01", tz="UTC"), pd.Period("2026-10", "M")
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--variant", default=VARIANT, help="a variant name from results/orb15_history_trades.csv")
+    variant = ap.parse_args().variant
     t = pd.read_csv(os.path.join(RESULTS, "orb15_history_trades.csv"))
-    t = t[t["variant"] == VARIANT].copy()
+    t = t[t["variant"] == variant].copy()
     for col in ("entry_time", "exit_time"):
         t[col] = pd.to_datetime(t[col], utc=True)
     t = t[t["entry_time"] >= START]
@@ -38,7 +42,9 @@ def main():
     out["breakeven"] = out["trades"] - out["wins"] - out["losses"]
     out["return_pct"] = 100 * (out["end_balance"] / out["start_balance"] - 1)
     out.index.name = "month"
-    out.to_csv(os.path.join(RESULTS, "orb15_best_monthly.csv"), float_format="%.4f")
+    name = "orb15_best_monthly.csv" if variant == VARIANT else (
+        "orb15_monthly_" + variant.split("| ")[-1].replace(" ", "_").replace(",", "").replace("+", "plus") + ".csv")
+    out.to_csv(os.path.join(RESULTS, name), float_format="%.4f")
     peak, dd = 10_000.0, 0.0
     for b in curve.to_numpy():
         peak, dd = max(peak, b), max(dd, 1 - b / peak)
