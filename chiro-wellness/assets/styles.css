@@ -510,10 +510,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .summary-doc { display: flex; align-items: center; gap: 14px; margin-top: 24px; padding: 16px; border-radius: var(--radius); background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); }
 .avatar {
-  flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  flex: none; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; overflow: hidden;
   font-family: var(--serif); font-size: 18px; font-weight: 600; color: var(--ink);
   background: linear-gradient(140deg, #FFD27A, var(--gold));
+  box-shadow: 0 0 0 2px var(--gold), 0 0 0 5px rgba(240, 165, 0, .15);
 }
+.avatar img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
 .doc-name { color: #fff; font-weight: 600; font-size: 15px; }
 .doc-role { font-size: 13px; color: rgba(255, 255, 255, .6); }
 .summary-foot { margin-top: 20px; display: grid; gap: 12px; font-size: 13px; }
@@ -528,6 +530,26 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .summary-list div { flex-direction: column; gap: 2px; padding: 8px 0; }
   .summary-list dd { text-align: left; }
 }
+
+/* Meet the doctor ---------------------------------------------------- */
+.meet { background: #fff; padding-block: 96px; border-top: 1px solid var(--line); }
+.meet-grid { display: grid; gap: 48px; align-items: center; }
+@media (min-width: 860px) { .meet-grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); gap: 80px; } }
+.meet-photo { position: relative; margin: 0 16px 16px 0; max-width: 440px; }
+.meet-photo::before {
+  content: ""; position: absolute; inset: 16px -16px -16px 16px; z-index: 0;
+  border: 1.5px solid var(--gold); border-radius: var(--radius-lg);
+}
+.meet-photo img {
+  position: relative; z-index: 1; display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover;
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-card); background: var(--mist);
+}
+.meet-copy { max-width: 540px; }
+.meet-copy h2 { font-size: clamp(36px, 4.4vw, 52px); margin-bottom: 20px; text-wrap: balance; }
+.meet-copy p { margin-bottom: 16px; }
+.meet-lede { font-size: 19px; color: var(--ink); line-height: 1.55; }
+.meet-copy .btn { margin-top: 12px; }
+@media (max-width: 859px) { .meet { padding-block: 72px; } .meet-photo { max-width: 340px; } }
 
 /* Visit / contact ---------------------------------------------------- */
 .visit { background: var(--ink); color: rgba(255, 255, 255, .75); padding-block: 96px; }

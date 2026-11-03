@@ -52,6 +52,10 @@ const SETTINGS = {
   MIN_NOTICE_HOURS: 3,     // no bookings sooner than this
   MAX_DAYS_AHEAD: 60,
 
+  // Only these dates can be booked (YYYY-MM-DD), using that weekday's HOURS.
+  // Set to [] to open every day in HOURS. Keep in sync with bookableDates in assets/config.js.
+  BOOKABLE_DATES: ['2026-11-07'],
+
   // Opening hours. CONFIRM WITH DR. VENTER. Use [] for closed days.
   HOURS: {
     Mon: [['08:00', '13:00'], ['14:00', '17:00']],
@@ -270,6 +274,10 @@ function availability_(fromStr, days, minutes) {
     const dateStr = Utilities.formatDate(dayStart, SETTINGS.TIME_ZONE, 'yyyy-MM-dd');
     const key = Utilities.formatDate(dayStart, SETTINGS.TIME_ZONE, 'EEE');
     const slots = [];
+    if (SETTINGS.BOOKABLE_DATES.length && SETTINGS.BOOKABLE_DATES.indexOf(dateStr) === -1) {
+      out[dateStr] = slots;
+      continue;
+    }
     (SETTINGS.HOURS[key] || []).forEach(function (range) {
       const open = toDate_(dateStr, range[0]).getTime();
       const close = toDate_(dateStr, range[1]).getTime();

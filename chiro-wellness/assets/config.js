@@ -28,6 +28,10 @@ window.CHIRO_CONFIG = {
   // How many days ahead patients can pick from on the booking form.
   daysToShow: 21,
 
+  // Only these dates are offered (YYYY-MM-DD). Set to [] to offer every open day.
+  // Keep in sync with BOOKABLE_DATES in google-apps-script/Code.gs, which enforces it.
+  bookableDates: ["2026-11-07"],
+
   // Visit types. Keys must match DURATIONS in google-apps-script/Code.gs.
   visitTypes: {
     new:      { label: "New patient",      detail: "Initial consultation & assessment", minutes: 60 },

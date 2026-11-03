@@ -30,6 +30,10 @@
     d.setUTCDate(d.getUTCDate() + n);
     return d.toISOString().slice(0, 10);
   }
+  function isBookable(dateStr) {
+    var only = C.bookableDates || [];
+    return !only.length || only.indexOf(dateStr) !== -1;
+  }
   function utcNoon(dateStr) { return new Date(dateStr + "T12:00:00Z"); }
   function weekdayKey(dateStr) { return DAY_KEYS[utcNoon(dateStr).getUTCDay()]; }
   function fmt(dateStr, opts) {
@@ -119,6 +123,7 @@
     for (var d = 0; d < C.daysToShow; d++) {
       var date = addDays(start, d);
       var slots = [];
+      if (!isBookable(date)) { out[date] = slots; continue; }
       (C.hours[weekdayKey(date)] || []).forEach(function (r) {
         for (var m = toMinutes(r[0]); m + minutes <= toMinutes(r[1]); m += C.slotStepMinutes) {
           var t = toHHMM(m);
@@ -177,6 +182,7 @@
     var firstOpen = "";
     for (var d = 0; d < C.daysToShow; d++) {
       var date = addDays(start, d);
+      if (!isBookable(date)) continue;
       var open = (C.hours[weekdayKey(date)] || []).length > 0 || (dates[date] && dates[date].length);
       if (!open) continue; // closed days are left out entirely
       var count = (dates[date] || []).length;
@@ -189,7 +195,10 @@
         "<strong>" + fmt(date, { day: "numeric" }) + "</strong>" +
         "<small>" + fmt(date, { month: "short" }) + "</small><i>" + note + "</i></span></label>";
     }
-    strip.innerHTML = html || '<div class="slot-empty">No dates are open in the next few weeks.</div>';
+    strip.innerHTML = html || '<div class="slot-empty">Online booking is closed at the moment. Please WhatsApp or call us to book.</div>';
+    // Only show the scroll arrows when there are more dates than fit.
+    var overflow = strip.scrollWidth > strip.clientWidth + 4;
+    $$(".strip-nav").forEach(function (b) { b.hidden = !overflow; });
 
     if (!(dates[state.date] && dates[state.date].length)) { state.date = firstOpen; }
     if (state.date) {
@@ -486,6 +495,11 @@
     fillClinicDetails();
     renderOptions();
     $("#dob").max = todayInClinic();
+    var only = C.bookableDates || [];
+    if (only.length) {
+      $("#date-note").textContent = "· Online booking is open for " +
+        only.map(function (d) { return fmt(d, { weekday: "long", day: "numeric", month: "long" }); }).join(", ") + " only";
+    }
     $("#demo-banner").hidden = LIVE;
     bind();
     updateSummary();

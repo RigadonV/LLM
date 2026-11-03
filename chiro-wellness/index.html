@@ -143,7 +143,7 @@
               </div>
 
               <fieldset class="group" data-group="date">
-                <legend>Date</legend>
+                <legend>Date <span class="legend-note" id="date-note"></span></legend>
                 <div class="date-wrap">
                   <button type="button" class="strip-nav prev" aria-label="Earlier dates" data-strip="-1">
                     <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12 4-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -310,7 +310,10 @@
               <div><dt>Time</dt><dd data-sum="time">—</dd></div>
             </dl>
             <div class="summary-doc">
-              <div class="avatar" aria-hidden="true">MV</div>
+              <picture class="avatar">
+                <source srcset="assets/dr-venter.webp" type="image/webp">
+                <img src="assets/dr-venter.jpg" alt="" width="46" height="46" loading="lazy" decoding="async">
+              </picture>
               <div>
                 <p class="doc-name">Dr. Machere Venter</p>
                 <p class="doc-role">Chiropractor · HPCB registered</p>
@@ -321,6 +324,27 @@
               <p><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3h3l1.5 4-2 1.3a9 9 0 0 0 4.2 4.2L13 10.5l4 1.5v3a2 2 0 0 1-2 2A13 13 0 0 1 3 5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Questions? <a href="#" data-whatsapp>WhatsApp us</a></p>
             </div>
           </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEET THE DOCTOR ------------------------------------------------- -->
+    <section class="meet" aria-labelledby="meet-title">
+      <div class="container meet-grid">
+        <figure class="meet-photo">
+          <picture>
+            <source srcset="assets/dr-venter.webp" type="image/webp">
+            <img src="assets/dr-venter.jpg" alt="Dr. Machere Venter, chiropractor at Chiropractic Wellness Clinic Botswana" width="719" height="960" loading="lazy" decoding="async">
+          </picture>
+        </figure>
+        <div class="meet-copy">
+          <p class="eyebrow">Your chiropractor</p>
+          <h2 id="meet-title">Meet Dr.&nbsp;Machere Venter</h2>
+          <p class="meet-lede">Dr. Venter leads Chiropractic Wellness Clinic Botswana and personally sees every patient, from the first assessment to every follow-up.</p>
+          <p>She offers drug-free, hands-on care for back and neck pain, pregnancy, sports injuries, and children and families in Gaborone. She is registered with the Health Professions Council of Botswana.</p>
+          <a href="#book" class="btn btn-dark">Book with Dr. Venter
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
         </div>
       </div>
     </section>
