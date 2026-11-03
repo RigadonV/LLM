@@ -78,6 +78,11 @@ def simulate(m, sp, v, session):
     t, o, h, l, c = m.index, *(m[x].to_numpy() for x in ("open", "high", "low", "close"))
     b = candles(m, session[0])
     bt = b.index
+    in_session = (m.index.time >= pd.Timestamp(session[0]).time()) & (m.index.time < pd.Timestamp(session[1]).time())
+    ses = m[in_session]
+    daily = ses.groupby(ses.index.date).agg(high=("high", "max"), low=("low", "min"))
+    daily["atr14"] = (daily["high"] - daily["low"]).rolling(14).mean().shift(1)  # previous 14 sessions
+    daily["prev_high"], daily["prev_low"] = daily["high"].shift(1), daily["low"].shift(1)
     rows = []
     for day in pd.bdate_range(START, END):
         op = pd.Timestamp(f"{day.date()} {session[0]}", tz=TZ)
@@ -92,6 +97,9 @@ def simulate(m, sp, v, session):
         last = op + pd.Timedelta(hours=v["cutoff_h"])
         lon = t.searchsorted(pd.Timestamp(f"{day.date()} 03:00", tz=TZ))  # the London open
         bias = int(np.sign(o[a] - o[lon])) if lon < a else 0  # London's move up to the session open
+        if v.get("max_or_atr") and not (hi - lo <= v["max_or_atr"] * daily["atr14"].get(day.date(), np.nan)):
+            continue  # opening range too wide against the last 14 sessions
+        lon_hi, lon_lo = (h[lon:a].max(), l[lon:a].min()) if lon < a else (np.nan, np.nan)
         for k in np.flatnonzero((bt >= op + pd.Timedelta(minutes=v["or_min"])) & (bt + pd.Timedelta(minutes=15) <= last)):
             r = b.iloc[k]
             if v["trend"] == "ema":
@@ -112,11 +120,18 @@ def simulate(m, sp, v, session):
             if x >= z:
                 break
             fill = o[x] + sp[x] if d > 0 else o[x]
-            stop = (lo if d > 0 else hi) if v["stop"] == "range" else (r.low if d > 0 else r.high)
+            stop = ((lo if d > 0 else hi) if v["stop"] == "range" else (hi + lo) / 2 if v["stop"] == "mid"
+                    else (r.low if d > 0 else r.high))
             risk = d * (fill - stop)
             if risk <= 0:
                 break  # the next open is already beyond the stop
-            tp = fill + d * v["target"] * risk if v["target"] else None
+            tg = v["target"]
+            if isinstance(tg, tuple):  # ("level", "prev_day" | "london"): that high/low, if 0.5R+ beyond, else 2R
+                lvl = ((daily["prev_high"] if d > 0 else daily["prev_low"]).get(day.date(), np.nan)
+                       if tg[1] == "prev_day" else (lon_hi if d > 0 else lon_lo))
+                tp = lvl if d * (lvl - fill) >= 0.5 * risk else fill + d * 2.0 * risk
+            else:
+                tp = fill + d * tg * risk if tg else None
             manage = v.get("manage", "fixed")  # "be": stop to entry at +1R; "trail": then 1R behind the best price
             sl, best, armed, reached = stop, fill, False, False
             exit_px, reason, y = None, None, None
@@ -128,7 +143,7 @@ def simulate(m, sp, v, session):
                     break
                 if tp is not None and ((hi_y >= tp) if d > 0 else (lo_y <= tp)):
                     exit_px, reason = (max(tp, op_y) if d > 0 else min(tp, op_y)), "target"
-                    reached = reached or v["target"] >= 1
+                    reached = reached or d * (tp - fill) >= risk
                     break
                 best = max(best, hi_y) if d > 0 else min(best, lo_y)
                 if d * (best - fill) >= risk:  # +1R reached: stop moves take effect from the next minute
@@ -144,6 +159,7 @@ def simulate(m, sp, v, session):
                              breakout_candle=bt[k], entry_time=t[x].tz_convert("UTC"),
                              exit_time=t[y].tz_convert("UTC"), entry=fill, stop=stop, target=tp, exit=exit_px,
                              risk_pts=risk, r=d * (exit_px - fill) / risk, reason=reason, reached_1r=reached,
+                             target_r=d * (tp - fill) / risk if tp is not None else np.nan,
                              leverage_at_1pct=0.01 * fill / risk))
             break  # one trade a day
     return pd.DataFrame(rows)
