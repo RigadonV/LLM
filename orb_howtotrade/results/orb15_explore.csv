@@ -1,0 +1,15 @@
+stop_rule,condition,2025 low: n,2025 low: win%,2025 low: avgR,2025 high: n,2025 high: win%,2025 high: avgR,2026 low: n,2026 low: win%,2026 low: avgR,2026 high: n,2026 high: win%,2026 high: avgR,same way both years
+stop at other side of range,opening range width / ATR,48,52.0833,0.1045,32,53.1250,-0.0215,37,51.3514,0.1169,52,51.9231,0.0485,True
+stop at other side of range,London move size / ATR,45,53.3333,0.0156,35,51.4286,0.1035,40,55.0000,0.1027,49,48.9796,0.0559,False
+stop at other side of range,overnight gap / ATR,44,54.5455,-0.0639,36,50.0000,0.1983,41,48.7805,0.0184,48,54.1667,0.1270,True
+stop at other side of range,breakout candle body / range width,40,60.0000,0.1264,40,45.0000,-0.0183,45,46.6667,0.0337,44,56.8182,0.1212,False
+stop at other side of range,entry distance beyond 50 EMA / ATR,41,51.2195,0.0620,39,53.8462,0.0458,44,52.2727,0.0461,45,51.1111,0.1071,False
+stop at other side of range,minutes after the open,49,59.1837,0.1670,31,41.9355,-0.1244,36,61.1111,0.2514,53,45.2830,-0.0415,True
+stop at other side of range,yesterday was an NR7 day,13,69.2308,0.3116,67,49.2537,0.0041,10,50.0000,-0.0366,79,51.8987,0.0913,False
+stop beyond breakout candle,opening range width / ATR,48,37.5000,0.0066,32,28.1250,-0.2247,37,45.9459,0.3000,52,42.3077,0.0693,True
+stop beyond breakout candle,London move size / ATR,45,33.3333,-0.1059,35,34.2857,-0.0603,40,42.5000,0.0877,49,44.8980,0.2285,True
+stop beyond breakout candle,overnight gap / ATR,44,38.6364,0.0090,36,27.7778,-0.2020,41,41.4634,0.0920,48,45.8333,0.2277,False
+stop beyond breakout candle,breakout candle body / range width,40,32.5000,-0.0903,40,35.0000,-0.0816,45,35.5556,0.0674,44,52.2727,0.2653,True
+stop beyond breakout candle,entry distance beyond 50 EMA / ATR,41,31.7073,-0.0879,39,35.8974,-0.0839,44,43.1818,0.1254,45,44.4444,0.2041,True
+stop beyond breakout candle,minutes after the open,49,36.7347,-0.0230,31,29.0323,-0.1854,36,44.4444,0.1720,53,43.3962,0.1606,True
+stop beyond breakout candle,yesterday was an NR7 day,13,46.1538,0.0928,67,31.3433,-0.1206,10,30.0000,-0.4229,79,45.5696,0.2397,False
