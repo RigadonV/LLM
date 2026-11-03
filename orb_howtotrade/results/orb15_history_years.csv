@@ -1,0 +1,129 @@
+year,trades,win_pct,avg_r,total_r,variant
+2019,77,38.9610,-0.1218,-9.3764,"range base | base, London filter"
+2020,79,50.6329,0.0302,2.3870,"range base | base, London filter"
+2021,88,52.2727,-0.0629,-5.5314,"range base | base, London filter"
+2022,89,52.8090,0.0499,4.4368,"range base | base, London filter"
+2023,93,49.4624,-0.0120,-1.1151,"range base | base, London filter"
+2024,76,47.3684,0.0939,7.1326,"range base | base, London filter"
+2025,76,47.3684,-0.0154,-1.1672,"range base | base, London filter"
+2026,80,53.7500,0.1063,8.5014,"range base | base, London filter"
+2019,38,42.1053,-0.1248,-4.7428,range base | 1. early breakouts (by 10:30)
+2020,36,47.2222,0.0686,2.4690,range base | 1. early breakouts (by 10:30)
+2021,50,58.0000,0.0070,0.3495,range base | 1. early breakouts (by 10:30)
+2022,46,52.1739,0.0430,1.9799,range base | 1. early breakouts (by 10:30)
+2023,48,39.5833,-0.1072,-5.1442,range base | 1. early breakouts (by 10:30)
+2024,43,51.1628,0.1600,6.8808,range base | 1. early breakouts (by 10:30)
+2025,43,55.8140,0.1088,4.6772,range base | 1. early breakouts (by 10:30)
+2026,33,60.6061,0.2386,7.8729,range base | 1. early breakouts (by 10:30)
+2019,42,40.4762,-0.1359,-5.7059,range base | 2. narrow opening range (<= 0.45 x ATR)
+2020,47,46.8085,0.0048,0.2278,range base | 2. narrow opening range (<= 0.45 x ATR)
+2021,48,58.3333,-0.0269,-1.2921,range base | 2. narrow opening range (<= 0.45 x ATR)
+2022,48,54.1667,0.1412,6.7794,range base | 2. narrow opening range (<= 0.45 x ATR)
+2023,59,45.7627,-0.0236,-1.3917,range base | 2. narrow opening range (<= 0.45 x ATR)
+2024,46,47.8261,0.1548,7.1214,range base | 2. narrow opening range (<= 0.45 x ATR)
+2025,46,47.8261,0.0073,0.3378,range base | 2. narrow opening range (<= 0.45 x ATR)
+2026,31,54.8387,0.1653,5.1229,range base | 2. narrow opening range (<= 0.45 x ATR)
+2019,77,37.6623,-0.0946,-7.2864,range base | 3. stop at range midpoint
+2020,79,46.8354,0.1515,11.9648,range base | 3. stop at range midpoint
+2021,88,45.4545,0.0166,1.4640,range base | 3. stop at range midpoint
+2022,89,52.8090,0.2335,20.7821,range base | 3. stop at range midpoint
+2023,93,38.7097,-0.0913,-8.4938,range base | 3. stop at range midpoint
+2024,76,42.1053,0.0106,0.8036,range base | 3. stop at range midpoint
+2025,76,40.7895,0.0151,1.1444,range base | 3. stop at range midpoint
+2026,80,45.0000,0.1415,11.3212,range base | 3. stop at range midpoint
+2019,77,41.5584,-0.0953,-7.3383,range base | 4a. target previous session high/low
+2020,79,50.6329,0.0113,0.8896,range base | 4a. target previous session high/low
+2021,88,52.2727,-0.0803,-7.0668,range base | 4a. target previous session high/low
+2022,89,52.8090,0.0316,2.8148,range base | 4a. target previous session high/low
+2023,93,49.4624,-0.0154,-1.4314,range base | 4a. target previous session high/low
+2024,76,47.3684,0.0939,7.1326,range base | 4a. target previous session high/low
+2025,76,48.6842,0.0009,0.0661,range base | 4a. target previous session high/low
+2026,80,53.7500,0.1050,8.4036,range base | 4a. target previous session high/low
+2019,77,38.9610,-0.1272,-9.7980,range base | 4b. target London high/low
+2020,79,51.8987,0.0501,3.9618,range base | 4b. target London high/low
+2021,88,52.2727,-0.0629,-5.5314,range base | 4b. target London high/low
+2022,89,52.8090,0.0499,4.4368,range base | 4b. target London high/low
+2023,93,49.4624,-0.0120,-1.1151,range base | 4b. target London high/low
+2024,76,47.3684,0.0768,5.8332,range base | 4b. target London high/low
+2025,76,47.3684,-0.0298,-2.2619,range base | 4b. target London high/low
+2026,80,53.7500,0.1010,8.0824,range base | 4b. target London high/low
+2019,19,36.8421,-0.2448,-4.6509,range base | 1 + 2
+2020,21,42.8571,0.0233,0.4891,range base | 1 + 2
+2021,26,65.3846,0.0844,2.1948,range base | 1 + 2
+2022,26,53.8462,0.1136,2.9528,range base | 1 + 2
+2023,33,33.3333,-0.1621,-5.3483,range base | 1 + 2
+2024,23,60.8696,0.3808,8.7593,range base | 1 + 2
+2025,29,55.1724,0.1125,3.2635,range base | 1 + 2
+2026,11,63.6364,0.5935,6.5280,range base | 1 + 2
+2019,19,36.8421,-0.0859,-1.6319,range base | 1 + 2 + 3
+2020,21,38.0952,0.0676,1.4192,range base | 1 + 2 + 3
+2021,26,53.8462,0.2294,5.9656,range base | 1 + 2 + 3
+2022,26,50.0000,0.2227,5.7890,range base | 1 + 2 + 3
+2023,33,30.3030,-0.2735,-9.0260,range base | 1 + 2 + 3
+2024,23,47.8261,0.2178,5.0090,range base | 1 + 2 + 3
+2025,29,48.2759,0.2722,7.8930,range base | 1 + 2 + 3
+2026,11,63.6364,0.8440,9.2839,range base | 1 + 2 + 3
+2019,140,45.0000,-0.0343,-4.8080,range base | no London filter (reference)
+2020,138,50.0000,-0.0218,-3.0133,range base | no London filter (reference)
+2021,148,50.6757,-0.0070,-1.0429,range base | no London filter (reference)
+2022,151,51.6556,0.0318,4.7981,range base | no London filter (reference)
+2023,147,49.6599,0.0110,1.6173,range base | no London filter (reference)
+2024,146,50.0000,0.0853,12.4575,range base | no London filter (reference)
+2025,129,45.7364,-0.0638,-8.2283,range base | no London filter (reference)
+2026,124,48.3871,0.0528,6.5420,range base | no London filter (reference)
+2019,77,37.6623,0.0565,4.3507,"candle base | base, London filter"
+2020,79,41.7722,0.1744,13.7805,"candle base | base, London filter"
+2021,88,39.7727,0.0357,3.1449,"candle base | base, London filter"
+2022,89,40.4494,0.1395,12.4193,"candle base | base, London filter"
+2023,93,30.1075,-0.1437,-13.3687,"candle base | base, London filter"
+2024,76,35.5263,-0.0543,-4.1240,"candle base | base, London filter"
+2025,76,35.5263,-0.0341,-2.5926,"candle base | base, London filter"
+2026,80,43.7500,0.1464,11.7102,"candle base | base, London filter"
+2019,38,44.7368,0.2436,9.2573,candle base | 1. early breakouts (by 10:30)
+2020,36,38.8889,0.0337,1.2120,candle base | 1. early breakouts (by 10:30)
+2021,50,44.0000,0.1809,9.0471,candle base | 1. early breakouts (by 10:30)
+2022,46,43.4783,0.2362,10.8635,candle base | 1. early breakouts (by 10:30)
+2023,48,25.0000,-0.2876,-13.8050,candle base | 1. early breakouts (by 10:30)
+2024,43,37.2093,-0.0391,-1.6829,candle base | 1. early breakouts (by 10:30)
+2025,43,41.8605,0.1198,5.1517,candle base | 1. early breakouts (by 10:30)
+2026,33,42.4242,0.0968,3.1928,candle base | 1. early breakouts (by 10:30)
+2019,42,40.4762,0.1061,4.4564,candle base | 2. narrow opening range (<= 0.45 x ATR)
+2020,47,40.4255,0.1532,7.2023,candle base | 2. narrow opening range (<= 0.45 x ATR)
+2021,48,41.6667,0.0491,2.3564,candle base | 2. narrow opening range (<= 0.45 x ATR)
+2022,48,47.9167,0.3950,18.9593,candle base | 2. narrow opening range (<= 0.45 x ATR)
+2023,59,28.8136,-0.1551,-9.1524,candle base | 2. narrow opening range (<= 0.45 x ATR)
+2024,46,36.9565,-0.0104,-0.4778,candle base | 2. narrow opening range (<= 0.45 x ATR)
+2025,46,36.9565,-0.0088,-0.4040,candle base | 2. narrow opening range (<= 0.45 x ATR)
+2026,31,45.1613,0.2614,8.1032,candle base | 2. narrow opening range (<= 0.45 x ATR)
+2019,77,38.9610,0.0493,3.7924,candle base | 4a. target previous session high/low
+2020,79,41.7722,0.1300,10.2670,candle base | 4a. target previous session high/low
+2021,88,42.0455,0.0276,2.4297,candle base | 4a. target previous session high/low
+2022,89,41.5730,0.1216,10.8181,candle base | 4a. target previous session high/low
+2023,93,27.9570,-0.2483,-23.0939,candle base | 4a. target previous session high/low
+2024,76,36.8421,-0.0616,-4.6807,candle base | 4a. target previous session high/low
+2025,76,38.1579,0.0144,1.0944,candle base | 4a. target previous session high/low
+2026,80,45.0000,0.1189,9.5150,candle base | 4a. target previous session high/low
+2019,77,37.6623,0.0405,3.1190,candle base | 4b. target London high/low
+2020,79,43.0380,0.1690,13.3487,candle base | 4b. target London high/low
+2021,88,40.9091,0.0149,1.3121,candle base | 4b. target London high/low
+2022,89,41.5730,0.1413,12.5756,candle base | 4b. target London high/low
+2023,93,31.1828,-0.1340,-12.4591,candle base | 4b. target London high/low
+2024,76,35.5263,-0.0665,-5.0530,candle base | 4b. target London high/low
+2025,76,36.8421,-0.0624,-4.7445,candle base | 4b. target London high/low
+2026,80,43.7500,0.1242,9.9394,candle base | 4b. target London high/low
+2019,19,47.3684,0.2716,5.1597,candle base | 1 + 2
+2020,21,38.0952,0.0778,1.6338,candle base | 1 + 2
+2021,26,46.1538,0.1734,4.5077,candle base | 1 + 2
+2022,26,46.1538,0.3557,9.2490,candle base | 1 + 2
+2023,33,27.2727,-0.2365,-7.8050,candle base | 1 + 2
+2024,23,52.1739,0.3271,7.5222,candle base | 1 + 2
+2025,29,44.8276,0.1888,5.4752,candle base | 1 + 2
+2026,11,54.5455,0.6704,7.3745,candle base | 1 + 2
+2019,140,36.4286,0.0261,3.6571,candle base | no London filter (reference)
+2020,138,44.2029,0.2367,32.6679,candle base | no London filter (reference)
+2021,148,38.5135,-0.0237,-3.5042,candle base | no London filter (reference)
+2022,151,38.4106,0.0608,9.1756,candle base | no London filter (reference)
+2023,147,32.6531,-0.0585,-8.5977,candle base | no London filter (reference)
+2024,146,39.0411,0.0288,4.1999,candle base | no London filter (reference)
+2025,129,31.7829,-0.1167,-15.0547,candle base | no London filter (reference)
+2026,124,36.2903,-0.0329,-4.0820,candle base | no London filter (reference)

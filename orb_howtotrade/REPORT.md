@@ -257,6 +257,78 @@ Fixed stop, targets 1R / 2R / 3R, average R per trade:
 Breakeven and trailing versions followed the same pattern. Which combination looks best changes from one year to
 the next.
 
+## Ideas 1–4 over 8 years (Jan 2019 – Oct 2026), Nasdaq-100 with the London filter
+
+**History:** Dukascopy 1-minute data for the Nasdaq-100 was extended back to January 2019, almost 8 years in all.
+Each year gets its own spread, the median hourly ask − bid during 09:00–16:00 New York, in points:
+
+| 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 |
+|---|---|---|---|---|---|---|---|
+| 1.06 | 1.38 | 1.30 | 1.35 | 1.38 | 1.45 | 1.40 | 1.09 |
+
+**Base:** the strategy above with the London filter, target 2R, with the range stop or the candle stop.
+
+**The changes**, fixed before this history was run:
+1. **Early breakouts only:** the breakout candle closes by 10:30.
+2. **Narrow opening range only:** at most 0.45× the average session range of the previous 14 sessions.
+3. **Stop at the range midpoint.**
+4. **Target at a real level:** (a) the previous session's high or low, or (b) the London session's high or low.
+   If that level is less than 0.5R beyond the entry, the 2R target is used instead.
+
+The combinations 1 + 2 and 1 + 2 + 3 were also fixed in advance. Script: `pipeline/orb15_history.py`.
+
+**Fresh years versus the years ideas 1 and 2 came from.** Ideas 1 and 2, including the 0.45 cutoff, were picked
+from the trades of Nov 2024 – Oct 2026. So 2019–2024 is the fair test for them, and 2025–2026 is shown separately.
+"Years better" counts the fresh years in which a version beat its base on average R and on win rate. The
+t-statistic is for the average R being above zero; above about 2 it probably isn't chance.
+
+| Version | 2019–2024: trades | Win rate | Avg R | t | Years better (avg R · win rate) | 2025–2026: win rate · avg R | All 8 years: avg R | $10k after 8 years | Max drawdown |
+|---|---|---|---|---|---|---|---|---|---|
+| **Range stop, base** | 502 | 48.8% | −0.004 | −0.1 | — | 50.6% · +0.047 | +0.008 | $10,287 | 21.1% |
+| 1. Early breakouts | 261 | 48.7% | +0.007 | 0.1 | 3/6 · 3/6 | 57.9% · +0.165 | +0.043 | $11,377 | 10.0% |
+| 2. Narrow range | 290 | 49.0% | +0.020 | 0.4 | 3/6 · 4/6 | 50.6% · +0.071 | +0.031 | $11,008 | 14.3% |
+| 3. Midpoint stop | 502 | 44.0% | +0.038 | 0.7 | 4/6 · 0/6 | 42.9% · +0.080 | +0.048 | $13,122 | 17.0% |
+| 4a. Previous-session level | 502 | 49.2% | −0.010 | −0.3 | 1/6 · 1/6 | 51.3% · +0.054 | +0.005 | $10,112 | 22.1% |
+| 4b. London level | 502 | 49.0% | −0.004 | −0.1 | 1/6 · 1/6 | 50.6% · +0.037 | +0.005 | $10,122 | 20.2% |
+| 1 + 2 | 148 | 48.6% | +0.030 | 0.4 | 3/6 · 3/6 | 57.5% · +0.245 | +0.075 | $11,416 | 9.4% |
+| 1 + 2 + 3 | 148 | 42.6% | +0.051 | 0.5 | 5/6 · 2/6 | 52.5% · +0.429 | +0.131 | $12,603 | 13.0% |
+| Range stop, no London filter | 870 | 49.5% | +0.012 | 0.4 | 3/6 · 3/6 | 47.0% · −0.007 | +0.007 | $10,427 | 19.9% |
+| **Candle stop, base** | 502 | 37.5% | +0.032 | 0.5 | — | 39.7% · +0.058 | +0.038 | $12,102 | 31.0% |
+| 1. Early breakouts | 261 | 38.7% | +0.057 | 0.7 | 4/6 · 4/6 | 42.1% · +0.110 | +0.069 | $12,244 | 23.4% |
+| 2. Narrow range | 290 | 39.0% | +0.080 | 1.0 | 4/6 · 4/6 | 40.3% · +0.100 | +0.085 | $13,224 | 18.5% |
+| 4a. Previous-session level | 502 | 38.0% | −0.001 | −0.0 | 0/6 · 4/6 | 41.7% · +0.068 | +0.015 | $10,433 | 36.4% |
+| 4b. London level | 502 | 38.2% | +0.026 | 0.4 | 2/6 · 4/6 | 40.4% · +0.033 | +0.027 | $11,278 | 32.1% |
+| **1 + 2** | 148 | 41.9% | **+0.137** | 1.2 | 4/6 · 4/6 | 47.5% · +0.321 | +0.176 | **$13,689** | **10.5%** |
+| Candle stop, no London filter | 870 | 38.2% | +0.043 | 1.0 | 3/6 · 3/6 | 34.0% · −0.076 | +0.016 | $10,867 | 42.4% |
+
+The midpoint stop is the same whichever base it starts from. Against the candle base it was better in 3 of 6
+fresh years on average R and 5 of 6 on win rate.
+
+The best version, candle stop with 1 + 2, year by year:
+
+| | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 (to Oct) |
+|---|---|---|---|---|---|---|---|---|
+| Avg R | +0.27 | +0.08 | +0.17 | +0.36 | −0.24 | +0.33 | +0.19 | +0.67 |
+| Trades | 19 | 21 | 26 | 26 | 33 | 23 | 29 | 11 |
+
+### What the 8 years say
+
+- **The London filter didn't hold up.** In 2019–2024 it made both stops slightly worse: −0.004R against +0.012R
+  without it for the range stop, and +0.032R against +0.043R for the candle stop. All its benefit is in
+  2025–2026. It looks like a feature of those two years, not a lasting edge.
+- **None of the four ideas reliably raised the win rate.**
+  - In the fresh years the range-stop versions won 48.6–49.2% of the time, against 48.8% for the base.
+  - Early breakouts won 48.7%; the ~60% seen in the exploration came from the years the idea was picked from.
+  - With the candle stop, 1 + 2 lifted the win rate from 37.5% to 41.9%, the largest change, in 4 of 6 years.
+  - The midpoint stop lowers the win rate (44%) while slightly raising the average R.
+  - The win rate is mostly set by where the stop and target sit.
+- **The level targets did nothing.** Most trades end at the 16:00 close or the stop anyway.
+- **The most promising version:** narrow range plus early breakout, with the candle stop.
+  - It made +0.137R a trade in the fresh years, against +0.032R for the base, and was positive in 7 of 8 years.
+  - It cut the 8-year drawdown from 31% to 10.5%.
+  - But it trades only about twice a month (about 24 trades a year), and its fresh-year t-statistic is 1.2. That
+    is suggestive, not proven, and the 8-year $13,689 includes the two in-sample years.
+
 ## Limits
 
 - **Data:** the feed is Dukascopy's CFD feed, not exchange futures or stock data, and its volume is not exchange
@@ -280,6 +352,12 @@ the next.
   - `results/orb15_london_bias.csv`: with-London and against-London results with their t-statistics.
   - `results/orb15_management_trades.csv`: every trade, with its London bias and whether it reached 1R.
   - `_prior` files hold the year-before check.
+- `pipeline/orb15_explore.py`: the exploratory split that suggested ideas 1 and 2 → `results/orb15_explore.csv`.
+- `pipeline/orb15_history.py`: ideas 1–4 over Jan 2019 – Oct 2026.
+  - `results/orb15_history_summary.csv`: one row per version, over the whole period.
+  - `results/orb15_history_years.csv`: each version by year.
+  - `results/orb15_history_periods.csv`: 2019–2024, 2025–2026 and all 8 years, with t-statistics.
+  - `results/orb15_history_trades.csv`: every trade.
 
 **To reproduce:** `python pipeline/orb15.py`. It uses the 1-minute data from `strategy_search/`; its
 `pipeline/fetch_m1.py` downloads it, with `--symbols USATECHIDXUSD XAUUSD`.
