@@ -134,6 +134,8 @@ It's plain static files. Any of these work:
 | Reasons for visit and body-area tags | `assets/config.js` → `services`, `bodyAreas` |
 | Opening hours shown in the footer | `assets/config.js` → `hours` |
 | Opening hours used for real bookings | `Code.gs` → `HOURS` (keep the two in sync) |
+| Which dates can be booked (currently Sat 7 Nov only) | `assets/config.js` → `bookableDates` **and** `Code.gs` → `BOOKABLE_DATES`. Use `[]` to open every day in `HOURS`. |
+| Practising somewhere else on a date (currently Radiokop on 7 Nov) | `assets/config.js` → `locationsByDate` **and** `Code.gs` → `LOCATIONS_BY_DATE`. That address goes on the page, invitations and emails for that date. |
 | Colours and fonts | top of `assets/styles.css` (`:root` variables, per the brand spec in the BRD) |
 
 ## Good to know

@@ -56,6 +56,12 @@ const SETTINGS = {
   // Set to [] to open every day in HOURS. Keep in sync with bookableDates in assets/config.js.
   BOOKABLE_DATES: ['2026-11-07'],
 
+  // Where Dr. Venter practises on specific dates, if not at CLINIC_ADDRESS.
+  // Used in the invitation, emails and Sheet. Keep in sync with locationsByDate in assets/config.js.
+  LOCATIONS_BY_DATE: {
+    '2026-11-07': '9 Sherwood Village, Radiokop, Roodepoort, South Africa'
+  },
+
   // Opening hours. CONFIRM WITH DR. VENTER. Use [] for closed days.
   HOURS: {
     Mon: [['08:00', '13:00'], ['14:00', '17:00']],
@@ -63,7 +69,7 @@ const SETTINGS = {
     Wed: [['08:00', '13:00'], ['14:00', '17:00']],
     Thu: [['08:00', '13:00'], ['14:00', '17:00']],
     Fri: [['08:00', '13:00'], ['14:00', '16:00']],
-    Sat: [['08:00', '12:00']],
+    Sat: [['08:00', '13:00']],
     Sun: []
   },
 
@@ -141,6 +147,7 @@ function doPost(e) {
     b.visitLabel = visit === 'new' ? 'New patient' : 'Follow-up';
     b.minutes = minutes;
     b.whenText = Utilities.formatDate(start, SETTINGS.TIME_ZONE, "EEEE d MMMM yyyy 'at' HH:mm");
+    b.location = locationFor_(data.date);
 
     createBookingEvent_(b, start, end);
 
@@ -169,7 +176,7 @@ function createBookingEvent_(b, start, end) {
 
   return Calendar.Events.insert({
     summary: SETTINGS.CLINIC_NAME + ' · ' + b.firstName + ' ' + b.lastName + ' · ' + b.visitLabel,
-    location: SETTINGS.CLINIC_ADDRESS,
+    location: b.location,
     description: eventDescription_(b),
     start: { dateTime: start.toISOString(), timeZone: SETTINGS.TIME_ZONE },
     end: { dateTime: end.toISOString(), timeZone: SETTINGS.TIME_ZONE },
@@ -403,7 +410,8 @@ function str_(v, max) {
 /* ------------------------------------------------------------------ */
 
 function eventDescription_(b) {
-  const lines = ['Booking ref: ' + b.ref, b.visitLabel + ' · ' + b.minutes + ' minutes with ' + SETTINGS.DOCTOR_NAME, ''];
+  const lines = ['Booking ref: ' + b.ref, b.visitLabel + ' · ' + b.minutes + ' minutes with ' + SETTINGS.DOCTOR_NAME,
+    'Where: ' + b.location, ''];
   if (SETTINGS.INVITE_PATIENT) {
     lines.push(
       'FOR THE PATIENT',
@@ -444,6 +452,7 @@ function eventDescription_(b) {
 function notifyReception_(b) {
   const rows = [
     ['When', b.whenText],
+    ['Where', b.location],
     ['Visit', b.visitLabel + ' (' + b.minutes + ' min)'],
     ['Reason', b.service],
     ['About the visit', b.reasonDetails],
@@ -494,7 +503,7 @@ function confirmPatient_(b) {
       '<p>Your appointment with ' + esc_(SETTINGS.DOCTOR_NAME) + ' is booked.</p>' +
       '<p style="background:#F2F7F6;padding:14px 16px;border-left:3px solid #F0A500">' +
       '<strong>' + esc_(b.whenText) + '</strong><br>' + esc_(b.visitLabel) + ' · ' + b.minutes + ' minutes<br>' +
-      esc_(SETTINGS.CLINIC_ADDRESS) + '</p>' +
+      esc_(b.location) + '</p>' +
       (b.visit === 'new' ? '<p>For your first visit, please arrive 10 minutes early, wear comfortable clothing and bring any X-rays, scans or reports you have.</p>' : '') +
       '<p>Need to change or cancel? Reply to this email or call ' + esc_(SETTINGS.CLINIC_PHONE) + '.</p>' +
       '<p style="color:#5b6f6b;font-size:13px">Booking reference: ' + esc_(b.ref) + '</p></div>'
@@ -505,11 +514,11 @@ function logToSheet_(b, start) {
   const ss = SpreadsheetApp.openById(SETTINGS.SHEET_ID);
   const sheet = ss.getSheetByName('Bookings') || ss.insertSheet('Bookings');
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Booked at', 'Ref', 'Appointment', 'Visit', 'Reason', 'About the visit', 'First name', 'Last name',
+    sheet.appendRow(['Booked at', 'Ref', 'Appointment', 'Where', 'Visit', 'Reason', 'About the visit', 'First name', 'Last name',
       'DOB', 'Gender', 'Guardian', 'Phone', 'Email', 'Medical aid', 'Areas', 'Ailments / injuries']);
     sheet.setFrozenRows(1);
   }
-  sheet.appendRow([new Date(), b.ref, start, b.visitLabel, b.service, b.reasonDetails, b.firstName, b.lastName,
+  sheet.appendRow([new Date(), b.ref, start, b.location, b.visitLabel, b.service, b.reasonDetails, b.firstName, b.lastName,
     b.dob, b.gender, b.guardian, b.phone, b.email, b.medicalAid, b.areas.join(', '), b.concerns]
     .map(function (v) { return typeof v === 'string' && /^[=+\-@]/.test(v) ? "'" + v : v; }));
 }
@@ -517,6 +526,10 @@ function logToSheet_(b, start) {
 /* ------------------------------------------------------------------ */
 /* Helpers                                                            */
 /* ------------------------------------------------------------------ */
+
+function locationFor_(dateStr) {
+  return (SETTINGS.LOCATIONS_BY_DATE && SETTINGS.LOCATIONS_BY_DATE[dateStr]) || SETTINGS.CLINIC_ADDRESS;
+}
 
 function toDate_(dateStr, timeStr) {
   return new Date(dateStr + 'T' + timeStr + ':00' + SETTINGS.UTC_OFFSET);

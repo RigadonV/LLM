@@ -100,9 +100,14 @@
     <section id="book" class="booking" aria-labelledby="book-title">
       <div class="container">
         <div class="section-head">
+          <picture class="head-photo">
+            <source srcset="assets/dr-venter.webp" type="image/webp">
+            <img src="assets/dr-venter.jpg" alt="Dr. Machere Venter" width="104" height="104" decoding="async">
+          </picture>
           <p class="eyebrow">Online booking</p>
           <h2 id="book-title">Reserve your time with Dr.&nbsp;Venter</h2>
           <p>Times shown come straight from the clinic calendar. Booking takes about two minutes.</p>
+          <div class="location-notice" hidden></div>
         </div>
 
         <div class="booking-shell">
@@ -200,7 +205,7 @@
                 </div>
                 <div class="field">
                   <label for="phone">Mobile number</label>
-                  <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required pattern="[+0-9 \(\)\-]{7,20}" placeholder="+267 7X XXX XXX">
+                  <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required pattern="[+0-9 \(\)\-]{7,20}" placeholder="With country code, e.g. +27 or +267">
                   <p class="field-error"></p>
                 </div>
                 <div class="field">
@@ -268,7 +273,7 @@
                   <span class="spinner" aria-hidden="true"></span>
                 </button>
               </div>
-              <p class="fineprint">This form is not for emergencies. In a medical emergency call <a href="tel:997">997</a>.</p>
+              <p class="fineprint">This form is not for emergencies. In a medical emergency call <a href="tel:997">997</a> in Botswana or <a href="tel:10177">10177</a> in South Africa.</p>
             </section>
 
             <!-- SUCCESS -->
@@ -278,6 +283,7 @@
               </div>
               <h3 id="success-title" tabindex="-1">Your time is reserved, <span data-success="name"></span>.</h3>
               <p class="success-when" data-success="when"></p>
+              <p class="success-where" data-success="where"></p>
               <ol class="next-steps" aria-label="What happens next">
                 <li class="is-done">
                   <span class="ns-dot" aria-hidden="true"></span>
@@ -308,6 +314,7 @@
               <div><dt>Reason</dt><dd data-sum="service">—</dd></div>
               <div><dt>Date</dt><dd data-sum="date">—</dd></div>
               <div><dt>Time</dt><dd data-sum="time">—</dd></div>
+              <div><dt>Where</dt><dd data-sum="where">—</dd></div>
             </dl>
             <div class="summary-doc">
               <picture class="avatar">
@@ -320,7 +327,7 @@
               </div>
             </div>
             <div class="summary-foot">
-              <p><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s-5.5-5.1-5.5-9.3a5.5 5.5 0 0 1 11 0C15.5 12.9 10 18 10 18Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="8.6" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span data-text="address"></span></p>
+              <p><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s-5.5-5.1-5.5-9.3a5.5 5.5 0 0 1 11 0C15.5 12.9 10 18 10 18Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="8.6" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span id="sum-address"></span></p>
               <p><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3h3l1.5 4-2 1.3a9 9 0 0 0 4.2 4.2L13 10.5l4 1.5v3a2 2 0 0 1-2 2A13 13 0 0 1 3 5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Questions? <a href="#" data-whatsapp>WhatsApp us</a></p>
             </div>
           </aside>
@@ -355,8 +362,9 @@
         <div class="visit-info">
           <p class="eyebrow eyebrow-light">Find us</p>
           <h2 id="visit-title">Visit the clinic</h2>
+          <div class="location-notice" hidden></div>
           <div class="info-block">
-            <h3>Address</h3>
+            <h3>Gaborone clinic</h3>
             <p data-text="address"></p>
             <a class="link-gold" id="directions" target="_blank" rel="noopener">Get directions →</a>
           </div>

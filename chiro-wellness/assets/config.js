@@ -32,6 +32,15 @@ window.CHIRO_CONFIG = {
   // Keep in sync with BOOKABLE_DATES in google-apps-script/Code.gs, which enforces it.
   bookableDates: ["2026-11-07"],
 
+  // Where Dr. Venter practises on specific dates, if not at the Gaborone clinic.
+  // Keep in sync with LOCATIONS_BY_DATE in google-apps-script/Code.gs.
+  locationsByDate: {
+    "2026-11-07": {
+      area: "Radiokop, South Africa",
+      address: "9 Sherwood Village, Radiokop, Roodepoort, South Africa"
+    }
+  },
+
   // Visit types. Keys must match DURATIONS in google-apps-script/Code.gs.
   visitTypes: {
     new:      { label: "New patient",      detail: "Initial consultation & assessment", minutes: 60 },
@@ -62,7 +71,7 @@ window.CHIRO_CONFIG = {
     Wed: [["08:00", "13:00"], ["14:00", "17:00"]],
     Thu: [["08:00", "13:00"], ["14:00", "17:00"]],
     Fri: [["08:00", "13:00"], ["14:00", "16:00"]],
-    Sat: [["08:00", "12:00"]],
+    Sat: [["08:00", "13:00"]],
     Sun: []
   },
   slotStepMinutes: 30,

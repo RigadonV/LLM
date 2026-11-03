@@ -30,6 +30,9 @@
     d.setUTCDate(d.getUTCDate() + n);
     return d.toISOString().slice(0, 10);
   }
+  function locationFor(dateStr) {
+    return (dateStr && (C.locationsByDate || {})[dateStr]) || { area: "Gaborone, Botswana", address: C.clinic.address };
+  }
   function isBookable(dateStr) {
     var only = C.bookableDates || [];
     return !only.length || only.indexOf(dateStr) !== -1;
@@ -93,6 +96,24 @@
     $("#hours").innerHTML = rows.map(function (r) {
       return "<div><dt>" + r.from + (r.to !== r.from ? " – " + r.to : "") + "</dt><dd>" + r.text + "</dd></div>";
     }).join("");
+  }
+
+  // "Saturday 7 November: Radiokop, South Africa" notices for upcoming away dates.
+  function renderLocationNotices() {
+    var today = todayInClinic();
+    var dates = Object.keys(C.locationsByDate || {})
+      .filter(function (d) { return d >= today && isBookable(d); })
+      .sort();
+    if (!dates.length) return;
+    var pin = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s-5.5-5.1-5.5-9.3a5.5 5.5 0 0 1 11 0C15.5 12.9 10 18 10 18Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="8.6" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
+    var text = dates.map(function (d) {
+      var loc = C.locationsByDate[d];
+      return "<p><strong>" + fmt(d, { weekday: "long", day: "numeric", month: "long" }) + ": " + escapeHTML(loc.area) + ".</strong> " +
+        escapeHTML(C.clinic.doctor) + " is seeing patients at " + escapeHTML(loc.address) + ". " +
+        '<a href="https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(loc.address) +
+        '" target="_blank" rel="noopener">Get directions</a></p>';
+    }).join("");
+    $$(".location-notice").forEach(function (el) { el.innerHTML = pin + "<div>" + text + "</div>"; el.hidden = false; });
   }
 
   function renderOptions() {
@@ -250,6 +271,9 @@
       var p = pretty12(state.time), end = pretty12(toHHMM(toMinutes(state.time) + v.minutes));
       setSum("time", p.time + " " + p.ampm + " – " + end.time + " " + end.ampm);
     } else setSum("time", "");
+    var loc = locationFor(state.date);
+    setSum("where", state.date ? loc.area : "");
+    $("#sum-address").textContent = loc.address;
   }
 
   /* ---------------------------------------------------------------- */
@@ -411,6 +435,7 @@
     var invited = res.invited !== false;
     $('[data-success="name"]').textContent = data.firstName;
     $('[data-success="when"]').textContent = longDate(data.date) + " at " + p.time + " " + p.ampm;
+    $('[data-success="where"]').textContent = locationFor(data.date).address;
     $('[data-success="invite"]').textContent = invited
       ? "Open the calendar invitation sent to " + data.email + " and tap Yes."
       : "The clinic will contact you on " + data.phone + " to confirm.";
@@ -494,6 +519,7 @@
   function init() {
     fillClinicDetails();
     renderOptions();
+    renderLocationNotices();
     $("#dob").max = todayInClinic();
     var only = C.bookableDates || [];
     if (only.length) {
