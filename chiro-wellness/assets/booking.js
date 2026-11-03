@@ -67,8 +67,12 @@
   /* ---------------------------------------------------------------- */
   function fillClinicDetails() {
     var cl = C.clinic;
-    var wa = "https://wa.me/" + cl.whatsapp + "?text=" +
-      encodeURIComponent("Hi Chiro Wellness, I'd like to ask about an appointment.");
+    var next = upcomingAwayDates()[0];
+    var waText = next
+      ? "Hi Dr. Venter, I'd like to ask about an appointment in " + C.locationsByDate[next].area.split(",")[0] +
+        " on " + fmt(next, { weekday: "long", day: "numeric", month: "long" }) + "."
+      : "Hi Chiro Wellness, I'd like to ask about an appointment.";
+    var wa = "https://wa.me/" + cl.whatsapp + "?text=" + encodeURIComponent(waText);
     $$("[data-whatsapp]").forEach(function (a) { a.href = wa; a.target = "_blank"; a.rel = "noopener"; });
     $$("[data-text='address']").forEach(function (el) { el.textContent = cl.address; });
     $$("[data-tel]").forEach(function (a) {
@@ -77,33 +81,59 @@
       if (!a.classList.contains("nav-phone") || !a.textContent.trim()) a.textContent = num;
     });
     $$("[data-mail]").forEach(function (a) { a.href = "mailto:" + cl.email; a.textContent = cl.email; });
-    var q = encodeURIComponent(cl.address);
-    $("#directions").href = "https://www.google.com/maps/dir/?api=1&destination=" + q;
-    $("#map").src = "https://maps.google.com/maps?q=" + q + "&z=15&output=embed";
     $("#year").textContent = new Date().getFullYear();
 
-    // Opening hours, grouping consecutive days with identical times.
-    var order = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    // "Find us": the next away date (e.g. Radiokop) if there is one, otherwise the Gaborone clinic.
+    var away = upcomingAwayDates()[0];
+    var where = away ? C.locationsByDate[away].address : cl.address;
+    if (away) {
+      $("#visit-title").textContent = "Visit Dr. Venter in " + C.locationsByDate[away].area.split(",")[0];
+      $("#visit-when").textContent = fmt(away, { weekday: "long", day: "numeric", month: "long" });
+    } else {
+      $("#visit-eyebrow").textContent = "Find us";
+      $("#visit-title").textContent = "Visit the clinic";
+      $("#visit-when").textContent = "Gaborone clinic";
+      $("#usual-practice").hidden = true;
+    }
+    $("#visit-address").textContent = where;
+    var q = encodeURIComponent(where);
+    $("#directions").href = "https://www.google.com/maps/dir/?api=1&destination=" + q;
+    $("#map").src = "https://maps.google.com/maps?q=" + q + "&z=15&output=embed";
+
     var label = function (ranges) {
       return ranges.length ? ranges.map(function (r) { return r[0] + "–" + r[1]; }).join(", ") : "Closed";
     };
     var rows = [];
-    order.forEach(function (d) {
-      var text = label(C.hours[d] || []);
-      var last = rows[rows.length - 1];
-      if (last && last.text === text) last.to = d; else rows.push({ from: d, to: d, text: text });
-    });
+    var only = (C.bookableDates || []).filter(function (d) { return d >= todayInClinic(); }).sort();
+    if (only.length) {
+      // Booking is limited to specific dates: show just those days.
+      only.forEach(function (d) {
+        rows.push({ from: fmt(d, { weekday: "long", day: "numeric", month: "long" }), to: null, text: label(C.hours[weekdayKey(d)] || []) });
+      });
+    } else {
+      // Weekly hours, grouping consecutive days with identical times.
+      ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach(function (d) {
+        var text = label(C.hours[d] || []);
+        var last = rows[rows.length - 1];
+        if (last && last.text === text) last.to = d; else rows.push({ from: d, to: d, text: text });
+      });
+    }
     $("#hours").innerHTML = rows.map(function (r) {
-      return "<div><dt>" + r.from + (r.to !== r.from ? " – " + r.to : "") + "</dt><dd>" + r.text + "</dd></div>";
+      return "<div><dt>" + r.from + (r.to && r.to !== r.from ? " – " + r.to : "") + "</dt><dd>" + r.text + "</dd></div>";
     }).join("");
   }
 
-  // "Saturday 7 November: Radiokop, South Africa" notices for upcoming away dates.
-  function renderLocationNotices() {
+  // Upcoming dates when Dr. Venter practises away from Gaborone.
+  function upcomingAwayDates() {
     var today = todayInClinic();
-    var dates = Object.keys(C.locationsByDate || {})
+    return Object.keys(C.locationsByDate || {})
       .filter(function (d) { return d >= today && isBookable(d); })
       .sort();
+  }
+
+  // "Saturday 7 November: Radiokop, South Africa" notice above the booking form.
+  function renderLocationNotices() {
+    var dates = upcomingAwayDates();
     if (!dates.length) return;
     var pin = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s-5.5-5.1-5.5-9.3a5.5 5.5 0 0 1 11 0C15.5 12.9 10 18 10 18Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="8.6" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
     var text = dates.map(function (d) {
