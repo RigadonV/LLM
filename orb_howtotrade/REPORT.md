@@ -365,6 +365,45 @@ What changes without the filters:
 - **The two recent years:** it was positive in 6 of 8 years (the other two about flat) but did worse in 2025–2026
   than the filtered version. Those are the years the filtered version's rules partly came from.
 
+## A 15-minute opening range on the Nasdaq-100 (US Tech 100), targets 1R and 2R, last 12 months
+
+**Setup:**
+- **Opening range:** the first 15-minute candle, 09:30–09:45 New York.
+- **Entry:** a full-body 15-minute candle closing beyond the range, in either direction, with no trend, London or
+  volume filter. Entry at the next open, one trade a day, entries until 12:30.
+- **Exits:** stop beyond the breakout candle or at the other side of the range; target 1R or 2R; anything still
+  open is closed at 16:00.
+- **Comparison:** the same rules with the narrow-range (≤ 0.45× the 14-session average) and breakout-by-10:30
+  filters. A 15-minute range is narrower than a 30-minute one, so the range filter skips fewer days.
+- **Window:** 3 Nov 2025 – 30 Oct 2026, on $10,000 at 1% risk. Script: `pipeline/orb15_15min.py`.
+
+| Version | Trades | Win rate | Target / stop / close | Avg R | Total R | Avg risk | Max drawdown | Return | $10k becomes |
+|---|---|---|---|---|---|---|---|---|---|
+| **Stop beyond breakout candle, 1R** | 241 | **53.9%** | 50% / 44% / 5% | +0.064 | +15.4 | 104 pts | 7.7% | **+15.3%** | $11,533 |
+| **Stop beyond breakout candle, 2R** | 241 | 42.7% | 24% / 54% / 23% | +0.073 | +17.6 | 104 pts | 12.9% | **+16.9%** | $11,691 |
+| Stop at other side of range, 1R | 241 | 50.2% | 32% / 31% / 37% | +0.020 | +4.7 | 186 pts | 10.4% | +4.0% | $10,398 |
+| Stop at other side of range, 2R | 241 | 46.1% | 7% / 34% / 59% | −0.007 | −1.8 | 186 pts | 14.2% | −2.8% | $9,722 |
+| With filters: candle stop, 1R | 142 | 54.2% | 50% / 44% / 6% | +0.066 | +9.3 | 104 pts | 7.7% | +9.0% | $10,903 |
+| With filters: candle stop, 2R | 142 | 43.0% | 24% / 53% / 23% | +0.079 | +11.2 | 104 pts | 12.8% | +10.5% | $11,054 |
+| With filters: range stop, 1R | 142 | 51.4% | 37% / 38% / 25% | +0.019 | +2.6 | 162 pts | 10.3% | +2.1% | $10,207 |
+| With filters: range stop, 2R | 142 | 45.1% | 10% / 42% / 48% | −0.016 | −2.3 | 162 pts | 14.1% | −3.0% | $9,702 |
+
+Monthly returns, no filters, stop beyond the breakout candle:
+
+| | Nov | Dec | Jan | Feb | Mar | Apr | May | Jun | Jul | Aug | Sep | Oct |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Target 1R | +2.96% | −1.28% | −0.90% | +7.80% | −0.11% | +7.52% | −0.37% | −1.10% | −0.33% | −1.96% | −0.23% | +2.94% |
+| Target 2R | +1.77% | +2.92% | −4.71% | +11.13% | −1.30% | +5.11% | +1.75% | −5.40% | −1.68% | −4.04% | +4.80% | +6.76% |
+
+**Reading it:**
+- **Best stop:** the stop beyond the breakout candle, with either target.
+- **Win rate:** 54% with a 1R target. That is the highest win rate of any ORB version tested here, and a 1R target
+  means a trade is decided within the day.
+- **The filters didn't help:** they kept the same average R but took fewer trades.
+- **Lumpy months:** with the 1R target, only 4 of 12 months were positive, and February and April made almost all
+  of the year's gain. The 2R target had 7 positive months.
+- **One window only:** this is a single 12-month window, which in the earlier tests often reversed the next year.
+
 ## Limits
 
 - **Data:** the feed is Dukascopy's CFD feed, not exchange futures or stock data, and its volume is not exchange

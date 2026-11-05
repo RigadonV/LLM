@@ -1,0 +1,9 @@
+market,version,trades,trades_per_week,long_pct,win_rate_pct,loss_pct,target_pct,stop_pct,close_pct,avg_r,total_r,avg_risk_pts,avg_week_pct,compound_week_pct,positive_weeks_pct,worst_week_pct,max_drawdown_pct,final_balance,total_return_pct
+Nasdaq-100,plain | stop beyond breakout candle | target 1R,241,4.6346,55.6017,53.9419,45.6432,50.2075,44.3983,5.3942,0.0640,15.4190,103.5776,0.2919,0.2746,55.7692,-3.7183,7.6560,11532.7993,15.3280
+Nasdaq-100,plain | stop beyond breakout candle | target 2R,241,4.6346,55.6017,42.7386,56.4315,23.6515,53.5270,22.8216,0.0731,17.6093,103.5776,0.3413,0.3010,51.9231,-4.2263,12.9388,11691.3859,16.9139
+Nasdaq-100,plain | stop at other side of range | target 1R,241,4.6346,55.6017,50.2075,46.4730,31.5353,31.1203,37.3444,0.0197,4.7422,185.7493,0.0906,0.0751,55.7692,-3.0936,10.4157,10398.1425,3.9814
+Nasdaq-100,plain | stop at other side of range | target 2R,241,4.6346,55.6017,46.0581,50.6224,7.0539,33.6100,59.3361,-0.0073,-1.7580,185.7493,-0.0304,-0.0541,44.2308,-4.2119,14.2359,9722.3667,-2.7763
+Nasdaq-100,narrow range + breakout by 10:30 | stop beyond breakout candle | target 1R,142,2.7308,55.6338,54.2254,45.0704,50.0000,44.3662,5.6338,0.0657,9.3229,104.2257,0.1744,0.1663,48.0769,-1.9998,7.6748,10902.7385,9.0274
+Nasdaq-100,narrow range + breakout by 10:30 | stop beyond breakout candle | target 2R,142,2.7308,55.6338,42.9577,55.6338,23.9437,52.8169,23.2394,0.0787,11.1820,104.2257,0.2118,0.1930,46.1538,-2.9701,12.8067,11054.3672,10.5437
+Nasdaq-100,narrow range + breakout by 10:30 | stop at other side of range | target 1R,142,2.7308,55.6338,51.4085,45.0704,37.3239,38.0282,24.6479,0.0185,2.6266,162.2040,0.0479,0.0395,48.0769,-2.9417,10.2861,10207.3694,2.0737
+Nasdaq-100,narrow range + breakout by 10:30 | stop at other side of range | target 2R,142,2.7308,55.6338,45.0704,51.4085,9.8592,42.2535,47.8873,-0.0159,-2.2615,162.2040,-0.0439,-0.0582,48.0769,-3.2443,14.0502,9701.5839,-2.9842
